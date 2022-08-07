@@ -1,0 +1,133 @@
+/* ----------------------------------------------------------------- GLOBAL ---- */
+/* Theme color*/
+/* Buttons*/
+.ant-btn-primary{
+    background: #ff6783 !important;
+    border-color: #ff6783 !important;
+}
+
+/* link*/
+a:active, .link, .link-active{
+    color: #ff6783 !important;
+}
+/* link hovering, active*/
+ a:hover{
+    color: #9d122d !important;
+}
+
+a{
+    color: #494949;
+}
+
+
+
+/* Header styling START*/
+.header{
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(16, 16, 17, 0.2) 0px 1px 2px, rgba(16, 16, 17, 0.1) 0px 3.4px 8px, rgba(16, 16, 17, 0) 0px 12px 30px;
+    padding-left: 100px;
+    padding-right: 100px;
+
+    height: 70px;
+
+    z-index: 100;
+    position: relative;
+
+}
+
+.logo{
+    margin: 10px;
+}
+
+/* ant menu*/
+.ant-menu{
+    background-color: rgba(255,255,255,0) !important;
+}
+.ant-menu-horizontal{
+    border-bottom: 0px;
+}
+.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu:hover, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-active, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-open, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-open, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-selected{
+    color: #ff6783;
+}
+.ant-menu-horizontal > .ant-menu-item-selected a {
+    color: #ff6783;
+}
+
+.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu:hover::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-active::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-open::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-open::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-selected::after{
+    border-bottom: 0px;
+}
+.ant-menu-light .ant-menu-item:hover, .ant-menu-light .ant-menu-item-active, .ant-menu-light .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open, .ant-menu-light .ant-menu-submenu-active, .ant-menu-light .ant-menu-submenu-title:hover {
+    color: inherit;
+}
+.ant-menu{
+    color: #494949;
+    font-weight: 600;
+}
+/*  right menu item align reight*/
+.right-menu{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+/* Header styling END*/
+
+
+/* Footer styling START*/
+.footer{
+    background-color: rgb(183, 183, 183);
+    padding-left: 100px;
+    padding-right: 100px;
+
+    width: 100%;
+    height: 50px;
+
+    position: absolute;
+    bottom: 0;
+}
+
+.footer > .ant-col-24{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    color: rgb(255,255,255);
+}
+/* Footer styling END*/
+/* ----------------------------------------------------------------- GLOBAL ---- */
+
+
+/* ----------------------------------------------------------------- LOGIN/SIGNUP ---- */
+.login-page{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+}
+
+.login-page-left{
+    background-color: #fff4f6;
+    z-index: 1;
+}
+
+.login-page-right{
+    background: url("assets/login-bg.svg");
+    z-index: 1;
+}
+
+#login-form{
+    background-color: #ffffff;
+    width: 50%;
+    border-radius: 20px;
+    box-shadow: rgba(16, 16, 17, 0.18) -2px -2px 17px 8px;
+    padding: 60px;
+}
+/* ----------------------------------------------------------------- LOGIN/SIGNUP ---- */
+
+
+
+
+
+
