@@ -38,15 +38,21 @@ function App() {
                 </Menu>
             </Col>
             <Col span={10} className="right-menu">
+                {/*TODO: hide this when user is not login
+                         then put username and avatar*/}
                 <Avatar style={{ backgroundColor: '#ff6783', verticalAlign: 'middle'}} size="default">
                     Peter
                 </Avatar>
                 <span style={{marginLeft: '10px', color: '#494949'}}>Peter Liu</span>
+
+                {/*TODO: hide this when user is login*/}
                 <NavLink to="login">
                     <Button style={{marginLeft: '20px'}} type="primary" shape="" icon={<LoginOutlined />} size={'default'}>
                         Login
                     </Button>
                 </NavLink>
+
+                {/*TODO: hide this when user is not login*/}
                 <Button style={{marginLeft: '20px'}} type="primary" shape="" icon={<LogoutOutlined />} size={'default'}>
                     Logout
                 </Button>

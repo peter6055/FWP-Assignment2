@@ -7,7 +7,7 @@ import Logo from '../assets/logo.svg'
 import React from 'react';
 import {Link} from "react-router-dom";
 
-
+// TODO: redirect when user are logged
 const Login = () =>
     <Row style={{height: 'calc(100vh - 120px)'}}>
         <Col className={"login-page login-page-left"} span={12} style={{}}>
@@ -36,7 +36,9 @@ const Login = () =>
                 <br />
                 <br />
 
+                {/*TODO: add an validation and sign in action once the btn click*/}
                 <Button type="primary" size={"default"}>Login</Button>
+
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;or
                     <Link className={"link"} to="/signup" state={"From Contact Page"}>&nbsp;Sign up</Link>
                 </span>
