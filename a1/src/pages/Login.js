@@ -11,8 +11,8 @@ import {Link} from "react-router-dom";
 const Login = () =>
     <Row style={{height: 'calc(100vh - 120px)'}}>
         <Col className={"login-page login-page-left"} span={12} style={{}}>
-            <img src={Logo} width={300} style={{paddingBottom: "20px"}}></img>
-            <img src={AccountPageBg} width={400}></img>
+            <img src={Logo} width={300} style={{paddingBottom: "20px"}} alt="Logo"></img>
+            <img src={AccountPageBg} width={400} alt="AccountPageBg"></img>
         </Col>
         <Col className={"login-page login-page-right"} span={12} style={{}}>
             <form id={"login-form"}>

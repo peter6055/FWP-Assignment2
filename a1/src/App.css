@@ -126,6 +126,19 @@ a{
 }
 /* ----------------------------------------------------------------- LOGIN/SIGNUP ---- */
 
+/* ----------------------------------------------------------------- Landing ---- */
+.Landing-background{
+    background-color: wheat;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.Landing-text-padding{
+    padding-right: 80px;
+}
+/* ----------------------------------------------------------------- Landing ---- */
 
 
 
