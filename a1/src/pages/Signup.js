@@ -9,7 +9,7 @@ import {Link} from "react-router-dom";
 
 // TODO: spec pa.a redirect when user are logged
 const Signup = () => {
-    return (<Row style={{height: 'calc(100vh - 120px)'}}>
+    return (<Row className={"safeArea"} style={{height: 'calc(100vh - 50px)'}}>
         <Col className={"login-page login-page-left"} span={12} style={{}}>
             <img src={Logo} width={300} style={{paddingBottom: "20px"}} alt={"Logo"}></img>
             <img src={AccountPageBg} width={400} alt={"Background"}></img>

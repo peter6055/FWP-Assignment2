@@ -5,7 +5,7 @@ import {Col, Row, Button} from 'antd';
 import chatLogo from '../assets/speak.png'
 
 const Home = () => {
-    return (<Row style={{height: 'calc(100vh - 120px)'}}>
+    return (<Row className={"safeArea"} style={{height: '100vh'}}>
             <Col span={12} className={"Landing-background"}>
                 <img src={chatLogo} width={400} alt={"logo"}></img>
             </Col>
