@@ -22,11 +22,12 @@ function initUsers() {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
-function createUsers(username, password) {
+function createUsers(username, password, email) {
   const user = 
     {
       username: username,
-      password: password
+      password: password,
+      email: email
     };
   const users=getUsers();
   users.push(user);

@@ -1,5 +1,5 @@
-import {Col, Row, Input, Space, Button} from 'antd';
-import {UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone, MailOutlined} from '@ant-design/icons';
+import { Col, Row, Input, Space, Button} from 'antd';
+import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone, MailOutlined } from '@ant-design/icons';
 
 import AccountPageBg from "../assets/account-page-bg.svg";
 import Logo from '../assets/logo.svg'
@@ -9,14 +9,31 @@ import React, { useState } from "react";
 import {Link} from "react-router-dom";
 import { createUsers } from "../data/repository";
 
+
+
 const Signup = () =>{
-  const [fields, setFields] = useState({ username: "", password: "" });
-  //const [errorMessage, setErrorMessage] = useState(null);
+const navigate = useNavigate();
+  const [fields, setFields] = useState({ username: "", password: "", email: "" });
+  const [errorMessage, setErrorMessage] = useState(null);
   //const navigate = useNavigate();
   const handleSubmit = (event) => {
+    console.log(fields)
     event.preventDefault();
-    createUsers(fields.username,fields.password);
-
+    if(!fields.username){
+        setErrorMessage("User name can not be empty");
+    }else if(!fields.email){
+        setErrorMessage("Email address can not be empty");
+    }else if(!/\S+@\S+\.\S+/.test(fields.email)){
+        setErrorMessage("Email address should be valid");
+    }else if(fields.password.length < 8){
+        setErrorMessage("Password length can not less than 8");
+    }else if(!/[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/.test(fields.password) || !/[A-Z]/.test(fields.password) || !/[0-9]/.test(fields.password) || !/[a-z]/.test(fields.password)){
+        setErrorMessage("Password should be strong");
+    }else{
+    createUsers(fields.username,fields.password, fields.email);
+    navigate("/Profile");
+    alert("Signup success")
+    }
     // Set error message.
     //setErrorMessage("Username and / or password invalid, please try again.");
   }
@@ -25,13 +42,13 @@ const Signup = () =>{
     const name = event.target.name;
     const value = event.target.value;
     // Copy fields.
-    const temp = { username: fields.username, password: fields.password };
+    const temp = { username: fields.username, password: fields.password, email: fields.email};
     // Update field and state.
     temp[name] = value;
     setFields(temp);
   }
   return(
-    <Row className={"safeArea"} style={{height: 'calc(100vh - 50px)'}}>
+    <Row style={{height: 'calc(100vh - 120px)'}}>
         <Col className={"login-page login-page-left"} span={12} style={{}}>
             <img src={Logo} width={300} style={{paddingBottom: "20px"}} alt="Logo"></img>
             <img src={AccountPageBg} width={400} alt="AccountPageBg"></img>
@@ -41,16 +58,14 @@ const Signup = () =>{
                 <h1><strong>Sign up to LAN</strong></h1>
 
                 <p>Username</p>
-
                 <Input size="large" name="username" onChange={handleInputChange} placeholder="Input username" prefix={<UserOutlined />} />
                 <br />
                 <br />
 
-
                 <p>Email</p>
-                <Input size="large" placeholder="Input email" prefix={<MailOutlined/>}/>
-                <br/>
-                <br/>
+                <Input size="large" placeholder="Input email" name="email"onChange={handleInputChange}prefix={<MailOutlined />} />
+                <br />
+                <br />
 
                 <p>Password</p>
                 <Space direction="vertical" style={{width: "100%"}}>
@@ -59,23 +74,20 @@ const Signup = () =>{
                         onChange={handleInputChange}
                         size="large"
                         placeholder="Input password"
-                        iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
-                        prefix={<LockOutlined/>}
+                        iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                        prefix={<LockOutlined />}
                     />
                 </Space>
-                <br/>
-                <br/>
-                <br/>
-
-
+                <br />
+                <br />
+                {errorMessage !== null && <p>{errorMessage}</p>}
+                <br />
                 <Button type="primary" size={"default"}onClick={handleSubmit}>Sign up</Button>
-
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;or
                     <Link className={"link"} to="/login" state={"From Contact Page"}>&nbsp;Login</Link>
                 </span>
             </form>
         </Col>
-
     </Row>);
 }
 
