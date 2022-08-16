@@ -11,7 +11,7 @@ import Profile from './pages/Profile.js';
 import {Avatar, Button, Col, Menu, Row} from "antd";
 import Logo from "./assets/logo.svg";
 import {HomeOutlined, LoginOutlined, LogoutOutlined, PicRightOutlined, UserOutlined} from "@ant-design/icons";
-import {BrowserRouter, NavLink, Routes, Route, Link} from 'react-router-dom';
+import {BrowserRouter, NavLink, Routes, Route} from 'react-router-dom';
 
 let activeClassName = "link-active";
 
@@ -22,7 +22,10 @@ function App() {
         <BrowserRouter>
         <Row className="header">
             <Col span={6}>
-                <img className="logo" src={Logo} width={150} alt={"Logo"}></img>
+
+                <img className="logo" src={Logo} width={150} alt="logo"></img>
+
+
             </Col>
 
             <Col span={10} style={{marginTop: "10px"}}>
