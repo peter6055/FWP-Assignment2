@@ -1,4 +1,4 @@
-import { Col, Row, Input, Space, Button} from 'antd';
+import { message, Col, Row, Input, Space, Button} from 'antd';
 import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone, MailOutlined } from '@ant-design/icons';
 
 import AccountPageBg from "../assets/account-page-bg.svg";
@@ -7,7 +7,7 @@ import Logo from '../assets/logo.svg'
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import {Link} from "react-router-dom";
-import { createUsers } from "../data/repository";
+import { createUsers, uniqueName } from "../data/repository";
 
 
 
@@ -21,6 +21,8 @@ const navigate = useNavigate();
     event.preventDefault();
     if(!fields.username){
         setErrorMessage("User name can not be empty");
+    }else if(!uniqueName(fields.email)){
+        setErrorMessage("Someone is using this name");
     }else if(!fields.email){
         setErrorMessage("Email address can not be empty");
     }else if(!/\S+@\S+\.\S+/.test(fields.email)){
@@ -32,7 +34,12 @@ const navigate = useNavigate();
     }else{
     createUsers(fields.username,fields.password, fields.email);
     navigate("/Profile");
-    alert("Signup success")
+    message.success({
+        content: 'Sign up successful',
+        style: {
+            marginTop: '80px',
+        },
+    });
     }
     // Set error message.
     //setErrorMessage("Username and / or password invalid, please try again.");

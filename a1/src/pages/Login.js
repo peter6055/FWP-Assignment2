@@ -1,4 +1,4 @@
-import { Col, Row, Input, Space, Button} from 'antd';
+import { message, Col, Row, Input, Space, Button} from 'antd';
 import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 import AccountPageBg from "../assets/account-page-bg.svg";
@@ -23,8 +23,13 @@ const Login = (props) =>{
       props.loginUser(fields.username);
       // Navigate to the home page.
       navigate("/profile");
-      alert("Login success")
-      return;
+      message.success({
+        content: 'Login successful',
+        style: {
+            marginTop: '80px',
+        },
+    });      
+    return;
     }
 
     // Reset password field to blank.

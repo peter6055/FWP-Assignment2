@@ -6,12 +6,13 @@ import {Link, useNavigate} from 'react-router-dom';
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
+import { getJoinDate } from "../data/repository";
 
 
 const {Text, Paragraph, Title} = Typography;
 
 
-const Profile = () => {
+const Profile = (props) => {
     const navigate = useNavigate();
 
     // TODO: spec cr.delete user: after clicking delete
@@ -107,7 +108,7 @@ const Profile = () => {
                             peter@shopmy.com.au
                         </Paragraph>
 
-                        <Text type="secondary">Join Thu 28 Jul 2022</Text>
+                        <Text type="secondary">{getJoinDate(props.username)}</Text>
                         <br/>
                         <br/>
 
