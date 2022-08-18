@@ -11,13 +11,12 @@ import { createUsers, uniqueName } from "../data/repository";
 
 
 
-const Signup = () =>{
+const Signup = (props) =>{
 const navigate = useNavigate();
   const [fields, setFields] = useState({ username: "", password: "", email: "" });
   const [errorMessage, setErrorMessage] = useState(null);
   //const navigate = useNavigate();
   const handleSubmit = (event) => {
-    console.log(fields)
     event.preventDefault();
     if(!fields.username){
         setErrorMessage("User name can not be empty");
@@ -33,6 +32,8 @@ const navigate = useNavigate();
         setErrorMessage("Password should be strong");
     }else{
     createUsers(fields.username,fields.password, fields.email);
+    localStorage.setItem("user", JSON.stringify(fields.username));
+    props.loginUser(fields.username);
     navigate("/Profile");
     message.success({
         content: 'Sign up successful',

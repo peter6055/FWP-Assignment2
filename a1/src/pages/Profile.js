@@ -5,25 +5,21 @@ import {Link, useNavigate} from 'react-router-dom';
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
-import { changeEmail,changeName, getEmail, getJoinDate} from "../data/repository";
-
+import { changeEmail,changeName, getEmail, getJoinDate,deleteAccount} from "../data/repository";
 
 const {Text, Paragraph, Title} = Typography;
-
-function onChangeNameEdit(){
-    console.log("test");
-}
 
 
 const Profile = (props) => {
     const navigate = useNavigate();
     const [Email, setEmail] = useState(getEmail(props.username));
-    //setEmail(email)
+    const [Name, setName]=useState(props.username);
     const date=getJoinDate(props.username);
     // TODO: spec cr.delete user: after clicking delete
     const confirmSelected = () => {
         // TODO: delete account & post, clear session
-
+        deleteAccount(props.username);
+        props.username=null;
         navigate("/");
 
         message.success({
@@ -33,17 +29,17 @@ const Profile = (props) => {
             },
         });
     };
-    const handleEmailChange = (event) => {
-        const value = event.target.value;
-        setEmail(value);
-    }
 
-
-    const handleNameChange = (event) => {
-        console.log(event);
+    const handleNameChange = (event) =>{
         changeName(props.username, event);
+        console.log(event);
+        localStorage.setItem("user", JSON.parse(event));
+        setName(event);
     }
-
+    const handleEmailChange = (event) =>{
+        changeEmail(props.username, event);
+        setEmail(event);
+    }
 
     // TODO: spec hd.1: on click handle hook
     const actions = [
@@ -98,33 +94,28 @@ const Profile = (props) => {
 
                         {/* TODO: spec pa.d: hide editable, delete account btn + list users' post in this page*/}
                         {/* TODO: spec cr.edit user info: store to localstorage onchange*/}
-                        <div id="changeName">
-                            <Typography.Title
-                                editable={{
-                                    onChange: handleNameChange
-                                }}
-                                level={3}
-                                style={{
-                                    marginTop: "20px",
-                                    marginLeft: "2px",
-                                    marginBottom: "5px"
-
-                                }}
-                            >
-                                {props.username}
-                            </Typography.Title>
-                        </div>
-
+                        <Typography.Title
+                            editable={{
+                                onChange:handleNameChange,
+                            }}
+                            level={3}
+                            style={{
+                                marginTop: "20px",
+                                marginLeft: "2px",
+                                marginBottom: "5px"
+                            }}
+                        >
+                            {Name}
+                        </Typography.Title>
 
                         <Paragraph
-                            id="changeEmail"
                             editable={{
+                                onChange:handleEmailChange,
                                 tooltip: 'click to edit text',
                             }}
                             style={{
                                 marginLeft: "2px",
                                 marginBottom: "30px"
-
                             }}
                         >
                             {Email}
@@ -157,7 +148,7 @@ const Profile = (props) => {
                     </Card>
                 </div>
             </Col>
-            <Col span={17} style={{}}>
+            <Col span={11} style={{}}>
                 <div className={"postContainer"}>
                     <CommentElement></CommentElement>
                     <CommentElement></CommentElement>
@@ -166,91 +157,90 @@ const Profile = (props) => {
                     <CommentElement></CommentElement>
                 </div>
             </Col>
-            {/*<Col span={6} style={{}}>*/}
-            {/*    <div className={"infoContainer"}>*/}
-            {/*        <Alert*/}
-            {/*            message={*/}
-            {/*                <Title level={4}>Getting Start</Title>*/}
+            <Col span={6} style={{}}>
+                <div className={"infoContainer"}>
+                    <Alert
+                        message={
+                            <Title level={4}>Getting Start</Title>
 
-            {/*            }*/}
-            {/*            description={*/}
-            {/*                <div>*/}
-            {/*                    <li>Take a post</li>*/}
-            {/*                    <li>Discover your friend</li>*/}
-            {/*                    <li>Manage profile</li>*/}
-            {/*                    <li>Connect with friends</li>*/}
+                        }
+                        description={
+                            <div>
+                                <li>Take a post</li>
+                                <li>Discover your friend</li>
+                                <li>Manage profile</li>
+                                <li>Connect with friends</li>
 
-            {/*                </div>*/}
-            {/*            }*/}
-            {/*            type="warning"*/}
-            {/*        />*/}
-            {/*        <Card style={{ width: "100%", marginTop: "20px" }}>*/}
-            {/*            <Title level={4}>Discover</Title>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*        </Card>*/}
-            {/*    </div>*/}
-            {/*</Col>*/}
-        </Row>
-    );
+                            </div>
+                        }
+                        type="warning"
+                    />
+                    <Card style={{ width: "100%", marginTop: "20px" }}>
+                        <Title level={4}>Discover</Title>
+                        <div className={"discoverFriendContainer"}>
+                            <Avatar size={50} icon={<UserOutlined />} />
+                            <div className={"discoverFriendProfile"}>
+                                <span><strong>Name Smith</strong></span>
+                                <span>name@loopagile.com</span>
+                            </div>
+                            <div className={"discoverFriendBtn"}>
+                                View
+                            </div>
+                        </div>
+                        <div className={"discoverFriendContainer"}>
+                            <Avatar size={50} icon={<UserOutlined />} />
+                            <div className={"discoverFriendProfile"}>
+                                <span><strong>Name Smith</strong></span>
+                                <span>name@loopagile.com</span>
+                            </div>
+                            <div className={"discoverFriendBtn"}>
+                                View
+                            </div>
+                        </div>
+                        <div className={"discoverFriendContainer"}>
+                            <Avatar size={50} icon={<UserOutlined />} />
+                            <div className={"discoverFriendProfile"}>
+                                <span><strong>Name Smith</strong></span>
+                                <span>name@loopagile.com</span>
+                            </div>
+                            <div className={"discoverFriendBtn"}>
+                                View
+                            </div>
+                        </div>
+                        <div className={"discoverFriendContainer"}>
+                            <Avatar size={50} icon={<UserOutlined />} />
+                            <div className={"discoverFriendProfile"}>
+                                <span><strong>Name Smith</strong></span>
+                                <span>name@loopagile.com</span>
+                            </div>
+                            <div className={"discoverFriendBtn"}>
+                                View
+                            </div>
+                        </div>
+                        <div className={"discoverFriendContainer"}>
+                            <Avatar size={50} icon={<UserOutlined />} />
+                            <div className={"discoverFriendProfile"}>
+                                <span><strong>Name Smith</strong></span>
+                                <span>name@loopagile.com</span>
+                            </div>
+                            <div className={"discoverFriendBtn"}>
+                                View
+                            </div>
+                        </div>
+                        <div className={"discoverFriendContainer"}>
+                            <Avatar size={50} icon={<UserOutlined />} />
+                            <div className={"discoverFriendProfile"}>
+                                <span><strong>Name Smith</strong></span>
+                                <span>name@loopagile.com</span>
+                            </div>
+                            <div className={"discoverFriendBtn"}>
+                                View
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            </Col>
+        </Row>);
 
 }
 
