@@ -12,7 +12,7 @@ import {Avatar, Button, Col, Menu, Row} from "antd";
 import Logo from "./assets/logo.svg";
 import {HomeOutlined, LoginOutlined, LogoutOutlined, PicRightOutlined, UserOutlined} from "@ant-design/icons";
 import {BrowserRouter, NavLink, Routes, Route} from 'react-router-dom';
-import { getUser, removeUser } from "./data/repository";
+import { getUser, removeUser} from "./data/repository";
 
 let activeClassName = "link-active";
 

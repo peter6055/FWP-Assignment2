@@ -21,7 +21,7 @@ const navigate = useNavigate();
     event.preventDefault();
     if(!fields.username){
         setErrorMessage("User name can not be empty");
-    }else if(!uniqueName(fields.email)){
+    }else if(!uniqueName(fields.username)){
         setErrorMessage("Someone is using this name");
     }else if(!fields.email){
         setErrorMessage("Email address can not be empty");

@@ -1,12 +1,11 @@
-import React from 'react';
-
+import React, { useState } from "react";
 import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Alert} from "antd";
 import {UserOutlined, QuestionCircleOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import {Link, useNavigate} from 'react-router-dom';
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
-import { getJoinDate } from "../data/repository";
+import { changeEmail,changeName, getEmail, getJoinDate} from "../data/repository";
 
 
 const {Text, Paragraph, Title} = Typography;
@@ -14,10 +13,13 @@ const {Text, Paragraph, Title} = Typography;
 
 const Profile = (props) => {
     const navigate = useNavigate();
-
+    const [Email, setEmail] = useState(getEmail(props.username));
+    //setEmail(email)
+    const date=getJoinDate(props.username);
     // TODO: spec cr.delete user: after clicking delete
     const confirmSelected = () => {
         // TODO: delete account & post, clear session
+
         navigate("/");
 
         message.success({
@@ -27,6 +29,10 @@ const Profile = (props) => {
             },
         });
     };
+    const handleEmailChange = (event) => {
+        const value = event.target.value;
+        setEmail(value);
+      }
 
     // TODO: spec hd.1: on click handle hook
     const actions = [
@@ -82,7 +88,10 @@ const Profile = (props) => {
                         {/* TODO: spec pa.d: hide editable, delete account btn + list users' post in this page*/}
                         {/* TODO: spec cr.edit user info: store to localstorage onchange*/}
                         <Typography.Title
-                            editable
+                            id="changeName"
+                            editable={{
+                                onEnd:changeName(props.username, document.getElementById('changeName')),
+                            }}
                             level={3}
                             style={{
                                 marginTop: "20px",
@@ -91,11 +100,14 @@ const Profile = (props) => {
 
                             }}
                         >
-                            Peter Liu
+                            {props.username}
                         </Typography.Title>
 
                         <Paragraph
+                            id="changeEmail"
                             editable={{
+                                onEnd:changeEmail(props.username, Email),
+                                onChange:handleEmailChange,
                                 tooltip: 'click to edit text',
                             }}
                             style={{
@@ -103,12 +115,11 @@ const Profile = (props) => {
                                 marginBottom: "30px"
 
                             }}
-
                         >
-                            peter@shopmy.com.au
+                            {Email}
                         </Paragraph>
 
-                        <Text type="secondary">{getJoinDate(props.username)}</Text>
+                        <Text type="secondary">{date}</Text>
                         <br/>
                         <br/>
 
