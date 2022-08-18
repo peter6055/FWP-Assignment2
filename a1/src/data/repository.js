@@ -138,6 +138,7 @@ function changeEmail(username, newEmail){
         localStorage.setItem(USERS_KEY, JSON.stringify(users));
       }
     }
+    return true
   }else{
     alert("Please input a valid email address "+newEmail)
   }

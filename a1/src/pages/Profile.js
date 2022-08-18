@@ -43,8 +43,9 @@ const Profile = (props) => {
         }
     }
     const handleEmailChange = (event) =>{
-        changeEmail(props.username, event);
-        setEmail(event);
+        if (changeEmail(props.username, event)){
+            setEmail(event);
+        }
     }
 
     // TODO: spec hd.1: on click handle hook
