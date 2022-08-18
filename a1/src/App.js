@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from "react";
 import 'antd/dist/antd.css';
 import './App.css';
 
@@ -12,20 +12,28 @@ import {Avatar, Button, Col, Menu, Row} from "antd";
 import Logo from "./assets/logo.svg";
 import {HomeOutlined, LoginOutlined, LogoutOutlined, PicRightOutlined, UserOutlined} from "@ant-design/icons";
 import {BrowserRouter, NavLink, Routes, Route} from 'react-router-dom';
+import { getUser, removeUser} from "./data/repository";
 
 let activeClassName = "link-active";
 
 
 function App() {
+  const [username, setUsername] = useState(getUser());
+
+  const loginUser = (username) => {
+    setUsername(username);
+  }
+
+  const logoutUser = () => {
+    removeUser();
+    setUsername(null);
+  }
   return (
     <div className="App">
         <BrowserRouter>
         <Row className="header">
             <Col span={6}>
-
-                <img className="logo" src={Logo} width={150} alt="logo"></img>
-
-
+                <img className="logo" src={Logo} width={150} alt={"Logo"}></img>
             </Col>
 
             <Col span={10} style={{marginTop: "10px"}}>
@@ -45,34 +53,48 @@ function App() {
                 </Menu>
             </Col>
             <Col span={8} className="right-menu">
-                {/*TODO: hide this when user is not login
+                {/* hide this when user is not login
                          then put username and avatar*/}
+                {
+                    username ?
+                <>
                 <Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" className={"postAvatar"} size="default">
-                    Peter
-                </Avatar>
-                <span style={{marginLeft: '10px', color: '#494949'}}>Peter Liu</span>
-
-                {/*TODO: hide this when user is login*/}
+                    Petser</Avatar>
+                <span style={{ marginLeft: '10px', color: '#494949' }}>{username}</span></>
+                :
+                <></>
+                }
+                {
+                    !username ?
                 <NavLink to="login">
                     <Button style={{marginLeft: '20px'}} type="primary" shape="" icon={<LoginOutlined />} size={'default'}>
                         Login
                     </Button>
                 </NavLink>
+                :
+                <></>
+                }
 
-                {/*TODO: hide this when user is not login*/}
-                <Button style={{marginLeft: '20px'}} type="primary" shape="" icon={<LogoutOutlined />} size={'default'}>
-                    Logout
-                </Button>
+                {
+                    username ?
+                <NavLink to="login" logoutUser={logoutUser}>
+                    <Button onClick={logoutUser} style={{marginLeft: '20px'}} type="primary" shape="" icon={<LogoutOutlined />} size={'default'}>
+                        Logout
+                    </Button>
+                </NavLink>
+                :
+                <></>
+                }
             </Col>
         </Row>
 
 
         <Routes>
-            <Route path="/" element={<Home/>} />
-            <Route path="post" element={<Post/>} />
-            <Route path="login" element={<Login/>} />
-            <Route path="signup" element={<Signup/>} />
-            <Route path="profile" element={<Profile/>} />
+            <Route path="/" element={<Home username={username}/>} />
+            <Route path="post" element={<Post username={username}/>} />
+            <Route path="login" element={<Login loginUser={loginUser}/>} />
+            <Route path="signup" element={<Signup username={username}/>} />
+            <Route path="profile" element={<Profile username={username}/>} />
 
         </Routes>
 

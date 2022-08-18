@@ -1,5 +1,5 @@
-import {Col, Row, Input, Space, Button} from 'antd';
-import {UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone} from '@ant-design/icons';
+import { message, Col, Row, Input, Space, Button} from 'antd';
+import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 import AccountPageBg from "../assets/account-page-bg.svg";
 import Logo from '../assets/logo.svg'
@@ -19,11 +19,17 @@ const Login = (props) =>{
     const verified = verifyUser(fields.username, fields.password);
     // If verified login the user.
     if(verified === true) {
-      //props.loginUser(fields.username);
-
+      localStorage.setItem("user", JSON.stringify(fields.username));
+      props.loginUser(fields.username);
       // Navigate to the home page.
-      navigate("/loop");
-      return;
+      navigate("/profile");
+      message.success({
+        content: 'Login successful',
+        style: {
+            marginTop: '80px',
+        },
+    });      
+    return;
     }
 
     // Reset password field to blank.
@@ -46,10 +52,10 @@ const Login = (props) =>{
   }
 
   return(
-    <Row className={"safeArea"} style={{height: 'calc(100vh - 50px)'}}>
+    <Row style={{height: 'calc(100vh - 120px)'}}>
         <Col className={"login-page login-page-left"} span={12} style={{}}>
-            <img src={Logo} width={300} style={{paddingBottom: "20px"}} alt={"Logo"}></img>
-            <img src={AccountPageBg} width={400} alt={"background"}></img>
+            <img src={Logo} width={300} style={{paddingBottom: "20px"}} alt="Logo"></img>
+            <img src={AccountPageBg} width={400} alt="AccountPageBg"></img>
         </Col>
         <Col className={"login-page login-page-right"} span={12} style={{}}>
             <form id={"login-form"}>
@@ -60,7 +66,6 @@ const Login = (props) =>{
                 <br />
                 <br />
 
-
                 <p>Password</p>
                 <Space direction="vertical" style={{width: "100%"}}>
                     <Input.Password
@@ -68,18 +73,16 @@ const Login = (props) =>{
                         size="large"
                         onChange={handleInputChange}
                         placeholder="Input password"
-                        iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
-                        prefix={<LockOutlined/>}
+                        iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                        prefix={<LockOutlined />}
                     />
                 </Space>
-
                 {errorMessage !== null && <p>{errorMessage}</p>}
                 <br />
                 <br />
                 <br />
-
+                {/*add an validation and sign in action once the btn click*/}
                 <Button type="primary" size={"default"} onClick={handleSubmit}>Login</Button>
-
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;or
                     <Link className={"link"} to="/signup" state={"From Contact Page"}>&nbsp;Sign up</Link>
                 </span>
