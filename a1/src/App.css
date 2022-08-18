@@ -173,7 +173,7 @@ a{
 /* ----------------------------------------------------------------- Profile ---- */
 .profilePage{
     background: #f9f9f5;
-    padding: 30px 70px 0px 70px;
+    padding: 30px 200px 0px 200px;
 }
 
 
@@ -181,7 +181,7 @@ a{
     margin: 20px 0px 0px 0px;
 
     position: fixed;
-    width: 26%;
+    width: 22.5%;
 }
 
 .profileCard{
