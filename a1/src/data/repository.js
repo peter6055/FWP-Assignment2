@@ -112,7 +112,6 @@ function changeName(username, newUsername){
   const newUsers=[];
   const users = getUsers();
   if(uniqueName(newUsername)){
-    console.log(username)
     for(const user of users) {
       if(username === user.username)
       {
@@ -121,6 +120,9 @@ function changeName(username, newUsername){
       newUsers.push(user);
     }
     localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
+    const newName='"'+newUsername+'"';
+    localStorage.setItem("user", newName);
+    return true;
   }else{
     alert("Someone is using it")
   }

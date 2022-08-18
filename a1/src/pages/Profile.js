@@ -19,7 +19,8 @@ const Profile = (props) => {
     const confirmSelected = () => {
         // TODO: delete account & post, clear session
         deleteAccount(props.username);
-        props.username=null;
+        props.logoutUser();
+        //props.username=null;
         navigate("/");
 
         message.success({
@@ -31,10 +32,11 @@ const Profile = (props) => {
     };
 
     const handleNameChange = (event) =>{
-        changeName(props.username, event);
-        console.log(event);
-        localStorage.setItem("user", JSON.parse(event));
-        setName(event);
+        if (changeName(props.username, event)){
+            setName(event);
+            // refresh page to refresh props.userName
+            window.location.reload(false);
+        }
     }
     const handleEmailChange = (event) =>{
         changeEmail(props.username, event);
