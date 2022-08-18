@@ -106,7 +106,7 @@ const Profile = (props) => {
                         <Paragraph
                             id="changeEmail"
                             editable={{
-                                onEnd:changeEmail(props.username, Email),
+                                enEnd:changeEmail(props.username, this),
                                 onChange:handleEmailChange,
                                 tooltip: 'click to edit text',
                             }}

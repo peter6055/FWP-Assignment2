@@ -100,7 +100,8 @@ function setUser(username) {
 }
 
 function getUser() {
-  return localStorage.getItem(USER_KEY);
+  let data= localStorage.getItem(USER_KEY);
+  return JSON.parse(data)
 }
 
 function removeUser() {
