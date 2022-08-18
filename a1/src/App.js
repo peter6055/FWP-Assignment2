@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import 'antd/dist/antd.css';
 import './App.css';
 
@@ -12,102 +12,121 @@ import {Avatar, Button, Col, Menu, Row} from "antd";
 import Logo from "./assets/logo.svg";
 import {HomeOutlined, LoginOutlined, LogoutOutlined, PicRightOutlined, UserOutlined} from "@ant-design/icons";
 import {BrowserRouter, NavLink, Routes, Route} from 'react-router-dom';
-import { getUser, removeUser, initUsers} from "./data/repository";
+import {getUser, removeUser, initUsers} from "./data/repository";
 
 let activeClassName = "link-active";
 
 
 function App() {
-  initUsers();
-  const [username, setUsername] = useState(getUser());
+    initUsers();
+    const [username, setUsername] = useState(getUser());
 
-  const loginUser = (username) => {
-    setUsername(username);
-  }
+    const loginUser = (username) => {
+        setUsername(username);
+    }
 
-  const logoutUser = () => {
-    removeUser();
-    setUsername(null);
-  }
-  return (
-    <div className="App">
-        <BrowserRouter>
-        <Row className="header">
-            <Col span={6}>
-                <img className="logo" src={Logo} width={150} alt={"Logo"}></img>
-            </Col>
+    const logoutUser = () => {
+        removeUser();
+        setUsername(null);
+    }
+    return (
+        <div className="App">
+            <BrowserRouter>
+                <Row className="header">
+                    <Col span={6}>
+                        <img className="logo" src={Logo} width={150} alt={"Logo"}></img>
+                    </Col>
 
-            <Col span={10} style={{marginTop: "10px"}}>
-                <Menu mode="horizontal">
-                    <NavLink to="" className={({ isActive }) => isActive && activeClassName} >
-                        <Menu.Item icon={<HomeOutlined />}>Home</Menu.Item>
-                    </NavLink>
-                    <NavLink to="post" className={({ isActive }) => isActive && activeClassName}>
-                        <Menu.Item icon={<PicRightOutlined />}>Post</Menu.Item>
-                    </NavLink>
-                    <NavLink to="login" className={({ isActive }) => isActive && activeClassName}>
-                        <Menu.Item icon={<UserOutlined />}>Account</Menu.Item>
-                    </NavLink>
-                    <NavLink to="profile" className={({ isActive }) => isActive && activeClassName}>
-                        <Menu.Item icon={<UserOutlined />}>profile_test</Menu.Item>
-                    </NavLink>
-                </Menu>
-            </Col>
-            <Col span={8} className="right-menu">
-                {/* hide this when user is not login
+                    <Col span={10} style={{marginTop: "12px"}}>
+                        <Menu mode="horizontal">
+                            <NavLink to="" className={({isActive}) => isActive && activeClassName}>
+                                <Menu.Item icon={<HomeOutlined/>}>Home</Menu.Item>
+                            </NavLink>
+
+                            {
+                                username ?
+                                    <NavLink to="post" className={({isActive}) => isActive && activeClassName}>
+                                        <Menu.Item icon={<PicRightOutlined/>}>Post</Menu.Item>
+                                    </NavLink>
+                                    :
+                                    <></>
+                            }
+                            {/*<NavLink to="login" className={({ isActive }) => isActive && activeClassName}>*/}
+                            {/*    <Menu.Item icon={<UserOutlined />}>Account</Menu.Item>*/}
+                            {/*</NavLink>*/}
+
+                            {
+                                username ?
+                                    <NavLink to="profile" className={({isActive}) => isActive && activeClassName}>
+                                        <Menu.Item icon={<UserOutlined/>}>Profile</Menu.Item>
+                                    </NavLink>
+                                    :
+                                    <></>
+                            }
+                        </Menu>
+                    </Col>
+                    <Col span={8} className="right-menu">
+                        {/* hide this when user is not login
                          then put username and avatar*/}
-                {
-                    username ?
-                <>
-                <Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" className={"postAvatar"} size="default">
-                    Petser</Avatar>
-                <span style={{ marginLeft: '10px', color: '#494949' }}>{username}</span></>
-                :
-                <></>
-                }
-                {
-                    !username ?
-                <NavLink to="login">
-                    <Button style={{marginLeft: '20px'}} type="primary" shape="" icon={<LoginOutlined />} size={'default'}>
-                        Login
-                    </Button>
-                </NavLink>
-                :
-                <></>
-                }
+                        {
+                            username ?
+                                <>
+                                    <Avatar alt={username} className={"postAvatar"} size="default" style={{
+                                        backgroundColor: "#f56a00",
+                                        verticalAlign: 'middle',
+                                        fontSize: '17px'
+                                    }}>
+                                        {username.charAt(0).toUpperCase()}
+                                    </Avatar>
+                                    <span style={{marginLeft: '10px', color: '#494949'}}>{username}</span></>
+                                :
+                                <></>
+                        }
+                        {
+                            !username ?
+                                <NavLink to="login">
+                                    <Button style={{marginLeft: '20px'}} type="primary" shape="" icon={<LoginOutlined/>}
+                                            size={'default'}>
+                                        Login
+                                    </Button>
+                                </NavLink>
+                                :
+                                <></>
+                        }
 
-                {
-                    username ?
-                <NavLink to="login" logoutUser={logoutUser}>
-                    <Button onClick={logoutUser} style={{marginLeft: '20px'}} type="primary" shape="" icon={<LogoutOutlined />} size={'default'}>
-                        Logout
-                    </Button>
-                </NavLink>
-                :
-                <></>
-                }
-            </Col>
-        </Row>
+                        {
+                            username ?
+                                <NavLink to="login" logoutUser={logoutUser}>
+                                    <Button onClick={logoutUser} style={{marginLeft: '20px'}} type="primary" shape=""
+                                            icon={<LogoutOutlined/>} size={'default'}>
+                                        Logout
+                                    </Button>
+                                </NavLink>
+                                :
+                                <></>
+                        }
+                    </Col>
+                </Row>
 
 
-        <Routes>
-            <Route path="/" element={<Home username={username}/>} />
-            <Route path="post" element={<Post username={username}/>} />
-            <Route path="login" element={<Login loginUser={loginUser}/>} />
-            <Route path="signup" element={<Signup loginUser={loginUser}/>} />
-            <Route path="profile" element={<Profile username={username} logoutUser={logoutUser}/>} />
+                <Routes>
+                    <Route path="/" element={<Home username={username}/>}/>
+                    <Route path="post" element={<Post username={username}/>}/>
+                    <Route path="login" element={<Login loginUser={loginUser}/>}/>
+                    <Route path="signup" element={<Signup loginUser={loginUser}/>}/>
+                    <Route path="profile" element={<Profile username={username} logoutUser={logoutUser}/>}/>
 
-        </Routes>
+                </Routes>
 
-        <Row className="footer">
-            <Col span={24} style={{}}>
-                Loop Agile © 2022 Created by Frocen & Peter
-            </Col>
-        </Row>
-        </BrowserRouter>
+                <Row className="footer">
+                    <Col span={24} style={{}}>
+                        Loop Agile © 2022 Created by Frocen & Peter
+                    </Col>
+                </Row>
+            </BrowserRouter>
 
-    </div>
-  );
+        </div>
+    );
 }
 
 export default App;

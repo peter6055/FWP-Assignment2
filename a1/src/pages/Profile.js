@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Alert} from "antd";
 import {UserOutlined, QuestionCircleOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import {Link, useNavigate} from 'react-router-dom';
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
-import { changeEmail,changeName, getEmail, getJoinDate,deleteAccount} from "../data/repository";
+import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount} from "../data/repository";
 
 const {Text, Paragraph, Title} = Typography;
 
-function onChangeNameEdit(){
+function onChangeNameEdit() {
     console.log("test");
 }
 
@@ -17,9 +17,8 @@ function onChangeNameEdit(){
 const Profile = (props) => {
     const navigate = useNavigate();
     const [Email, setEmail] = useState(getEmail(props.username));
-    const [Name, setName]=useState(props.username);
-    const date=getJoinDate(props.username);
-    // TODO: spec cr.delete user: after clicking delete
+    const [Name, setName] = useState(props.username);
+    const date = getJoinDate(props.username);
     const confirmSelected = () => {
         // TODO: delete account & post, clear session
         deleteAccount(props.username);
@@ -35,15 +34,15 @@ const Profile = (props) => {
         });
     };
 
-    const handleNameChange = (event) =>{
-        if (changeName(props.username, event)){
+    const handleNameChange = (event) => {
+        if (changeName(props.username, event)) {
             setName(event);
             // refresh page to refresh props.userName
             window.location.reload(false);
         }
     }
-    const handleEmailChange = (event) =>{
-        if (changeEmail(props.username, event)){
+    const handleEmailChange = (event) => {
+        if (changeEmail(props.username, event)) {
             setEmail(event);
         }
     }
@@ -56,7 +55,7 @@ const Profile = (props) => {
 
 
     const CommentElement = () => (
-        <Card style={{ width: "100%" }}>
+        <Card style={{width: "100%"}}>
 
             <Comment
                 actions={actions}
@@ -71,9 +70,9 @@ const Profile = (props) => {
                             and efficiently.
                         </p>
                         <div className={"postImageGroup"}>
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300" />
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300" />
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300" />
+                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
 
                         </div>
                     </div>
@@ -89,22 +88,21 @@ const Profile = (props) => {
     );
 
 
-
-
     return (
-        <Row className={"profilePage safeArea"}>
-            <Col span={7}>
-                <div className={"profileContainer"}>
-                    <Card style={{ width: "100%" }}>
-                        <Avatar size={100} src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
-                                className={"postAvatar"}/>
+        <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
+            <Col span={5} style={{display: "flex", justifyContent: "flex-end"}}>
+                <div className={"profileContainer"} style={{maxWidth: "370px"}}>
+                    <Card style={{width: "100%"}}>
+                        <Avatar size={100} alt="Han Solo"
+                                className={"profilePageAvatar"}
+                                style={{backgroundColor: "#f56a00", verticalAlign: 'middle', fontSize: '70px'}}>
+                            {Name.charAt(0).toUpperCase()}
+                        </Avatar>
 
                         {/* TODO: spec pa.d: hide editable, delete account btn + list users' post in this page*/}
-                        {/* TODO: spec cr.edit user info: store to localstorage onchange*/}
-
                         <Typography.Title
                             editable={{
-                                onChange:handleNameChange,
+                                onChange: handleNameChange,
                             }}
                             level={3}
                             style={{
@@ -118,8 +116,7 @@ const Profile = (props) => {
 
                         <Paragraph
                             editable={{
-                                onChange:handleEmailChange,
-
+                                onChange: handleEmailChange,
                                 tooltip: 'click to edit text',
                             }}
                             style={{
@@ -157,7 +154,7 @@ const Profile = (props) => {
                     </Card>
                 </div>
             </Col>
-            <Col span={17} style={{}}>
+            <Col span={17} style={{maxWidth: "855px"}}>
                 <div className={"postContainer"}>
                     <CommentElement></CommentElement>
                     <CommentElement></CommentElement>
