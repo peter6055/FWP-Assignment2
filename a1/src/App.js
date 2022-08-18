@@ -94,8 +94,8 @@ function App() {
             <Route path="/" element={<Home username={username}/>} />
             <Route path="post" element={<Post username={username}/>} />
             <Route path="login" element={<Login loginUser={loginUser}/>} />
-            <Route path="signup" element={<Signup username={username}/>} />
-            <Route path="profile" element={<Profile username={username}/>} />
+            <Route path="signup" element={<Signup loginUser={loginUser}/>} />
+            <Route path="profile" element={<Profile username={username} logoutUser={logoutUser}/>} />
 
         </Routes>
 

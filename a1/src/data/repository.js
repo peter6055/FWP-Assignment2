@@ -109,14 +109,20 @@ function removeUser() {
 }
 
 function changeName(username, newUsername){
+  const newUsers=[];
+  const users = getUsers();
   if(uniqueName(newUsername)){
-    const users = getUsers();
     for(const user of users) {
       if(username === user.username)
       {
         user.username=newUsername;
       }
+      newUsers.push(user);
     }
+    localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
+    const newName='"'+newUsername+'"';
+    localStorage.setItem("user", newName);
+    return true;
   }else{
     alert("Someone is using it")
   }
@@ -129,11 +135,11 @@ function changeEmail(username, newEmail){
       if(username === user.username)
       {
         user.email=newEmail;
-        return true;      
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
       }
     }
   }else{
-    alert("Please input a valid email address"+newEmail)
+    alert("Please input a valid email address "+newEmail)
   }
 }
 
@@ -146,7 +152,8 @@ function deleteAccount(username){
         newUsers.push(user);
       }
     }
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
+    removeUser();
 }
 export {
   deleteAccount,

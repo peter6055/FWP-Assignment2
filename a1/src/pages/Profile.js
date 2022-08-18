@@ -5,8 +5,7 @@ import {Link, useNavigate} from 'react-router-dom';
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
-import { changeEmail,changeName, getEmail, getJoinDate} from "../data/repository";
-
+import { changeEmail,changeName, getEmail, getJoinDate,deleteAccount} from "../data/repository";
 
 const {Text, Paragraph, Title} = Typography;
 
@@ -18,12 +17,14 @@ function onChangeNameEdit(){
 const Profile = (props) => {
     const navigate = useNavigate();
     const [Email, setEmail] = useState(getEmail(props.username));
-    //setEmail(email)
+    const [Name, setName]=useState(props.username);
     const date=getJoinDate(props.username);
     // TODO: spec cr.delete user: after clicking delete
     const confirmSelected = () => {
         // TODO: delete account & post, clear session
-
+        deleteAccount(props.username);
+        props.logoutUser();
+        //props.username=null;
         navigate("/");
 
         message.success({
@@ -33,17 +34,18 @@ const Profile = (props) => {
             },
         });
     };
-    const handleEmailChange = (event) => {
-        const value = event.target.value;
-        setEmail(value);
+
+    const handleNameChange = (event) =>{
+        if (changeName(props.username, event)){
+            setName(event);
+            // refresh page to refresh props.userName
+            window.location.reload(false);
+        }
     }
-
-
-    const handleNameChange = (event) => {
-        console.log(event);
-        changeName(props.username, event);
+    const handleEmailChange = (event) =>{
+        changeEmail(props.username, event);
+        setEmail(event);
     }
-
 
     // TODO: spec hd.1: on click handle hook
     const actions = [
@@ -98,33 +100,30 @@ const Profile = (props) => {
 
                         {/* TODO: spec pa.d: hide editable, delete account btn + list users' post in this page*/}
                         {/* TODO: spec cr.edit user info: store to localstorage onchange*/}
-                        <div id="changeName">
-                            <Typography.Title
-                                editable={{
-                                    onChange: handleNameChange
-                                }}
-                                level={3}
-                                style={{
-                                    marginTop: "20px",
-                                    marginLeft: "2px",
-                                    marginBottom: "5px"
 
-                                }}
-                            >
-                                {props.username}
-                            </Typography.Title>
-                        </div>
-
+                        <Typography.Title
+                            editable={{
+                                onChange:handleNameChange,
+                            }}
+                            level={3}
+                            style={{
+                                marginTop: "20px",
+                                marginLeft: "2px",
+                                marginBottom: "5px"
+                            }}
+                        >
+                            {Name}
+                        </Typography.Title>
 
                         <Paragraph
-                            id="changeEmail"
                             editable={{
+                                onChange:handleEmailChange,
+
                                 tooltip: 'click to edit text',
                             }}
                             style={{
                                 marginLeft: "2px",
                                 marginBottom: "30px"
-
                             }}
                         >
                             {Email}
