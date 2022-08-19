@@ -1,11 +1,11 @@
-import React, {useState} from "react";
-import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Alert} from "antd";
-import {UserOutlined, QuestionCircleOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
+import React, {useEffect, useRef, useState} from "react";
+import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert} from "antd";
+import {QuestionCircleOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import {Link, useNavigate} from 'react-router-dom';
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
-import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount,getUserName} from "../data/repository";
+import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA} from "../data/repository";
 
 const {Text, Paragraph, Title} = Typography;
 
@@ -51,7 +51,6 @@ const Profile = (props) => {
 
     const CommentElement = () => (
         <Card style={{width: "100%"}}>
-
             <Comment
                 actions={actions}
                 author={<a>Han Solo</a>}
@@ -76,11 +75,73 @@ const Profile = (props) => {
                     "2022-08-09 23:08:41"
                 }
             >
-
             </Comment>
         </Card>
-
     );
+
+    // ============================================================== MFA ===============================
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [mfaInputQuestion, setMfaInputQuestion] = useState("");
+    const [mfaInputAnswer, setMfaInputAnswer] = useState("");
+
+    const MFAModal = () =>(
+        <Modal className={"mfaSetupModal"} title="Set up Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Confirm to set MFA"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
+            <Alert message="You should remember the answer you put below. Following login will require you to answer this question. If you forgot it, we are not able to recover you account! Once setup you will not able to turn off it!" type="warning" showIcon />
+            <br/>
+            <p><strong>What is Multi-factor Authentication (MFA)?</strong></p>
+            <p>Rather than just asking for a username and password, MFA requires one or more additional verification factors, which decreases the likelihood of a successful cyber attack.</p>
+            <br/>
+            <Form.Item label="Question">
+                <Input id={"mfaTextQuestion"} placeholder={mfaInputQuestion} />
+            </Form.Item>
+            <Form.Item label="Answer">
+                <Input id={"mfaTextAnswer"} placeholder={mfaInputAnswer} />
+            </Form.Item>
+        </Modal>
+    );
+
+    const showModal = () => {
+        // getMFA value first
+        var result = getMFA(props.username);
+        setIsModalVisible(true);
+
+        console.log(result["mfaStatus"]);
+        // hide answer
+        if(result["mfaStatus"] == true){
+            setMfaInputQuestion(result["mfaQuestion"]);
+            setMfaInputAnswer("The actual answer is hidden...");
+        } else {
+            setMfaInputQuestion("Input your question...");
+            setMfaInputAnswer("Input your answer...");
+        }
+    };
+
+    const handleOk = () => {
+        let mfaQuestion = document.getElementById("mfaTextQuestion").value;
+        let mfaAnswer = document.getElementById("mfaTextAnswer").value;
+        let result = setMFA(props.username, mfaQuestion, mfaAnswer);
+
+        if(result === true){
+            setIsModalVisible(false);
+            message.success({
+                content: "Completed!",
+                style: {
+                    marginTop: '80px',
+                },
+            });
+
+        } else {
+            message.error({
+                content: result,
+            });
+        }
+    };
+
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+    // ============================================================== MFA ===============================
 
 
     return (
@@ -122,6 +183,10 @@ const Profile = (props) => {
                             {Email}
                         </Paragraph>
 
+                        <Button type="primary" onClick={showModal}>Setup MFA</Button>
+                        <MFAModal></MFAModal>
+                        <br/>
+                        <br/>
                         <Text type="secondary">{date}</Text>
                         <br/>
                         <br/>
