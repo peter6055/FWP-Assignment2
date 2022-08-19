@@ -1,11 +1,11 @@
 import React, {useState} from "react";
 import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
 import {QuestionCircleOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
-import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA} from "../data/repository";
+import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount,getUserName} from "../data/repository";
 
 const {Text, Paragraph, Title} = Typography;
 
@@ -51,6 +51,7 @@ const Profile = (props) => {
 
     const CommentElement = () => (
         <Card style={{width: "100%"}}>
+
             <Comment
                 actions={actions}
                 author={<a>Han Solo</a>}
@@ -75,9 +76,9 @@ const Profile = (props) => {
                     "2022-08-09 23:08:41"
                 }
             >
+
             </Comment>
         </Card>
-    );
 
     // ============================================================== MFA ===============================
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -197,10 +198,6 @@ const Profile = (props) => {
                             {Email}
                         </Paragraph>
 
-                        <Button type="primary" onClick={showModal}>Setup MFA</Button>
-                        <MFAModal></MFAModal>
-                        <br/>
-                        <br/>
                         <Text type="secondary">{date}</Text>
                         <br/>
                         <br/>

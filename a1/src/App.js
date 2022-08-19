@@ -14,7 +14,6 @@ import {HomeOutlined, LoginOutlined, LogoutOutlined, PicRightOutlined, UserOutli
 import {BrowserRouter, NavLink, Routes, Route} from 'react-router-dom';
 import {getUser, removeUser, initUsers, getUserName} from "./data/repository";
 
-
 let activeClassName = "link-active";
 
 
@@ -26,7 +25,6 @@ function App() {
     const loginUser = (id) => {
         setId(id);
         setName(getUserName(id))
-
     }
 
     const logoutUser = () => {
@@ -82,7 +80,6 @@ function App() {
                             name ?
                                 <>
                                     <Avatar alt={name} className={"postAvatar"} size="default" style={{
-
                                         backgroundColor: "#f56a00",
                                         verticalAlign: 'middle',
                                         fontSize: '17px'
@@ -90,13 +87,11 @@ function App() {
                                         { JSON.stringify(name).charAt(1).toUpperCase()}
                                     </Avatar>
                                     <span style={{marginLeft: '10px', color: '#494949'}}>{name}</span></>
-
                                 :
                                 <></>
                         }
                         {
                             !name ?
-
                                 <NavLink to="login">
                                     <Button style={{marginLeft: '20px'}} type="primary" shape="" icon={<LoginOutlined/>}
                                             size={'default'}>
@@ -109,7 +104,6 @@ function App() {
 
                         {
                             name ?
-
                                 <NavLink to="login" logoutUser={logoutUser}>
                                     <Button onClick={logoutUser} style={{marginLeft: '20px'}} type="primary" shape=""
                                             icon={<LogoutOutlined/>} size={'default'}>
@@ -129,7 +123,6 @@ function App() {
                     <Route path="login" element={<Login loginUser={loginUser}/>}/>
                     <Route path="signup" element={<Signup loginUser={loginUser}/>}/>
                     <Route path="profile" element={<Profile id={id} logoutUser={logoutUser} editName={editName}/>}/>
-
 
                 </Routes>
 
