@@ -12,23 +12,33 @@ import {Avatar, Button, Col, Menu, Row} from "antd";
 import Logo from "./assets/logo.svg";
 import {HomeOutlined, LoginOutlined, LogoutOutlined, PicRightOutlined, UserOutlined} from "@ant-design/icons";
 import {BrowserRouter, NavLink, Routes, Route} from 'react-router-dom';
-import {getUser, removeUser, initUsers} from "./data/repository";
+import {getUser, removeUser, initUsers, getUserName} from "./data/repository";
+
 
 let activeClassName = "link-active";
 
 
 function App() {
     initUsers();
-    const [username, setUsername] = useState(getUser());
+    const [id, setId] = useState(getUser());
+    const [name, setName] = useState(getUserName(id));
 
-    const loginUser = (username) => {
-        setUsername(username);
+    const loginUser = (id) => {
+        setId(id);
+        setName(getUserName(id))
+
     }
 
     const logoutUser = () => {
         removeUser();
-        setUsername(null);
+        setId(null);
+        setName(null);
     }
+
+    const editName = (name) => {
+        setName(name);
+    }
+
     return (
         <div className="App">
             <BrowserRouter>
@@ -44,7 +54,7 @@ function App() {
                             </NavLink>
 
                             {
-                                username ?
+                                name ?
                                     <NavLink to="post" className={({isActive}) => isActive && activeClassName}>
                                         <Menu.Item icon={<PicRightOutlined/>}>Post</Menu.Item>
                                     </NavLink>
@@ -56,7 +66,7 @@ function App() {
                             {/*</NavLink>*/}
 
                             {
-                                username ?
+                                name ?
                                     <NavLink to="profile" className={({isActive}) => isActive && activeClassName}>
                                         <Menu.Item icon={<UserOutlined/>}>Profile</Menu.Item>
                                     </NavLink>
@@ -69,21 +79,24 @@ function App() {
                         {/* hide this when user is not login
                          then put username and avatar*/}
                         {
-                            username ?
+                            name ?
                                 <>
-                                    <Avatar alt={username} className={"postAvatar"} size="default" style={{
+                                    <Avatar alt={name} className={"postAvatar"} size="default" style={{
+
                                         backgroundColor: "#f56a00",
                                         verticalAlign: 'middle',
                                         fontSize: '17px'
                                     }}>
-                                        {username.charAt(0).toUpperCase()}
+                                        { JSON.stringify(name).charAt(1).toUpperCase()}
                                     </Avatar>
-                                    <span style={{marginLeft: '10px', color: '#494949'}}>{username}</span></>
+                                    <span style={{marginLeft: '10px', color: '#494949'}}>{name}</span></>
+
                                 :
                                 <></>
                         }
                         {
-                            !username ?
+                            !name ?
+
                                 <NavLink to="login">
                                     <Button style={{marginLeft: '20px'}} type="primary" shape="" icon={<LoginOutlined/>}
                                             size={'default'}>
@@ -95,7 +108,8 @@ function App() {
                         }
 
                         {
-                            username ?
+                            name ?
+
                                 <NavLink to="login" logoutUser={logoutUser}>
                                     <Button onClick={logoutUser} style={{marginLeft: '20px'}} type="primary" shape=""
                                             icon={<LogoutOutlined/>} size={'default'}>
@@ -110,11 +124,12 @@ function App() {
 
 
                 <Routes>
-                    <Route path="/" element={<Home username={username}/>}/>
-                    <Route path="post" element={<Post username={username}/>}/>
+                    <Route path="/" element={<Home id={id}/>}/>
+                    <Route path="post" element={<Post id={id}/>}/>
                     <Route path="login" element={<Login loginUser={loginUser}/>}/>
                     <Route path="signup" element={<Signup loginUser={loginUser}/>}/>
-                    <Route path="profile" element={<Profile username={username} logoutUser={logoutUser}/>}/>
+                    <Route path="profile" element={<Profile id={id} logoutUser={logoutUser} editName={editName}/>}/>
+
 
                 </Routes>
 

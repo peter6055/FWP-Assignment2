@@ -5,21 +5,19 @@ import {Link, useNavigate} from 'react-router-dom';
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
-import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount, setMFA, getMFA} from "../data/repository";
+import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA} from "../data/repository";
 
 const {Text, Paragraph, Title} = Typography;
 
-
 const Profile = (props) => {
     const navigate = useNavigate();
-    const [Email, setEmail] = useState(getEmail(props.username));
-    const [Name, setName] = useState(props.username);
-    const date = getJoinDate(props.username);
+    const [Email, setEmail] = useState(getEmail(props.id));
+    const [Name, setName] = useState(getUserName(props.id));
+    const date = getJoinDate((props.id));
     const confirmSelected = () => {
         // TODO: delete account & post, clear session
-        deleteAccount(props.username);
+        deleteAccount(props.id);
         props.logoutUser();
-        //props.username=null;
         navigate("/");
 
         message.success({
@@ -31,14 +29,15 @@ const Profile = (props) => {
     };
 
     const handleNameChange = (event) => {
-        if (changeName(props.username, event)) {
+        if (changeName(props.id, event)) {
             setName(event);
-            // refresh page to refresh props.userName
-            window.location.reload(false);
+            // refresh page to refresh props.id
+            //window.location.reload(false);
+            props.editName(event);
         }
     }
     const handleEmailChange = (event) => {
-        if (changeEmail(props.username, event)) {
+        if (changeEmail(props.id, event)) {
             setEmail(event);
         }
     }
@@ -138,6 +137,7 @@ const Profile = (props) => {
         }
     };
 
+
     const handleCancel = () => {
         setIsModalVisible(false);
     };
@@ -152,7 +152,7 @@ const Profile = (props) => {
                         <Avatar size={100} alt="Han Solo"
                                 className={"profilePageAvatar"}
                                 style={{backgroundColor: "#f56a00", verticalAlign: 'middle', fontSize: '70px'}}>
-                            {Name.charAt(0).toUpperCase()}
+                            {JSON.stringify(Name).charAt(1).toUpperCase()}
                         </Avatar>
 
                         {/* TODO: spec pa.d: hide editable, delete account btn + list users' post in this page*/}

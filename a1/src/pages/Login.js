@@ -5,7 +5,7 @@ import AccountPageBg from "../assets/account-page-bg.svg";
 import Logo from '../assets/logo.svg'
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser} from "../data/repository";
+import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser, verifyUser} from "../data/repository";
 import {Link} from "react-router-dom";
 
 
@@ -15,16 +15,15 @@ const Login = (props) => {
     const navigate = useNavigate();
     const handleSubmit = (event) => {
         event.preventDefault();
-
         const result = verifyUser(fields.username, fields.password);
         // If verified login the user.
-        if (result === true) {
+        if (result !== null) {
             // verify MFA if they setup MFA
             if(getMFAStatus(fields.username) == true){
                 //handle verify
                 handleVerify();
             } else {
-                credentialVerified();
+                credentialVerified(result);
             }
         } else {
             if(result === "error.usr.isempty"){
@@ -48,12 +47,12 @@ const Login = (props) => {
 
     }
 
-    const credentialVerified = () =>{
-        setUser(fields.username);
+    const credentialVerified = (result) =>{
+        setUser(result);
 
         localStorage.setItem("user", JSON.stringify(fields.username));
 
-        props.loginUser(fields.username);
+        props.loginUser(verified);
 
         // Navigate to the home page.
         navigate("/profile");
@@ -65,7 +64,6 @@ const Login = (props) => {
             },
         });
     }
-
 
 
     // Generic change handler.
@@ -119,7 +117,6 @@ const Login = (props) => {
         setErrorMessage("MFA Cancel, not authorised, please try again!");
     };
     // ============================================================== MFA ===============================
-
 
 
     return (

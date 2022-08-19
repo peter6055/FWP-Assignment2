@@ -8,17 +8,7 @@ function initUsers() {
         return;
 
     // User data is hard-coded, passwords are in plain-text.
-    const users = [
-        {
-            username: "mbolger",
-            password: "abc123"
-        },
-        {
-            username: "shekhar",
-            password: "def456"
-        }
-    ];
-
+    const users = [];
     // Set data into local storage.
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
@@ -32,10 +22,9 @@ function createUsers(username, password, email) {
     let month = months[d.getMonth()];
     let year = d.getFullYear();
     const JoinDate = `${day} ${date} ${month} ${year}`;
-    const users = getUsers();
+    const id =generateId();
     const user =
         {
-            uid: users.length,
             username: username,
             password: password,
             email: email,
@@ -43,19 +32,22 @@ function createUsers(username, password, email) {
             mfaStatus : false,
             mfaQuestion: "",
             mfaAnswer: "",
+            id: id
         };
+    const users = getUsers();
     users.push(user);
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    localStorage.setItem(USER_KEY, JSON.stringify(id));
+    return id;
 }
 
-function uniqueName(username) {
+function generateId(){
     const users = getUsers();
-    for (const user of users) {
-        if (username === user.username) {
-            return false;
-        }
+    if (users[0]===undefined){
+        return 1
+    }else{
+        return users[users.length-1].id+1
     }
-    return true;
 }
 
 function getUsers() {
@@ -66,19 +58,33 @@ function getUsers() {
     return JSON.parse(data);
 }
 
-function getJoinDate(username) {
+
+function getUserName(id){
+    const users = getUsers();
+    if (users[0]===undefined){
+        return null;
+    }else{
+        for (const user of users) {
+            if (id === user.id) {
+                return user.username;
+            }
+        }
+    }
+}
+
+function getJoinDate(id) {
     const users = getUsers();
     for (const user of users) {
-        if (username === user.username) {
+        if (id === user.id) {
             return user.JoinDate;
         }
     }
 }
 
-function getEmail(username) {
+function getEmail(id) {
     const users = getUsers();
     for (const user of users) {
-        if (username === user.username) {
+        if (id === user.id) {
             return user.email;
         }
     }
@@ -86,6 +92,17 @@ function getEmail(username) {
 
 // NOTE: In this example the login is also persistent as it is stored in local storage.
 function verifyUser(username, password) {
+//    const users = getUsers();
+//    for (const user of users) {
+//        if (username === user.username && password === user.password) {
+//            setUser(user.id);
+//            return user.id;
+//        }
+//    }
+//
+//    return null;
+//}
+
     if(username === ""){
         return "error.usr.isempty";
 
@@ -96,16 +113,15 @@ function verifyUser(username, password) {
         const users = getUsers();
         for (const user of users) {
             if (username === user.username && password === user.password) {
-                return true;
+                return user.id;
             }
         }
-        return false;
+        return null;
     }
 }
 
-
 function setUser(username) {
-    localStorage.setItem(USER_KEY, username);
+    localStorage.setItem(USER_KEY, id);
 }
 
 function getUser() {
@@ -117,30 +133,26 @@ function removeUser() {
     localStorage.removeItem(USER_KEY);
 }
 
-function changeName(username, newUsername) {
+
+function changeName(id, newUsername) {
     const newUsers = [];
     const users = getUsers();
-    if (uniqueName(newUsername)) {
         for (const user of users) {
-            if (username === user.username) {
+            if (id === user.id) {
                 user.username = newUsername;
             }
             newUsers.push(user);
         }
         localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
-        const newName = '"' + newUsername + '"';
-        localStorage.setItem("user", newName);
         return true;
-    } else {
-        alert("Someone is using it")
-    }
+   
 }
 
-function changeEmail(username, newEmail) {
+function changeEmail(id, newEmail) {
     if (/\S+@\S+\.\S+/.test(newEmail)) {
         const users = getUsers();
         for (const user of users) {
-            if (username === user.username) {
+            if (id === user.id) {
                 user.email = newEmail;
                 localStorage.setItem(USERS_KEY, JSON.stringify(users));
             }
@@ -151,6 +163,17 @@ function changeEmail(username, newEmail) {
     }
 }
 
+function deleteAccount(id) {
+    const users = getUsers();
+    const newUsers = [];
+    for (const user of users) {
+        if (id !== user.id) {
+           newUsers.push(user);
+        }
+    }
+    localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
+    removeUser();
+}
 
 function setMFA(username, mfaQuestion, mfaAnswer){
     if(username !== "" && mfaQuestion !== "" && mfaAnswer !== ""){
@@ -251,24 +274,13 @@ function verifyMFAAnswer(username, mfaAnswer){
     }
 }
 
-function deleteAccount(username) {
-    const users = getUsers();
-    const newUsers = [];
-    for (const user of users) {
-        if (username !== user.username) {
-            newUsers.push(user);
-        }
-    }
-    localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
-    removeUser();
-}
 
 export {
+    getUserName,
     deleteAccount,
     changeEmail,
     changeName,
     getEmail,
-    uniqueName,
     getJoinDate,
     initUsers,
     verifyUser,

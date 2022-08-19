@@ -7,7 +7,8 @@ import Logo from '../assets/logo.svg'
 import {useNavigate} from "react-router-dom";
 import React, {useState} from "react";
 import {Link} from "react-router-dom";
-import {createUsers, uniqueName} from "../data/repository";
+import {createUsers} from "../data/repository";
+
 
 
 const Signup = (props) => {
@@ -19,9 +20,7 @@ const Signup = (props) => {
         event.preventDefault();
         if (!fields.username) {
             setErrorMessage("User name can not be empty");
-        } else if (!uniqueName(fields.username)) {
-            setErrorMessage("Someone is using this name");
-        } else if (!fields.email) {
+        }else if (!fields.email) {
             setErrorMessage("Email address can not be empty");
         } else if (!/\S+@\S+\.\S+/.test(fields.email)) {
             setErrorMessage("Email address should be valid");
@@ -30,9 +29,8 @@ const Signup = (props) => {
         } else if (!/[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/.test(fields.password) || !/[A-Z]/.test(fields.password) || !/[0-9]/.test(fields.password) || !/[a-z]/.test(fields.password)) {
             setErrorMessage("Password should be strong");
         } else {
-            createUsers(fields.username, fields.password, fields.email);
-            localStorage.setItem("user", JSON.stringify(fields.username));
-            props.loginUser(fields.username);
+            const id=createUsers(fields.username, fields.password, fields.email);
+            props.loginUser(id);
             navigate("/Profile");
             message.success({
                 content: 'Sign up successful',

@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {Avatar, Card, Comment, Image, Row, Col, Form, Input, Button, Upload, Modal} from "antd";
 import {PlusOutlined} from '@ant-design/icons';
+import {getUserName} from "../data/repository";
+
 
 const {TextArea} = Input;
 
@@ -74,12 +76,12 @@ const Post = (props) => {
         <Card style={{width: "100%"}}>
             <Comment
                 avatar={
-                    <Avatar alt={props.username} className={"postAvatar"} size="default" style={{
+                    <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
                         backgroundColor: "#f56a00",
                         verticalAlign: 'middle',
                         fontSize: '17px'
                     }}>
-                        {props.username.charAt(0).toUpperCase()}
+                        {getUserName(props.id).charAt(1).toUpperCase()}
                     </Avatar>
                 }
                 content={
