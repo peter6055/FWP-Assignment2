@@ -1,11 +1,11 @@
-import {message, Col, Row, Input, Space, Button, Alert, Modal, Form} from 'antd';
+import {message, Col, Row, Input, Space, Button, Alert} from 'antd';
 import {UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone} from '@ant-design/icons';
 
 import AccountPageBg from "../assets/account-page-bg.svg";
 import Logo from '../assets/logo.svg'
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser, verifyUser} from "../data/repository";
+import {verifyUser} from "../data/repository";
 import {Link} from "react-router-dom";
 
 
@@ -15,57 +15,30 @@ const Login = (props) => {
     const navigate = useNavigate();
     const handleSubmit = (event) => {
         event.preventDefault();
-        const result = verifyUser(fields.username, fields.password);
+
+        const verified = verifyUser(fields.username, fields.password);
         // If verified login the user.
-        if (result !== null) {
-            // verify MFA if they setup MFA
-            if(getMFAStatus(fields.username) == true){
-                //handle verify
-                handleVerify();
-            } else {
-                credentialVerified(result);
-            }
-        } else {
-            if(result === "error.usr.isempty"){
-                setErrorMessage("Username should not be empty.");
-
-            } else if (result === "error.pswd.isempty") {
-                setErrorMessage("Password should not be empty.");
-
-            } else {
-                // Set error message.
-                setErrorMessage("Username and / or password invalid, please try again.");
-            }
+        if (verified !== null) {
+            props.loginUser(verified);
+            // Navigate to the home page.
+            navigate("/profile");
+            message.success({
+                content: 'Login successful',
+                style: {
+                    marginTop: '80px',
+                },
+            });
+            return;
         }
 
         // Reset password field to blank.
-        // TODO this seem to have bug
         const temp = {...fields};
         temp.password = "";
         setFields(temp);
-        document.getElementById("passwordInputBox").value = "";
 
+        // Set error message.
+        setErrorMessage("Username and / or password invalid, please try again.");
     }
-
-    const credentialVerified = (result) =>{
-        setUser(result);
-
-        localStorage.setItem("user", JSON.stringify(fields.username));
-
-        props.loginUser(verified);
-
-        // Navigate to the home page.
-        navigate("/profile");
-
-        message.success({
-            content: 'Login successful',
-            style: {
-                marginTop: '80px',
-            },
-        });
-    }
-
-
     // Generic change handler.
     const handleInputChange = (event) => {
         const name = event.target.name;
@@ -76,48 +49,6 @@ const Login = (props) => {
         temp[name] = value;
         setFields(temp);
     }
-
-
-    // ============================================================== MFA ===============================
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [mfaInputQuestion, setMfaInputQuestion] = useState("");
-    const MFAModal = () =>(
-        <Modal title="Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Submit"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
-            <p><strong>You had setup MFA, please answer:</strong></p>
-            <p>Question: {mfaInputQuestion}</p>
-            <br/>
-            <Form.Item label="Answer">
-                <Input id={"mfaTextAnswer"} placeholder="Please enter the answer. (Case sensitive)" />
-            </Form.Item>
-        </Modal>
-    );
-
-    const handleVerify = () => {
-        // getMFA value first
-        var result = getMFA(fields.username);
-        setIsModalVisible(true);
-        setMfaInputQuestion(result["mfaQuestion"]);
-    };
-
-    const handleOk = () => {
-        let mfaAnswer = document.getElementById("mfaTextAnswer").value;
-        let result = verifyMFAAnswer(fields.username, mfaAnswer);
-
-        if(result === true){
-            credentialVerified();
-        } else {
-            setErrorMessage(result);
-        }
-        setIsModalVisible(false);
-    };
-
-    const handleCancel = () => {
-        document.getElementById("mfaTextAnswer").value = "";
-        setIsModalVisible(false);
-        setErrorMessage("MFA Cancel, not authorised, please try again!");
-    };
-    // ============================================================== MFA ===============================
-
 
     return (
         <Row style={{height: 'calc(100vh - 120px)'}}>
@@ -138,7 +69,6 @@ const Login = (props) => {
                     <p>Password</p>
                     <Space direction="vertical" style={{width: "100%"}}>
                         <Input.Password
-                            id="passwordInputBox"
                             name="password"
                             size="large"
                             onChange={handleInputChange}
@@ -149,7 +79,6 @@ const Login = (props) => {
                     </Space>
                     <br/>
                     <br/>
-                    <MFAModal></MFAModal>
                     {errorMessage !== null && <Alert message={errorMessage} type="error" showIcon />}
 
                     <br/>
