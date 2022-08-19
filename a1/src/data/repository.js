@@ -32,14 +32,18 @@ function createUsers(username, password, email) {
     let month = months[d.getMonth()];
     let year = d.getFullYear();
     const JoinDate = `${day} ${date} ${month} ${year}`;
+    const users = getUsers();
     const user =
         {
+            uid: users.length,
             username: username,
             password: password,
             email: email,
-            JoinDate: JoinDate
+            JoinDate: JoinDate,
+            mfaStatus : false,
+            mfaQuestion: "",
+            mfaAnswer: "",
         };
-    const users = getUsers();
     users.push(user);
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
@@ -82,15 +86,21 @@ function getEmail(username) {
 
 // NOTE: In this example the login is also persistent as it is stored in local storage.
 function verifyUser(username, password) {
-    const users = getUsers();
-    for (const user of users) {
-        if (username === user.username && password === user.password) {
-            setUser(username);
-            return true;
-        }
-    }
+    if(username === ""){
+        return "error.usr.isempty";
 
-    return false;
+    } else if (password === ""){
+        return "error.pswd.isempty";
+
+    } else {
+        const users = getUsers();
+        for (const user of users) {
+            if (username === user.username && password === user.password) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 
@@ -141,6 +151,106 @@ function changeEmail(username, newEmail) {
     }
 }
 
+
+function setMFA(username, mfaQuestion, mfaAnswer){
+    if(username !== "" && mfaQuestion !== "" && mfaAnswer !== ""){
+        const users = getUsers();
+        for (const user of users) {
+            if (username === user.username) {
+                user.mfaStatus = true;
+                user.mfaQuestion = mfaQuestion;
+                user.mfaAnswer = mfaAnswer;
+                localStorage.setItem(USERS_KEY, JSON.stringify(users));
+                return true;
+            }
+        }
+        return "Username props error, please refresh the page. (msg: no usr found)";
+
+    } else {
+        if(mfaQuestion === ""){
+            return "Question should not be empty";
+
+        } else if (mfaAnswer === ""){
+            return "Answer should not be empty, case sensitive";
+
+        } else if (username === ""){
+            return "Username props error, please refresh the page. (msg: no usr input)";
+
+        }
+        return false;
+    }
+}
+
+
+function getMFA(username){
+    var result = [];
+    if(username !== ""){
+        const users = getUsers();
+        for (const user of users) {
+            if (username === user.username) {
+                result["mfaStatus"] = user.mfaStatus;
+                result["mfaQuestion"] = user.mfaQuestion;
+                if(user.mfaAnswer != null){
+                    result["mfaAnswer"] = true;
+                }
+                return result;
+            }
+        }
+        return "Username props error, please refresh the page. (msg: no usr found)";
+
+    } else {
+        return "Username props error, please refresh the page. (msg: no usr input)";
+    }
+}
+
+function getMFAStatus(username){
+    if(username !== ""){
+        const users = getUsers();
+        for (const user of users) {
+            if (username === user.username) {
+                if (user.mfaStatus === true) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+        return "Username props error, please refresh the page. (msg: no usr found)";
+
+    } else {
+        return "Username props error, please refresh the page. (msg: no usr input)";
+    }
+}
+
+function verifyMFAAnswer(username, mfaAnswer){
+    if(username !== "" && mfaAnswer!== ""){
+        const users = getUsers();
+        for (const user of users) {
+            if (username === user.username) {
+                if(user.mfaStatus === true){
+                    if(user.mfaAnswer === mfaAnswer){
+                        return true;
+                    } else {
+                        return "MFA answer Incorrect, not authorised, please try again!";
+                    }
+                } else {
+                    return "MFA not set, not require to authorise";
+                }
+            }
+        }
+        return "Username props error, please refresh the page. (msg: no usr found)";
+
+    } else {
+        if (mfaAnswer === "") {
+            return "Answer should not be empty, case sensitive, please try again!";
+
+        } else if (username === "") {
+            return "Username props error, please refresh the page. (msg: no usr input)";
+
+        }
+    }
+}
+
 function deleteAccount(username) {
     const users = getUsers();
     const newUsers = [];
@@ -164,5 +274,10 @@ export {
     verifyUser,
     getUser,
     removeUser,
-    createUsers
+    createUsers,
+    setMFA,
+    getMFA,
+    getMFAStatus,
+    verifyMFAAnswer,
+    setUser
 }
