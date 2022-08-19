@@ -1,0 +1,7 @@
+
+*.pack
+.DS_Store
+a1/.DS_Store
+a1/public/.DS_Store
+a1/src/.DS_Store
+a1/src/assets/.DS_Store
