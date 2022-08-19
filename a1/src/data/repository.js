@@ -116,11 +116,11 @@ function verifyUser(username, password) {
                 return user.id;
             }
         }
-        return null;
+        return "not-authorised.credential.incorrect";
     }
 }
 
-function setUser(username) {
+function setUser(id) {
     localStorage.setItem(USER_KEY, id);
 }
 
@@ -175,11 +175,11 @@ function deleteAccount(id) {
     removeUser();
 }
 
-function setMFA(username, mfaQuestion, mfaAnswer){
-    if(username !== "" && mfaQuestion !== "" && mfaAnswer !== ""){
+function setMFA(id, mfaQuestion, mfaAnswer){
+    if(id !== "" && mfaQuestion !== "" && mfaAnswer !== ""){
         const users = getUsers();
         for (const user of users) {
-            if (username === user.username) {
+            if (id === user.id) {
                 user.mfaStatus = true;
                 user.mfaQuestion = mfaQuestion;
                 user.mfaAnswer = mfaAnswer;
@@ -196,8 +196,8 @@ function setMFA(username, mfaQuestion, mfaAnswer){
         } else if (mfaAnswer === ""){
             return "Answer should not be empty, case sensitive";
 
-        } else if (username === ""){
-            return "Username props error, please refresh the page. (msg: no usr input)";
+        } else if (id === ""){
+            return "ID props error, please refresh the page. (msg: no usr input)";
 
         }
         return false;
@@ -205,12 +205,12 @@ function setMFA(username, mfaQuestion, mfaAnswer){
 }
 
 
-function getMFA(username){
+function getMFA(id){
     var result = [];
-    if(username !== ""){
+    if(id !== ""){
         const users = getUsers();
         for (const user of users) {
-            if (username === user.username) {
+            if (id === user.id) {
                 result["mfaStatus"] = user.mfaStatus;
                 result["mfaQuestion"] = user.mfaQuestion;
                 if(user.mfaAnswer != null){
@@ -219,18 +219,18 @@ function getMFA(username){
                 return result;
             }
         }
-        return "Username props error, please refresh the page. (msg: no usr found)";
+        return "ID props error, please refresh the page. (msg: no usr found)";
 
     } else {
-        return "Username props error, please refresh the page. (msg: no usr input)";
+        return "ID props error, please refresh the page. (msg: no usr input)";
     }
 }
 
-function getMFAStatus(username){
-    if(username !== ""){
+function getMFAStatus(id){
+    if(id !== ""){
         const users = getUsers();
         for (const user of users) {
-            if (username === user.username) {
+            if (id === user.id) {
                 if (user.mfaStatus === true) {
                     return true
                 } else {
@@ -238,18 +238,22 @@ function getMFAStatus(username){
                 }
             }
         }
-        return "Username props error, please refresh the page. (msg: no usr found)";
+        return "ID props error, please refresh the page. (msg: no usr found)";
 
     } else {
-        return "Username props error, please refresh the page. (msg: no usr input)";
+        return "ID props error, please refresh the page. (msg: no usr input)";
     }
 }
 
-function verifyMFAAnswer(username, mfaAnswer){
-    if(username !== "" && mfaAnswer!== ""){
+function verifyMFAAnswer(id, mfaAnswer){
+    console.log(id);
+
+    if(id !== "" && mfaAnswer!== ""){
         const users = getUsers();
         for (const user of users) {
-            if (username === user.username) {
+            if (id === user.id) {
+                console.log(user);
+
                 if(user.mfaStatus === true){
                     if(user.mfaAnswer === mfaAnswer){
                         return true;
@@ -267,8 +271,8 @@ function verifyMFAAnswer(username, mfaAnswer){
         if (mfaAnswer === "") {
             return "Answer should not be empty, case sensitive, please try again!";
 
-        } else if (username === "") {
-            return "Username props error, please refresh the page. (msg: no usr input)";
+        } else if (id === "") {
+            return "ID props error, please refresh the page. (msg: no usr input)";
 
         }
     }

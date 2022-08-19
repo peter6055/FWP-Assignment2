@@ -3,56 +3,63 @@ import {UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone} from '@ant
 
 import AccountPageBg from "../assets/account-page-bg.svg";
 import Logo from '../assets/logo.svg'
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser, verifyUser} from "../data/repository";
+import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser} from "../data/repository";
 import {Link} from "react-router-dom";
 
 
 const Login = (props) => {
     const [fields, setFields] = useState({username: "", password: ""});
+    const idTemp = useRef(0);
+
     const [errorMessage, setErrorMessage] = useState(null);
     const navigate = useNavigate();
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const result = verifyUser(fields.username, fields.password);
+
+        //set a temp id for later use
+        idTemp.current = result;
+
         // If verified login the user.
-        if (result !== null) {
+
+        if(result === "error.usr.isempty"){
+            setErrorMessage("Username should not be empty.");
+
+        } else if (result === "error.pswd.isempty") {
+            setErrorMessage("Password should not be empty.");
+
+        } else if (result === "not-authorised.credential.incorrect") {
+            // Set error message.
+            setErrorMessage("Username and / or password invalid, please try again.");
+
+          // no error means user is correct
+        } else {
             // verify MFA if they setup MFA
-            if(getMFAStatus(fields.username) == true){
+            if(getMFAStatus(idTemp.current) == true){
                 //handle verify
                 handleVerify();
             } else {
-                credentialVerified(result);
+                credentialVerified();
             }
-        } else {
-            if(result === "error.usr.isempty"){
-                setErrorMessage("Username should not be empty.");
 
-            } else if (result === "error.pswd.isempty") {
-                setErrorMessage("Password should not be empty.");
-
-            } else {
-                // Set error message.
-                setErrorMessage("Username and / or password invalid, please try again.");
-            }
         }
 
         // Reset password field to blank.
         // TODO this seem to have bug
-        const temp = {...fields};
-        temp.password = "";
-        setFields(temp);
-        document.getElementById("passwordInputBox").value = "";
+        // const temp = {...fields};
+        // temp.password = "";
+        // setFields(temp);
+        // document.getElementById("passwordInputBox").value = "";
 
     }
 
-    const credentialVerified = (result) =>{
-        setUser(result);
-
-        localStorage.setItem("user", JSON.stringify(fields.username));
-
-        props.loginUser(verified);
+    const credentialVerified = () =>{
+        setUser(idTemp.current);
+        props.loginUser(idTemp.current);
+        localStorage.setItem("user", JSON.stringify(idTemp.current));
 
         // Navigate to the home page.
         navigate("/profile");
@@ -85,7 +92,6 @@ const Login = (props) => {
         <Modal title="Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Submit"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
             <p><strong>You had setup MFA, please answer:</strong></p>
             <p>Question: {mfaInputQuestion}</p>
-            <br/>
             <Form.Item label="Answer">
                 <Input id={"mfaTextAnswer"} placeholder="Please enter the answer. (Case sensitive)" />
             </Form.Item>
@@ -94,14 +100,15 @@ const Login = (props) => {
 
     const handleVerify = () => {
         // getMFA value first
-        var result = getMFA(fields.username);
+        var result = getMFA(idTemp.current);
         setIsModalVisible(true);
         setMfaInputQuestion(result["mfaQuestion"]);
     };
 
     const handleOk = () => {
         let mfaAnswer = document.getElementById("mfaTextAnswer").value;
-        let result = verifyMFAAnswer(fields.username, mfaAnswer);
+        let result = verifyMFAAnswer(idTemp.current, mfaAnswer);
+
 
         if(result === true){
             credentialVerified();
