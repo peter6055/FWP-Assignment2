@@ -142,10 +142,10 @@ a {
 
 .ant-input:focus, .ant-input-focused, .ant-input:hover{
     border-color: #ff6783;
-    box-shadow: 0 0 0 2px rgba(255, 120, 117, 0.23);
+    /*box-shadow: 0 0 0 2px rgba(255, 120, 117, 0.23);*/
 }
 
-.ant-upload.ant-upload-select-picture-card:hover{
+.ant-upload.ant-upload-select-picture-card:hover, .ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover{
     border-color: #ff6783;
 }
 
@@ -155,6 +155,10 @@ html {
 
 ::selection {
     background: #ff6783;
+}
+
+.ant-input-affix-wrapper:focus, .ant-input-affix-wrapper-focused {
+    box-shadow: 0 0 0 2px rgba(255, 120, 117, 0.23);
 }
 /* Footer styling END*/
 /* ----------------------------------------------------------------- GLOBAL ---- */
