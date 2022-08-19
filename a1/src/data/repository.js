@@ -1,19 +1,16 @@
 const USERS_KEY = "users";
 const USER_KEY = "user";
-const POST_DATABASE = "post";
 
 // Initialise local storage "users" with data, if the data is already set this function returns immediately.
 function initUsers() {
     // Stop if data is already initialised.
-    if (localStorage.getItem(USERS_KEY) === null){
-        const users = [];
-        localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    }
+    if (localStorage.getItem(USERS_KEY) !== null)
+        return;
 
-    if (localStorage.getItem(POST_DATABASE) === null){
-        const post = [];
-        localStorage.setItem(POST_DATABASE, JSON.stringify(post));
-    }
+    // User data is hard-coded, passwords are in plain-text.
+    const users = [];
+    // Set data into local storage.
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
 function createUsers(username, password, email) {
@@ -32,23 +29,14 @@ function createUsers(username, password, email) {
             password: password,
             email: email,
             JoinDate: JoinDate,
-            id: id,
-        };
-
-    const post =
-        {
-            id : id,
-            post_data:[],
-            reply_data:[]
+            mfaStatus : false,
+            mfaQuestion: "",
+            mfaAnswer: "",
+            id: id
         };
     const users = getUsers();
     users.push(user);
-    const posts = getPosts();
-    console.log(posts)
-    posts.push(post);
-    console.log(posts)
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    localStorage.setItem(POST_DATABASE, JSON.stringify(posts));
     localStorage.setItem(USER_KEY, JSON.stringify(id));
     return id;
 }
@@ -62,7 +50,6 @@ function generateId(){
     }
 }
 
-
 function getUsers() {
     // Extract user data from local storage.
     const data = localStorage.getItem(USERS_KEY);
@@ -71,10 +58,6 @@ function getUsers() {
     return JSON.parse(data);
 }
 
-function getPosts(){
-    const data = localStorage.getItem(POST_DATABASE);
-    return JSON.parse(data);
-}
 
 function getUserName(id){
     const users = getUsers();
@@ -109,17 +92,6 @@ function getEmail(id) {
 
 // NOTE: In this example the login is also persistent as it is stored in local storage.
 function verifyUser(username, password) {
-//    const users = getUsers();
-//    for (const user of users) {
-//        if (username === user.username && password === user.password) {
-//            setUser(user.id);
-//            return user.id;
-//        }
-//    }
-//
-//    return null;
-//}
-
     if(username === ""){
         return "error.usr.isempty";
 
@@ -135,10 +107,7 @@ function verifyUser(username, password) {
         }
         return "not-authorised.credential.incorrect";
     }
-
-    return null;
 }
-
 
 function setUser(id) {
     localStorage.setItem(USER_KEY, id);
@@ -153,21 +122,19 @@ function removeUser() {
     localStorage.removeItem(USER_KEY);
 }
 
+
 function changeName(id, newUsername) {
     const newUsers = [];
     const users = getUsers();
-    if (newUsername!==""){
-        for (const user of users) {
-            if (id === user.id) {
-                user.username = newUsername;
-            }
-            newUsers.push(user);
+    for (const user of users) {
+        if (id === user.id) {
+            user.username = newUsername;
         }
-        localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
-        return true;
-    }else {
-        alert("Name can not be empty")
+        newUsers.push(user);
     }
+    localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
+    return true;
+
 }
 
 function changeEmail(id, newEmail) {
@@ -197,8 +164,6 @@ function deleteAccount(id) {
     removeUser();
 }
 
-
-// ========================================= MFA =================================
 function setMFA(id, mfaQuestion, mfaAnswer){
     if(id !== "" && mfaQuestion !== "" && mfaAnswer !== ""){
         const users = getUsers();
@@ -301,7 +266,7 @@ function verifyMFAAnswer(id, mfaAnswer){
         }
     }
 }
-// ========================================= MFA =================================
+
 
 export {
     getUserName,
@@ -314,5 +279,10 @@ export {
     verifyUser,
     getUser,
     removeUser,
-    createUsers
+    createUsers,
+    setMFA,
+    getMFA,
+    getMFAStatus,
+    verifyMFAAnswer,
+    setUser
 }

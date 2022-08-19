@@ -1,9 +1,9 @@
-import {message, Col, Row, Input, Space, Button, Alert} from 'antd';
+import {message, Col, Row, Input, Space, Button, Alert, Modal, Form} from 'antd';
 import {UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone} from '@ant-design/icons';
 
 import AccountPageBg from "../assets/account-page-bg.svg";
 import Logo from '../assets/logo.svg'
-import React, {useEffect, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser} from "../data/repository";
 import {Link} from "react-router-dom";
@@ -35,7 +35,7 @@ const Login = (props) => {
             // Set error message.
             setErrorMessage("Username and / or password invalid, please try again.");
 
-          // no error means user is correct
+            // no error means user is correct
         } else {
             // verify MFA if they setup MFA
             if(getMFAStatus(idTemp.current) == true){
@@ -70,9 +70,9 @@ const Login = (props) => {
                 marginTop: '80px',
             },
         });
-       
     }
-    
+
+
     // Generic change handler.
     const handleInputChange = (event) => {
         const name = event.target.name;
@@ -126,7 +126,6 @@ const Login = (props) => {
     // ============================================================== MFA ===============================
 
 
-
     return (
         <Row style={{height: 'calc(100vh - 120px)'}}>
             <Col className={"login-page login-page-left"} span={12} style={{}}>
@@ -146,6 +145,7 @@ const Login = (props) => {
                     <p>Password</p>
                     <Space direction="vertical" style={{width: "100%"}}>
                         <Input.Password
+                            id="passwordInputBox"
                             name="password"
                             size="large"
                             onChange={handleInputChange}
@@ -156,6 +156,7 @@ const Login = (props) => {
                     </Space>
                     <br/>
                     <br/>
+                    <MFAModal></MFAModal>
                     {errorMessage !== null && <Alert message={errorMessage} type="error" showIcon />}
 
                     <br/>
