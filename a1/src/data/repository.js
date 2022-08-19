@@ -32,8 +32,22 @@ function createUsers(username, password, email) {
             mfaStatus : false,
             mfaQuestion: "",
             mfaAnswer: "",
-            id: id
+            id: id        
+         };
+
+    const post =
+        {
+            UserId : id,
+            postId : id,
+            post_data:[],
         };
+    
+    const reply = {
+            UserId : id,
+            parentId: id,
+            replyId : id,
+            reply_data:[],
+        }
     const users = getUsers();
     users.push(user);
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
@@ -92,20 +106,12 @@ function getEmail(id) {
 
 // NOTE: In this example the login is also persistent as it is stored in local storage.
 function verifyUser(username, password) {
-    if(username === ""){
-        return "error.usr.isempty";
-
-    } else if (password === ""){
-        return "error.pswd.isempty";
-
-    } else {
-        const users = getUsers();
-        for (const user of users) {
-            if (username === user.username && password === user.password) {
-                return user.id;
-            }
+    const users = getUsers();
+    for (const user of users) {
+        if (username === user.username && password === user.password) {
+            setUser(user.id);
+            return user.id;
         }
-        return "not-authorised.credential.incorrect";
     }
 }
 
@@ -164,6 +170,7 @@ function deleteAccount(id) {
     removeUser();
 }
 
+// ============================================================== MFA ===============================
 function setMFA(id, mfaQuestion, mfaAnswer){
     if(id !== "" && mfaQuestion !== "" && mfaAnswer !== ""){
         const users = getUsers();
@@ -266,7 +273,7 @@ function verifyMFAAnswer(id, mfaAnswer){
         }
     }
 }
-
+// ============================================================== MFA ===============================
 
 export {
     getUserName,

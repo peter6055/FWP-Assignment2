@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
 import {QuestionCircleOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
@@ -79,83 +80,7 @@ const Profile = (props) => {
         </Card>
     );
 
-    // ============================================================== MFA ===============================
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [mfaInputQuestion, setMfaInputQuestion] = useState("");
-    const [mfaInputAnswer, setMfaInputAnswer] = useState("");
-
-    // question sources: https://www.beyondtrust.com/blog/entry/reused-security-questions-can-pose-a-high-risk-learn-tips-tricks-to-mitigate-the-threat
-    const mfaQuestionRecommendationOption = [
-        { value: 'In what city were you born?' },
-        { value: 'What is the name of your favorite pet?' },
-        { value: 'What is your mother\'s maiden name?' },
-        { value: 'What high school did you attend?' },
-        { value: 'What was the name of your elementary school?' },
-        { value: 'What was the make of your first car?' },
-        { value: 'What was your favorite food as a child?' },
-        { value: 'Where did you meet your spouse?' },
-        { value: 'What year was your father (or mother) born?' },
-    ];
-
-
-    const MFAModal = () =>(
-        <Modal className={"mfaSetupModal"} title="Set up Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Confirm to set MFA"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
-            <Alert message="You should remember the answer you put below. Following login will require you to answer this question. If you forgot it, we are not able to recover you account! Once setup you will not able to turn off it!" type="warning" showIcon />
-            <br/>
-            <p><strong>What is Multi-factor Authentication (MFA)?</strong></p>
-            <p>Rather than just asking for a username and password, MFA requires one or more additional verification factors, which decreases the likelihood of a successful cyber attack.</p>
-            <br/>
-            <Form.Item label="Question">
-                <AutoComplete id={"mfaTextQuestion"} placeholder={mfaInputQuestion} options={mfaQuestionRecommendationOption} />
-            </Form.Item>
-            <Form.Item label="Answer">
-                <Input id={"mfaTextAnswer"} placeholder={mfaInputAnswer} />
-            </Form.Item>
-        </Modal>
     );
-
-    const showModal = () => {
-        // getMFA value first
-        var result = getMFA(props.id);
-        setIsModalVisible(true);
-
-        console.log(result["mfaStatus"]);
-        // hide answer
-        if(result["mfaStatus"] == true){
-            setMfaInputQuestion(result["mfaQuestion"]);
-            setMfaInputAnswer("The actual answer is hidden...");
-        } else {
-            setMfaInputQuestion("Select a question or setup one yourself...");
-            setMfaInputAnswer("Input your answer...");
-        }
-    };
-
-    const handleOk = () => {
-        let mfaQuestion = document.getElementById("mfaTextQuestion").value;
-        let mfaAnswer = document.getElementById("mfaTextAnswer").value;
-        let result = setMFA(props.id, mfaQuestion, mfaAnswer);
-
-        if(result === true){
-            setIsModalVisible(false);
-            message.success({
-                content: "Completed!",
-                style: {
-                    marginTop: '80px',
-                },
-            });
-
-        } else {
-            message.error({
-                content: result,
-            });
-        }
-    };
-
-
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-    // ============================================================== MFA ===============================
 
 
     return (
