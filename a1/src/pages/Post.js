@@ -1,142 +1,133 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Card, Comment, Image, Row, Col,  Form, Input, Button, Upload, Modal} from "antd";
-import { PlusOutlined } from '@ant-design/icons';
+import {Avatar, Card, Comment, Image, Row, Col, Form, Input, Button, Upload, Modal} from "antd";
+import {PlusOutlined} from '@ant-design/icons';
+import {getUserName} from "../data/repository";
 
-const { TextArea } = Input;
+const {TextArea} = Input;
 
-function getBase64(file) {
-    var reader = new FileReader();
-    reader.readAsDataURL(file[0]);
-    reader.onload = function () {
-        console.log(reader.result);
+const Post = (props) => {
+    // upload file
+    const [fileList, setFileList] = useState([]);
+    const handleFileUpload = (e) => {
+        let status = e.file.status;
+        let event = e.event;
+        let uid = e.file.uid;
+        let name = e.file.name;
+
+        let reader = new FileReader();
+        reader.readAsDataURL(e.file.originFileObj);
+
+        // because render.onLoad will fire onChange three times
+        // this is to push the images only in the first time
+        if (status === "uploading" && event === undefined) {
+            reader.onload = function (e) {
+                fileList.push({"uid": uid, "name": name, "status": "done", "url": reader.result});
+            }
+        }
+    }
+
+    // for preview modal (source: https://ant.design/components/upload/#onChange)
+    const [previewVisible, setPreviewVisible] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('')
+    const handleFilePreview = async (file) => {
+        if (!file.url && !file.preview) {
+            file.preview = file;
+        }
+
+        setPreviewImage(file.url || file.preview);
+        setPreviewVisible(true);
+        setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
     };
-    reader.onerror = function (error) {
-        console.log('Error: ', error);
-    };
-}
-
-const Post = () => {
-    const handleSubmit = () => {
-        console.log(document.getElementById("postTextItem").value)
-    };
-
-    // const [previewVisible, setPreviewVisible] = useState(false);
-    // const [previewImage, setPreviewImage] = useState('');
-    // const [previewTitle, setPreviewTitle] = useState('');
-    const [fileList, setFileList] = useState([{
-        uid: '-1',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    }]);
+    const handleCancel = () => setPreviewVisible(false);
 
 
-    // const handleCancel = () => setPreviewVisible(false);
+    // remove file
+    const [forceRefresh, setForceRefresh] = useState(0);
+    const handleFileRemove = (e) => {
+        let uid = e.uid;
+        for (var count = 0; count < fileList.length; count++) {
+            console.log(fileList[count]);
 
-    // const handlePreview = async (file) => {
-    //     // if (!file.url && !file.preview) {
-    //     //     file.preview = await getBase64(file.originFileObj);
-    //     // }
-    //     console.log(file);
-    //     file.preview = await getBase64(file.originFileObj);
-    //     setPreviewImage(file.url || file.preview);
-    //     setPreviewVisible(true);
-    //     setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
-    // };
+            if (fileList[count].uid === uid) {
+                fileList.splice(count, 1);
+            }
+        }
 
-    const handleChange = (s) => setFileList(s);
-
-    // useEffect(() => {
-    //     console.log(fileList)
-    // }, [fileList]);
-
-    const handleUpload = (e) => {
-        handleChange("1")
-        console.log(fileList);
-        // setFileList("1");
-        // console.log(fileList);
-
-        // let uid = e.file.uid;
-        // let name = e.file.name;
-        //
-        //
-        // let reader = new FileReader();
-        // reader.readAsDataURL(e.file.originFileObj);
-        // reader.onload = function(e) {
-        //     // generate file
-        //     // const image = [];
-        //     // image['uid'] = uid;
-        //     // image['name'] = name;
-        //     // image['status'] = "done";
-        //     // image['url'] = reader.result;
-        //     // setFileList(image);
-        //
-        //     // file to file list
-        //
-        //     // reader.result
-        //     var obj = JSON.parse(JSON.stringify(fileList));
-        //     obj.push({"uid":"-2","name": name,"status":"done","url": reader.result});
-        //     var jsonStr = JSON.stringify(obj)
-        //     console.log(jsonStr)
-        //     // handleChange(jsonStr);
-        //     console.log(fileList);
-        //
-        // }
+        //force refresh to refresh the file list
+        setForceRefresh(forceRefresh + 1);
     }
 
 
+    // onclick make a post
+    const handleSubmitPost = () => {
+        // this is text of post
+        console.log(document.getElementById("postTextItem").value)
+
+        // this is images of post
+        console.log(fileList)
+
+        // TODO: validations and save to storage
+    };
+
 
     const CommentElement = () => (
-        <Card style={{ width: "100%" }}>
+        <Card style={{width: "100%"}}>
             <Comment
-                avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />}
+                avatar={
+                    <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
+                        backgroundColor: "#f56a00",
+                        verticalAlign: 'middle',
+                        fontSize: '17px'
+                    }}>
+                        {getUserName(props.id).charAt(1).toUpperCase()}
+                    </Avatar>
+                }
                 content={
                     <div>
                         <Form.Item>
-                            <TextArea id="postTextItem" rows={4} placeholder={"Write a post..."} />
+                            <TextArea id="postTextItem" rows={4} placeholder={"Write a post..."}/>
                         </Form.Item>
                         <Form.Item>
-                            {/*<input onChange={handleUpload} type="file" name="file" />*/}
-
                             <Upload
                                 action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                accept="image/*"
                                 listType="picture-card"
                                 fileList={fileList}
-                                // onPreview={handlePreview}
-                                onChange={handleUpload}
+                                onPreview={handleFilePreview}
+                                onChange={handleFileUpload}
+                                onRemove={handleFileRemove}
                             >
                                 {fileList.length >= 8 ? null :
                                     <div>
-                                        <PlusOutlined />
+                                        <PlusOutlined/>
                                         <div style={{marginTop: 8,}}>Upload</div>
                                     </div>
                                 }
                             </Upload>
-                            {/*<Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>*/}
-                            {/*    <img*/}
-                            {/*        alt="example"*/}
-                            {/*        style={{*/}
-                            {/*            width: '100%',*/}
-                            {/*        }}*/}
-                            {/*        src={previewImage}*/}
-                            {/*    />*/}
-                            {/*</Modal>*/}
-                            <TextArea type={"hidden"} style={{display: "none"}} id="postImageItem" rows={4} />
+                            <Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>
+                                <img
+                                    alt="example"
+                                    style={{
+                                        width: '100%',
+                                    }}
+                                    src={previewImage}
+                                />
+                            </Modal>
+                            <TextArea type={"hidden"} style={{display: "none"}} id="postImageItem" rows={4}/>
                         </Form.Item>
                         <Form.Item>
-                            <Button htmlType="submit" onClick={handleSubmit} type="primary">Make a Post</Button>
+                            <Button htmlType="submit" onClick={handleSubmitPost} type="primary">Make a Post</Button>
                         </Form.Item>
                     </div>
                 }
             >
-
             </Comment>
-
         </Card>
     );
 
     const PostElement = () => (
-        <Card style={{ width: "100%" }}>
+        <Card style={{width: "100%"}}>
 
             <Comment
                 author={<a>Han Solo</a>}
@@ -150,9 +141,9 @@ const Post = () => {
                             and efficiently.
                         </p>
                         <div className={"postImageGroup"}>
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300" />
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300" />
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300" />
+                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
 
                         </div>
                     </div>
@@ -169,8 +160,8 @@ const Post = () => {
 
 
     return (
-        <Row className={"profilePage safeArea"}>
-            <Col span={24}>
+        <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
+            <Col span={24} style={{maxWidth: "1000px"}}>
                 <div className={"postContainer"}>
                     <CommentElement></CommentElement>
                     <PostElement></PostElement>

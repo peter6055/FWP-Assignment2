@@ -1,21 +1,22 @@
 /* ----------------------------------------------------------------- GLOBAL ---- */
 /* Theme color*/
 /* Buttons*/
-.ant-btn-primary{
+.ant-btn-primary {
     background: #ff6783 !important;
     border-color: #ff6783 !important;
 }
 
 /* link*/
-a:active, .link, .link-active{
+a:active, .link, .link-active {
     color: #ff6783 !important;
 }
+
 /* link hovering, active*/
- a:hover{
+a:hover {
     color: #9d122d !important;
 }
 
-a{
+a {
     color: #494949;
 }
 
@@ -24,7 +25,7 @@ a{
     padding-top: 71px !important;
 }
 
-.button{
+.button {
     height: 37px;
     padding: 0px 20px 0px 43px;
     margin-right: 15px;
@@ -52,7 +53,7 @@ a{
 
 
 /* Header styling START*/
-.header{
+.header {
     background-color: rgb(255, 255, 255);
     box-shadow: rgba(16, 16, 17, 0.2) 0px 1px 2px, rgba(16, 16, 17, 0.1) 0px 3.4px 8px, rgba(16, 16, 17, 0) 0px 12px 30px;
     padding-left: 100px;
@@ -65,46 +66,53 @@ a{
     width: 100%;
 }
 
-.logo{
+.logo {
     margin: 10px;
 }
 
 /* ant menu*/
-.ant-menu{
-    background-color: rgba(255,255,255,0) !important;
+.ant-menu {
+    background-color: rgba(255, 255, 255, 0) !important;
 }
-.ant-menu-horizontal{
+
+.ant-menu-horizontal {
     border-bottom: 0px;
 }
-.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu:hover, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-active, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-open, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-open, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-selected{
+
+.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu:hover, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-active, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-open, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-open, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-selected {
     color: #ff6783;
 }
+
 .ant-menu-horizontal > .ant-menu-item-selected a {
     color: #ff6783;
 }
 
-.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu:hover::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-active::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-open::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-open::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-selected::after{
+.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu:hover::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-active::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-open::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-open::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected::after, .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu-selected::after {
     border-bottom: 0px;
 }
+
 .ant-menu-light .ant-menu-item:hover, .ant-menu-light .ant-menu-item-active, .ant-menu-light .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open, .ant-menu-light .ant-menu-submenu-active, .ant-menu-light .ant-menu-submenu-title:hover {
     color: inherit;
 }
-.ant-menu{
+
+.ant-menu {
     color: #494949;
     font-weight: 600;
 }
+
 /*  right menu item align reight*/
-.right-menu{
+.right-menu {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
 }
+
 /* Header styling END*/
 
 
 /* Footer styling START*/
-.footer{
+.footer {
     background-color: rgb(183, 183, 183);
     padding-left: 100px;
     padding-right: 100px;
@@ -116,19 +124,44 @@ a{
     bottom: 0;
 }
 
-.footer > .ant-col-24{
+.footer > .ant-col-24 {
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    color: rgb(255,255,255);
+    color: rgb(255, 255, 255);
+}
+
+.ant-input-prefix{
+    margin-right: 10px !important;
+}
+
+.anticon-edit{
+    color: #ff6783;
+}
+
+.ant-input:focus, .ant-input-focused, .ant-input:hover{
+    border-color: #ff6783;
+    box-shadow: 0 0 0 2px rgba(255, 120, 117, 0.23);
+}
+
+.ant-upload.ant-upload-select-picture-card:hover{
+    border-color: #ff6783;
+}
+
+html {
+    --antd-wave-shadow-color: #ff6783;
+}
+
+::selection {
+    background: #ff6783;
 }
 /* Footer styling END*/
 /* ----------------------------------------------------------------- GLOBAL ---- */
 
 
 /* ----------------------------------------------------------------- LOGIN/SIGNUP ---- */
-.login-page{
+.login-page {
     height: 100%;
     display: flex;
     justify-content: center;
@@ -137,27 +170,28 @@ a{
 
 }
 
-.login-page-left{
+.login-page-left {
     background-color: #fff4f6;
     z-index: 1;
 }
 
-.login-page-right{
+.login-page-right {
     background: url("assets/login-bg.svg");
     z-index: 1;
 }
 
-#login-form{
+#login-form {
     background-color: #ffffff;
     width: 50%;
     border-radius: 20px;
     box-shadow: rgba(16, 16, 17, 0.18) -2px -2px 17px 8px;
     padding: 60px;
 }
+
 /* ----------------------------------------------------------------- LOGIN/SIGNUP ---- */
 
 /* ----------------------------------------------------------------- Landing ---- */
-.Landing-background{
+.Landing-background {
     background-color: wheat;
     height: 100%;
     display: flex;
@@ -165,26 +199,28 @@ a{
     align-items: center;
     flex-direction: column;
 }
-.Landing-text-padding{
+
+.Landing-text-padding {
     padding-right: 80px;
 }
+
 /* ----------------------------------------------------------------- Landing ---- */
 
 /* ----------------------------------------------------------------- Profile ---- */
-.profilePage{
+.profilePage {
     background: #f9f9f5;
-    padding: 30px 200px 0px 200px;
+    padding: 30px 200px 0px calc(200px - 1%);
 }
 
 
-.profileContainer{
+.profileContainer {
     margin: 20px 0px 0px 0px;
 
     position: fixed;
     width: 22.5%;
 }
 
-.profileCard{
+.profileCard {
     box-shadow: rgba(16, 16, 17, 0.06) -2px -2px 10px 8px;
     padding: 70px 30px 70px 30px;
     width: 400px;
@@ -198,16 +234,16 @@ a{
 
 }
 
-.postContainer{
+.postContainer {
     margin: 20px 0px 100px 30px;
 }
 
-.postContainer > .ant-card{
+.postContainer > .ant-card {
     margin-bottom: 10px;
 }
 
 
-.postAvatar{
+.postAvatar {
 
     box-shadow: rgba(16, 16, 17, 0.15) 0px 0px 0px 1px;
 
@@ -216,39 +252,49 @@ a{
     align-items: center;
 }
 
-.postImageGroup{
+.postImageGroup {
     margin: 20px 0px 20px 0px;
 }
 
-.postImageGroup > .ant-image{
+.postImageGroup > .ant-image {
     margin-right: 10px;
 }
 
 
-.ant-popover.ant-popconfirm.ant-popover-placement-bottom{
+.ant-popover.ant-popconfirm.ant-popover-placement-bottom {
     max-width: 400px;
 }
 
-.infoContainer{
+.infoContainer {
     margin-left: 30px;
     margin-top: 20px;
 }
 
-.discoverFriendContainer{
+.discoverFriendContainer {
     display: flex;
     margin-top: 30px;
     margin-bottom: 30px;
 }
 
-.discoverFriendProfile{
+.discoverFriendProfile {
     display: flex;
     flex-direction: column;
     margin-left: 10px;
 }
 
-.discoverFriendBtn{
+.discoverFriendBtn {
     margin-right: 0px;
     margin-left: auto;
 }
+
+.profilePageAvatar > .ant-avatar-string {
+    top: 0px;
+    margin-left: 3px;
+}
+
+.postAvatar > .ant-avatar-string {
+    top: 0px;
+}
+
 /* ----------------------------------------------------------------- Profile ---- */
 
