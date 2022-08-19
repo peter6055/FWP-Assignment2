@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Avatar, Card, Comment, Image, Row, Col, Form, Input, Button, Upload, Modal} from "antd";
 import {PlusOutlined} from '@ant-design/icons';
 import {getUserName} from "../data/repository";

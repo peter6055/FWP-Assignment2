@@ -109,6 +109,17 @@ function getEmail(id) {
 
 // NOTE: In this example the login is also persistent as it is stored in local storage.
 function verifyUser(username, password) {
+//    const users = getUsers();
+//    for (const user of users) {
+//        if (username === user.username && password === user.password) {
+//            setUser(user.id);
+//            return user.id;
+//        }
+//    }
+//
+//    return null;
+//}
+
     if(username === ""){
         return "error.usr.isempty";
 

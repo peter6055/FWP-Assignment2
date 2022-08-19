@@ -3,7 +3,7 @@ import {UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone} from '@ant
 
 import AccountPageBg from "../assets/account-page-bg.svg";
 import Logo from '../assets/logo.svg'
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser} from "../data/repository";
 import {Link} from "react-router-dom";
