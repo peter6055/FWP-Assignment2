@@ -1,25 +1,23 @@
-import React, { useState } from "react";
-import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Alert} from "antd";
-import {UserOutlined, QuestionCircleOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
+import React, {useEffect, useRef, useState} from "react";
+import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert} from "antd";
+import {QuestionCircleOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import {Link, useNavigate} from 'react-router-dom';
 
 import editLogo from '../assets/edit.png'
 import deleteLogo from '../assets/delete.png'
-import { changeEmail,changeName, getEmail, getJoinDate,deleteAccount} from "../data/repository";
+import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA} from "../data/repository";
 
 const {Text, Paragraph, Title} = Typography;
 
-
 const Profile = (props) => {
     const navigate = useNavigate();
-    const [Email, setEmail] = useState(getEmail(props.username));
-    const [Name, setName]=useState(props.username);
-    const date=getJoinDate(props.username);
-    // TODO: spec cr.delete user: after clicking delete
+    const [Email, setEmail] = useState(getEmail(props.id));
+    const [Name, setName] = useState(getUserName(props.id));
+    const date = getJoinDate((props.id));
     const confirmSelected = () => {
         // TODO: delete account & post, clear session
-        deleteAccount(props.username);
-        props.username=null;
+        deleteAccount(props.id);
+        props.logoutUser();
         navigate("/");
 
         message.success({
@@ -30,15 +28,18 @@ const Profile = (props) => {
         });
     };
 
-    const handleNameChange = (event) =>{
-        changeName(props.username, event);
-        console.log(event);
-        localStorage.setItem("user", JSON.parse(event));
-        setName(event);
+    const handleNameChange = (event) => {
+        if (changeName(props.id, event)) {
+            setName(event);
+            // refresh page to refresh props.id
+            //window.location.reload(false);
+            props.editName(event);
+        }
     }
-    const handleEmailChange = (event) =>{
-        changeEmail(props.username, event);
-        setEmail(event);
+    const handleEmailChange = (event) => {
+        if (changeEmail(props.id, event)) {
+            setEmail(event);
+        }
     }
 
     // TODO: spec hd.1: on click handle hook
@@ -49,8 +50,7 @@ const Profile = (props) => {
 
 
     const CommentElement = () => (
-        <Card style={{ width: "100%" }}>
-
+        <Card style={{width: "100%"}}>
             <Comment
                 actions={actions}
                 author={<a>Han Solo</a>}
@@ -64,9 +64,9 @@ const Profile = (props) => {
                             and efficiently.
                         </p>
                         <div className={"postImageGroup"}>
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300" />
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300" />
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300" />
+                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
 
                         </div>
                     </div>
@@ -75,28 +75,90 @@ const Profile = (props) => {
                     "2022-08-09 23:08:41"
                 }
             >
-
             </Comment>
         </Card>
-
     );
 
+    // ============================================================== MFA ===============================
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [mfaInputQuestion, setMfaInputQuestion] = useState("");
+    const [mfaInputAnswer, setMfaInputAnswer] = useState("");
 
+    const MFAModal = () =>(
+        <Modal className={"mfaSetupModal"} title="Set up Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Confirm to set MFA"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
+            <Alert message="You should remember the answer you put below. Following login will require you to answer this question. If you forgot it, we are not able to recover you account! Once setup you will not able to turn off it!" type="warning" showIcon />
+            <br/>
+            <p><strong>What is Multi-factor Authentication (MFA)?</strong></p>
+            <p>Rather than just asking for a username and password, MFA requires one or more additional verification factors, which decreases the likelihood of a successful cyber attack.</p>
+            <br/>
+            <Form.Item label="Question">
+                <Input id={"mfaTextQuestion"} placeholder={mfaInputQuestion} />
+            </Form.Item>
+            <Form.Item label="Answer">
+                <Input id={"mfaTextAnswer"} placeholder={mfaInputAnswer} />
+            </Form.Item>
+        </Modal>
+    );
+
+    const showModal = () => {
+        // getMFA value first
+        var result = getMFA(props.username);
+        setIsModalVisible(true);
+
+        console.log(result["mfaStatus"]);
+        // hide answer
+        if(result["mfaStatus"] == true){
+            setMfaInputQuestion(result["mfaQuestion"]);
+            setMfaInputAnswer("The actual answer is hidden...");
+        } else {
+            setMfaInputQuestion("Input your question...");
+            setMfaInputAnswer("Input your answer...");
+        }
+    };
+
+    const handleOk = () => {
+        let mfaQuestion = document.getElementById("mfaTextQuestion").value;
+        let mfaAnswer = document.getElementById("mfaTextAnswer").value;
+        let result = setMFA(props.username, mfaQuestion, mfaAnswer);
+
+        if(result === true){
+            setIsModalVisible(false);
+            message.success({
+                content: "Completed!",
+                style: {
+                    marginTop: '80px',
+                },
+            });
+
+        } else {
+            message.error({
+                content: result,
+            });
+        }
+    };
+
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+    // ============================================================== MFA ===============================
 
 
     return (
-        <Row className={"profilePage safeArea"}>
-            <Col span={7}>
-                <div className={"profileContainer"}>
-                    <Card style={{ width: "100%" }}>
-                        <Avatar size={100} src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
-                                className={"postAvatar"}/>
+        <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
+            <Col span={5} style={{display: "flex", justifyContent: "flex-end"}}>
+                <div className={"profileContainer"} style={{maxWidth: "370px"}}>
+                    <Card style={{width: "100%"}}>
+                        <Avatar size={100} alt="Han Solo"
+                                className={"profilePageAvatar"}
+                                style={{backgroundColor: "#f56a00", verticalAlign: 'middle', fontSize: '70px'}}>
+                            {JSON.stringify(Name).charAt(1).toUpperCase()}
+                        </Avatar>
 
                         {/* TODO: spec pa.d: hide editable, delete account btn + list users' post in this page*/}
-                        {/* TODO: spec cr.edit user info: store to localstorage onchange*/}
                         <Typography.Title
                             editable={{
-                                onChange:handleNameChange,
+                                onChange: handleNameChange,
                             }}
                             level={3}
                             style={{
@@ -110,7 +172,7 @@ const Profile = (props) => {
 
                         <Paragraph
                             editable={{
-                                onChange:handleEmailChange,
+                                onChange: handleEmailChange,
                                 tooltip: 'click to edit text',
                             }}
                             style={{
@@ -121,6 +183,10 @@ const Profile = (props) => {
                             {Email}
                         </Paragraph>
 
+                        <Button type="primary" onClick={showModal}>Setup MFA</Button>
+                        <MFAModal></MFAModal>
+                        <br/>
+                        <br/>
                         <Text type="secondary">{date}</Text>
                         <br/>
                         <br/>
@@ -148,7 +214,7 @@ const Profile = (props) => {
                     </Card>
                 </div>
             </Col>
-            <Col span={11} style={{}}>
+            <Col span={17} style={{maxWidth: "855px"}}>
                 <div className={"postContainer"}>
                     <CommentElement></CommentElement>
                     <CommentElement></CommentElement>
@@ -157,90 +223,91 @@ const Profile = (props) => {
                     <CommentElement></CommentElement>
                 </div>
             </Col>
-            <Col span={6} style={{}}>
-                <div className={"infoContainer"}>
-                    <Alert
-                        message={
-                            <Title level={4}>Getting Start</Title>
+            {/*<Col span={6} style={{}}>*/}
+            {/*    <div className={"infoContainer"}>*/}
+            {/*        <Alert*/}
+            {/*            message={*/}
+            {/*                <Title level={4}>Getting Start</Title>*/}
 
-                        }
-                        description={
-                            <div>
-                                <li>Take a post</li>
-                                <li>Discover your friend</li>
-                                <li>Manage profile</li>
-                                <li>Connect with friends</li>
+            {/*            }*/}
+            {/*            description={*/}
+            {/*                <div>*/}
+            {/*                    <li>Take a post</li>*/}
+            {/*                    <li>Discover your friend</li>*/}
+            {/*                    <li>Manage profile</li>*/}
+            {/*                    <li>Connect with friends</li>*/}
 
-                            </div>
-                        }
-                        type="warning"
-                    />
-                    <Card style={{ width: "100%", marginTop: "20px" }}>
-                        <Title level={4}>Discover</Title>
-                        <div className={"discoverFriendContainer"}>
-                            <Avatar size={50} icon={<UserOutlined />} />
-                            <div className={"discoverFriendProfile"}>
-                                <span><strong>Name Smith</strong></span>
-                                <span>name@loopagile.com</span>
-                            </div>
-                            <div className={"discoverFriendBtn"}>
-                                View
-                            </div>
-                        </div>
-                        <div className={"discoverFriendContainer"}>
-                            <Avatar size={50} icon={<UserOutlined />} />
-                            <div className={"discoverFriendProfile"}>
-                                <span><strong>Name Smith</strong></span>
-                                <span>name@loopagile.com</span>
-                            </div>
-                            <div className={"discoverFriendBtn"}>
-                                View
-                            </div>
-                        </div>
-                        <div className={"discoverFriendContainer"}>
-                            <Avatar size={50} icon={<UserOutlined />} />
-                            <div className={"discoverFriendProfile"}>
-                                <span><strong>Name Smith</strong></span>
-                                <span>name@loopagile.com</span>
-                            </div>
-                            <div className={"discoverFriendBtn"}>
-                                View
-                            </div>
-                        </div>
-                        <div className={"discoverFriendContainer"}>
-                            <Avatar size={50} icon={<UserOutlined />} />
-                            <div className={"discoverFriendProfile"}>
-                                <span><strong>Name Smith</strong></span>
-                                <span>name@loopagile.com</span>
-                            </div>
-                            <div className={"discoverFriendBtn"}>
-                                View
-                            </div>
-                        </div>
-                        <div className={"discoverFriendContainer"}>
-                            <Avatar size={50} icon={<UserOutlined />} />
-                            <div className={"discoverFriendProfile"}>
-                                <span><strong>Name Smith</strong></span>
-                                <span>name@loopagile.com</span>
-                            </div>
-                            <div className={"discoverFriendBtn"}>
-                                View
-                            </div>
-                        </div>
-                        <div className={"discoverFriendContainer"}>
-                            <Avatar size={50} icon={<UserOutlined />} />
-                            <div className={"discoverFriendProfile"}>
-                                <span><strong>Name Smith</strong></span>
-                                <span>name@loopagile.com</span>
-                            </div>
-                            <div className={"discoverFriendBtn"}>
-                                View
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            </Col>
-        </Row>);
+            {/*                </div>*/}
+            {/*            }*/}
+            {/*            type="warning"*/}
+            {/*        />*/}
+            {/*        <Card style={{ width: "100%", marginTop: "20px" }}>*/}
+            {/*            <Title level={4}>Discover</Title>*/}
+            {/*            <div className={"discoverFriendContainer"}>*/}
+            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
+            {/*                <div className={"discoverFriendProfile"}>*/}
+            {/*                    <span><strong>Name Smith</strong></span>*/}
+            {/*                    <span>name@loopagile.com</span>*/}
+            {/*                </div>*/}
+            {/*                <div className={"discoverFriendBtn"}>*/}
+            {/*                    View*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*            <div className={"discoverFriendContainer"}>*/}
+            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
+            {/*                <div className={"discoverFriendProfile"}>*/}
+            {/*                    <span><strong>Name Smith</strong></span>*/}
+            {/*                    <span>name@loopagile.com</span>*/}
+            {/*                </div>*/}
+            {/*                <div className={"discoverFriendBtn"}>*/}
+            {/*                    View*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*            <div className={"discoverFriendContainer"}>*/}
+            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
+            {/*                <div className={"discoverFriendProfile"}>*/}
+            {/*                    <span><strong>Name Smith</strong></span>*/}
+            {/*                    <span>name@loopagile.com</span>*/}
+            {/*                </div>*/}
+            {/*                <div className={"discoverFriendBtn"}>*/}
+            {/*                    View*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*            <div className={"discoverFriendContainer"}>*/}
+            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
+            {/*                <div className={"discoverFriendProfile"}>*/}
+            {/*                    <span><strong>Name Smith</strong></span>*/}
+            {/*                    <span>name@loopagile.com</span>*/}
+            {/*                </div>*/}
+            {/*                <div className={"discoverFriendBtn"}>*/}
+            {/*                    View*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*            <div className={"discoverFriendContainer"}>*/}
+            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
+            {/*                <div className={"discoverFriendProfile"}>*/}
+            {/*                    <span><strong>Name Smith</strong></span>*/}
+            {/*                    <span>name@loopagile.com</span>*/}
+            {/*                </div>*/}
+            {/*                <div className={"discoverFriendBtn"}>*/}
+            {/*                    View*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*            <div className={"discoverFriendContainer"}>*/}
+            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
+            {/*                <div className={"discoverFriendProfile"}>*/}
+            {/*                    <span><strong>Name Smith</strong></span>*/}
+            {/*                    <span>name@loopagile.com</span>*/}
+            {/*                </div>*/}
+            {/*                <div className={"discoverFriendBtn"}>*/}
+            {/*                    View*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*        </Card>*/}
+            {/*    </div>*/}
+            {/*</Col>*/}
+        </Row>
+    );
 
 }
 

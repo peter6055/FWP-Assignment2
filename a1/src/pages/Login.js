@@ -1,94 +1,165 @@
-import { message, Col, Row, Input, Space, Button} from 'antd';
-import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import {message, Col, Row, Input, Space, Button, Alert, Modal, Form} from 'antd';
+import {UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone} from '@ant-design/icons';
 
 import AccountPageBg from "../assets/account-page-bg.svg";
 import Logo from '../assets/logo.svg'
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { verifyUser } from "../data/repository";
+import React, {useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser, verifyUser} from "../data/repository";
 import {Link} from "react-router-dom";
 
 
-const Login = (props) =>{
-  const [fields, setFields] = useState({ username: "", password: "" });
-  const [errorMessage, setErrorMessage] = useState(null);
-  const navigate = useNavigate();
-  const handleSubmit = (event) => {
-    event.preventDefault();
+const Login = (props) => {
+    const [fields, setFields] = useState({username: "", password: ""});
+    const [errorMessage, setErrorMessage] = useState(null);
+    const navigate = useNavigate();
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const result = verifyUser(fields.username, fields.password);
+        // If verified login the user.
+        if (result !== null) {
+            // verify MFA if they setup MFA
+            if(getMFAStatus(fields.username) == true){
+                //handle verify
+                handleVerify();
+            } else {
+                credentialVerified(result);
+            }
+        } else {
+            if(result === "error.usr.isempty"){
+                setErrorMessage("Username should not be empty.");
 
-    const verified = verifyUser(fields.username, fields.password);
-    // If verified login the user.
-    if(verified === true) {
-      localStorage.setItem("user", JSON.stringify(fields.username));
-      props.loginUser(fields.username);
-      // Navigate to the home page.
-      navigate("/profile");
-      message.success({
-        content: 'Login successful',
-        style: {
-            marginTop: '80px',
-        },
-    });      
-    return;
+            } else if (result === "error.pswd.isempty") {
+                setErrorMessage("Password should not be empty.");
+
+            } else {
+                // Set error message.
+                setErrorMessage("Username and / or password invalid, please try again.");
+            }
+        }
+
+        // Reset password field to blank.
+        // TODO this seem to have bug
+        const temp = {...fields};
+        temp.password = "";
+        setFields(temp);
+        document.getElementById("passwordInputBox").value = "";
+
     }
 
-    // Reset password field to blank.
-    const temp = { ...fields };
-    temp.password = "";
-    setFields(temp);
+    const credentialVerified = (result) =>{
+        setUser(result);
 
-    // Set error message.
-    setErrorMessage("Username and / or password invalid, please try again.");
-  }
-  // Generic change handler.
-  const handleInputChange = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    // Copy fields.
-    const temp = { username: fields.username, password: fields.password };
-    // Update field and state.
-    temp[name] = value;
-    setFields(temp);
-  }
+        localStorage.setItem("user", JSON.stringify(fields.username));
 
-  return(
-    <Row style={{height: 'calc(100vh - 120px)'}}>
-        <Col className={"login-page login-page-left"} span={12} style={{}}>
-            <img src={Logo} width={300} style={{paddingBottom: "20px"}} alt="Logo"></img>
-            <img src={AccountPageBg} width={400} alt="AccountPageBg"></img>
-        </Col>
-        <Col className={"login-page login-page-right"} span={12} style={{}}>
-            <form id={"login-form"}>
-                <h1><strong>Login to LAN</strong></h1>
+        props.loginUser(verified);
 
-                <p>Username</p>
-                <Input size="large" name="username" placeholder="Input username" onChange={handleInputChange} prefix={<UserOutlined />} />
-                <br />
-                <br />
+        // Navigate to the home page.
+        navigate("/profile");
 
-                <p>Password</p>
-                <Space direction="vertical" style={{width: "100%"}}>
-                    <Input.Password
-                        name="password"
-                        size="large"
-                        onChange={handleInputChange}
-                        placeholder="Input password"
-                        iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                        prefix={<LockOutlined />}
-                    />
-                </Space>
-                {errorMessage !== null && <p>{errorMessage}</p>}
-                <br />
-                <br />
-                <br />
-                {/*add an validation and sign in action once the btn click*/}
-                <Button type="primary" size={"default"} onClick={handleSubmit}>Login</Button>
-                <span>&nbsp;&nbsp;&nbsp;&nbsp;or
+        message.success({
+            content: 'Login successful',
+            style: {
+                marginTop: '80px',
+            },
+        });
+    }
+
+
+    // Generic change handler.
+    const handleInputChange = (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
+        // Copy fields.
+        const temp = {username: fields.username, password: fields.password};
+        // Update field and state.
+        temp[name] = value;
+        setFields(temp);
+    }
+
+
+    // ============================================================== MFA ===============================
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [mfaInputQuestion, setMfaInputQuestion] = useState("");
+    const MFAModal = () =>(
+        <Modal title="Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Submit"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
+            <p><strong>You had setup MFA, please answer:</strong></p>
+            <p>Question: {mfaInputQuestion}</p>
+            <br/>
+            <Form.Item label="Answer">
+                <Input id={"mfaTextAnswer"} placeholder="Please enter the answer. (Case sensitive)" />
+            </Form.Item>
+        </Modal>
+    );
+
+    const handleVerify = () => {
+        // getMFA value first
+        var result = getMFA(fields.username);
+        setIsModalVisible(true);
+        setMfaInputQuestion(result["mfaQuestion"]);
+    };
+
+    const handleOk = () => {
+        let mfaAnswer = document.getElementById("mfaTextAnswer").value;
+        let result = verifyMFAAnswer(fields.username, mfaAnswer);
+
+        if(result === true){
+            credentialVerified();
+        } else {
+            setErrorMessage(result);
+        }
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        document.getElementById("mfaTextAnswer").value = "";
+        setIsModalVisible(false);
+        setErrorMessage("MFA Cancel, not authorised, please try again!");
+    };
+    // ============================================================== MFA ===============================
+
+
+    return (
+        <Row style={{height: 'calc(100vh - 120px)'}}>
+            <Col className={"login-page login-page-left"} span={12} style={{}}>
+                <img src={Logo} width={300} style={{paddingBottom: "20px"}} alt="Logo"></img>
+                <img src={AccountPageBg} width={400} alt="AccountPageBg"></img>
+            </Col>
+            <Col className={"login-page login-page-right"} span={12} style={{}}>
+                <form id={"login-form"}>
+                    <h1><strong>Login to LAN</strong></h1>
+
+                    <p>Username</p>
+                    <Input size="large" name="username" placeholder="Input username" onChange={handleInputChange}
+                           prefix={<UserOutlined/>}/>
+                    <br/>
+                    <br/>
+
+                    <p>Password</p>
+                    <Space direction="vertical" style={{width: "100%"}}>
+                        <Input.Password
+                            id="passwordInputBox"
+                            name="password"
+                            size="large"
+                            onChange={handleInputChange}
+                            placeholder="Input password"
+                            iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+                            prefix={<LockOutlined/>}
+                        />
+                    </Space>
+                    <br/>
+                    <br/>
+                    <MFAModal></MFAModal>
+                    {errorMessage !== null && <Alert message={errorMessage} type="error" showIcon />}
+
+                    <br/>
+                    <Button type="primary" size={"default"} onClick={handleSubmit}>Login</Button>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;or
                     <Link className={"link"} to="/signup" state={"From Contact Page"}>&nbsp;Sign up</Link>
                 </span>
-            </form>
-        </Col>
-    </Row>);
+                </form>
+            </Col>
+        </Row>);
 }
 
 
