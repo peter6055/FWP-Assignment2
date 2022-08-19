@@ -1,19 +1,16 @@
 const USERS_KEY = "users";
 const USER_KEY = "user";
-const POST_DATABASE = "post";
 
 // Initialise local storage "users" with data, if the data is already set this function returns immediately.
 function initUsers() {
     // Stop if data is already initialised.
-    if (localStorage.getItem(USERS_KEY) === null){
-        const users = [];
-        localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    }
+    if (localStorage.getItem(USERS_KEY) !== null)
+        return;
 
-    if (localStorage.getItem(POST_DATABASE) === null){
-        const post = [];
-        localStorage.setItem(POST_DATABASE, JSON.stringify(post));
-    }
+    // User data is hard-coded, passwords are in plain-text.
+    const users = [];
+    // Set data into local storage.
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
 function createUsers(username, password, email) {
@@ -32,8 +29,11 @@ function createUsers(username, password, email) {
             password: password,
             email: email,
             JoinDate: JoinDate,
-            id: id
-        };
+            mfaStatus : false,
+            mfaQuestion: "",
+            mfaAnswer: "",
+            id: id        
+         };
 
     const post =
         {
@@ -50,12 +50,7 @@ function createUsers(username, password, email) {
         }
     const users = getUsers();
     users.push(user);
-    const posts = getPosts();
-    console.log(posts)
-    posts.push(post);
-    console.log(posts)
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    localStorage.setItem(POST_DATABASE, JSON.stringify(posts));
     localStorage.setItem(USER_KEY, JSON.stringify(id));
     return id;
 }
@@ -69,7 +64,6 @@ function generateId(){
     }
 }
 
-
 function getUsers() {
     // Extract user data from local storage.
     const data = localStorage.getItem(USERS_KEY);
@@ -78,10 +72,6 @@ function getUsers() {
     return JSON.parse(data);
 }
 
-function getPosts(){
-    const data = localStorage.getItem(POST_DATABASE);
-    return JSON.parse(data);
-}
 
 function getUserName(id){
     const users = getUsers();
@@ -123,10 +113,7 @@ function verifyUser(username, password) {
             return user.id;
         }
     }
-
-    return null;
 }
-
 
 function setUser(id) {
     localStorage.setItem(USER_KEY, id);
@@ -141,21 +128,19 @@ function removeUser() {
     localStorage.removeItem(USER_KEY);
 }
 
+
 function changeName(id, newUsername) {
     const newUsers = [];
     const users = getUsers();
-    if (newUsername!==""){
-        for (const user of users) {
-            if (id === user.id) {
-                user.username = newUsername;
-            }
-            newUsers.push(user);
+    for (const user of users) {
+        if (id === user.id) {
+            user.username = newUsername;
         }
-        localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
-        return true;
-    }else {
-        alert("Name can not be empty")
+        newUsers.push(user);
     }
+    localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
+    return true;
+
 }
 
 function changeEmail(id, newEmail) {
@@ -185,6 +170,111 @@ function deleteAccount(id) {
     removeUser();
 }
 
+// ============================================================== MFA ===============================
+function setMFA(id, mfaQuestion, mfaAnswer){
+    if(id !== "" && mfaQuestion !== "" && mfaAnswer !== ""){
+        const users = getUsers();
+        for (const user of users) {
+            if (id === user.id) {
+                user.mfaStatus = true;
+                user.mfaQuestion = mfaQuestion;
+                user.mfaAnswer = mfaAnswer;
+                localStorage.setItem(USERS_KEY, JSON.stringify(users));
+                return true;
+            }
+        }
+        return "Username props error, please refresh the page. (msg: no usr found)";
+
+    } else {
+        if(mfaQuestion === ""){
+            return "Question should not be empty";
+
+        } else if (mfaAnswer === ""){
+            return "Answer should not be empty, case sensitive";
+
+        } else if (id === ""){
+            return "ID props error, please refresh the page. (msg: no usr input)";
+
+        }
+        return false;
+    }
+}
+
+
+function getMFA(id){
+    var result = [];
+    if(id !== ""){
+        const users = getUsers();
+        for (const user of users) {
+            if (id === user.id) {
+                result["mfaStatus"] = user.mfaStatus;
+                result["mfaQuestion"] = user.mfaQuestion;
+                if(user.mfaAnswer != null){
+                    result["mfaAnswer"] = true;
+                }
+                return result;
+            }
+        }
+        return "ID props error, please refresh the page. (msg: no usr found)";
+
+    } else {
+        return "ID props error, please refresh the page. (msg: no usr input)";
+    }
+}
+
+function getMFAStatus(id){
+    if(id !== ""){
+        const users = getUsers();
+        for (const user of users) {
+            if (id === user.id) {
+                if (user.mfaStatus === true) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+        return "ID props error, please refresh the page. (msg: no usr found)";
+
+    } else {
+        return "ID props error, please refresh the page. (msg: no usr input)";
+    }
+}
+
+function verifyMFAAnswer(id, mfaAnswer){
+    console.log(id);
+
+    if(id !== "" && mfaAnswer!== ""){
+        const users = getUsers();
+        for (const user of users) {
+            if (id === user.id) {
+                console.log(user);
+
+                if(user.mfaStatus === true){
+                    if(user.mfaAnswer === mfaAnswer){
+                        return true;
+                    } else {
+                        return "MFA answer Incorrect, not authorised, please try again!";
+                    }
+                } else {
+                    return "MFA not set, not require to authorise";
+                }
+            }
+        }
+        return "Username props error, please refresh the page. (msg: no usr found)";
+
+    } else {
+        if (mfaAnswer === "") {
+            return "Answer should not be empty, case sensitive, please try again!";
+
+        } else if (id === "") {
+            return "ID props error, please refresh the page. (msg: no usr input)";
+
+        }
+    }
+}
+// ============================================================== MFA ===============================
+
 export {
     getUserName,
     deleteAccount,
@@ -196,5 +286,10 @@ export {
     verifyUser,
     getUser,
     removeUser,
-    createUsers
+    createUsers,
+    setMFA,
+    getMFA,
+    getMFAStatus,
+    verifyMFAAnswer,
+    setUser
 }

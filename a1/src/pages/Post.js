@@ -3,6 +3,7 @@ import {Avatar, Card, Comment, Image, Row, Col, Form, Input, Button, Upload, Mod
 import {PlusOutlined} from '@ant-design/icons';
 import {getUserName} from "../data/repository";
 
+
 const {TextArea} = Input;
 
 const Post = (props) => {
