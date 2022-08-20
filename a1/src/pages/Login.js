@@ -7,6 +7,7 @@ import React, {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser} from "../data/repository";
 import {Link} from "react-router-dom";
+import $ from 'jquery';
 
 
 const Login = (props) => {

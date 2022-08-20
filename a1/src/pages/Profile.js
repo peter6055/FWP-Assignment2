@@ -4,8 +4,10 @@ import {QuestionCircleOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 
 import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA} from "../data/repository";
+import $ from "jquery";
 
 const {Text, Paragraph} = Typography;
+
 
 const Profile = (props) => {
     const navigate = useNavigate();
@@ -49,19 +51,37 @@ const Profile = (props) => {
         <Card style={{width: "100%"}}>
             <Comment
                 actions={[
-                    <span key="comment-nested-reply-to" onClick={handleEditPost}>Edit post</span>,
-                    <span key="comment-nested-reply-to" onClick={handleDeletePost}>Delete post</span>
+                    <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
+                    <Popconfirm
+                        title={"You sure you want to delete this post?"}
+                        icon={
+                            <QuestionCircleOutlined
+                                style={{
+                                    color: 'red',
+                                }}
+                            />
+                        }
+                        onConfirm={handleDeletePost}
+                        placement="bottom"
+                        okText="Delete Forever!"
+                        cancelText="No"
+                    >
+                        <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
+                    </Popconfirm>
                 ]}
                 author={<a>Han Solo</a>}
                 avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
                                 className={"postAvatar"}/>}
                 content={
                     <div>
-                        <p>
-                            We supply a series of design principles, practical patterns and high quality design
-                            resources (Sketch and Axure), to help people create their product prototypes beautifully
-                            and efficiently.
-                        </p>
+                        <div className={"postText"}>
+                            <p>
+                                We supply a series of design principles, practical patterns and high quality design
+                                resources (Sketch and Axure), to help people create their product prototypes beautifully
+                                and efficiently.
+                            </p>
+                            <Button type="primary" onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
+                        </div>
                         <div className={"postImageGroup"}>
                             <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
                             <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
@@ -79,15 +99,64 @@ const Profile = (props) => {
         </Card>
     );
 
-    // TODO HD.1 edit post
-    const handleEditPost = () => (
-        null
-    );
+    const editPostOnClick = (e) => {
+        // this is the post content text already display on the entry
+        var currentPostText = $(e.target).closest('.ant-comment-content').find('.postText > p').text();
+
+        // hide read only and add a textarea
+        $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "none"})
+        $(e.target).closest('.ant-comment-content').find('.postText').prepend('' +
+            '<textarea class="ant-input" rows="4" style="width: 100%">' + currentPostText + '</textarea>'
+        );
+
+        // add a save btn after the content text
+        $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "inline"});
+
+        // hide edit post btn
+        $(e.target).css({display: "none"});
+
+    };
+
+
+    function handleEditPost(e){
+        // this is the value user type
+        console.log($(e.target).closest('.ant-comment-content').find('.postText > textarea').val());
+
+        //TODO HD.1 save edit to localstorage
+
+        // recover to non-editable mode
+        // remove text area
+        $(e.target).closest('.ant-comment-content').find('.postText > textarea').remove();
+
+        // show read only text
+        $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "inline"})
+
+        // hide save btn
+        $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "none"});
+
+        // show edit post btn
+        $(e.target).closest('.ant-comment-content').find('.ant-comment-actions > li:first > span').css({display: "inline"});
+
+        // successful msg
+        message.success({
+            content: "Edit successful",
+        });
+
+    }
+
 
     // TODO HD.1 delete post
-    const handleDeletePost = () => (
-        null
-    );
+    const handleDeletePost = (e) => {
+
+        // successful msg
+        message.success({
+            content: "Completed!",
+            style: {
+                marginTop: '80px',
+            },
+        });
+
+    };
     // ============================================================== Post ===============================
 
 
@@ -239,7 +308,6 @@ const Profile = (props) => {
 
                         <Divider orientation="center" plain>Danger Zone</Divider>
 
-
                         <Popconfirm
                             title={"After you delete your account, you are not able to login as a user. All of you post will be delete as well."}
                             icon={
@@ -253,7 +321,6 @@ const Profile = (props) => {
                             placement="bottom"
                             okText="Delete Forever!"
                             cancelText="No"
-
                         >
                             <a><Button danger> Delete my account</Button></a>
                         </Popconfirm>
