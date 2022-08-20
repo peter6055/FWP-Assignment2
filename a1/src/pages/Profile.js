@@ -140,6 +140,9 @@ const Profile = (props) => {
         // successful msg
         message.success({
             content: "Edit successful",
+            style: {
+                marginTop: '80px',
+            },
         });
 
     }
