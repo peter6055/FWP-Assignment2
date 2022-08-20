@@ -1,18 +1,31 @@
-import React, {useEffect, useState} from 'react';
-import {Avatar, Card, Comment, Image, Row, Col, Form, Input, Button, Upload, Modal, message} from "antd";
-import {PlusOutlined} from '@ant-design/icons';
+import React, {useState} from 'react';
+import {
+    Avatar,
+    Card,
+    Comment,
+    Image,
+    Row,
+    Col,
+    Form,
+    Input,
+    Button,
+    Upload,
+    Modal,
+    message,
+    Spin
+} from "antd";
+import {PlusOutlined, LoadingOutlined} from '@ant-design/icons';
 import $ from 'jquery';
 
 import {getUserName} from "../data/repository";
-
-
+import {upload} from "../data/aws";
 
 const {TextArea} = Input;
+const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+
 
 const Post = (props) => {
     const [Name, setName] = useState(getUserName(props.id));
-
-
     // ============================================================== Make Post ===============================
     const MakePostElement = () => (
         <Card style={{width: "100%"}}>
@@ -48,6 +61,7 @@ const Post = (props) => {
                                     </div>
                                 }
                             </Upload>
+                            <Spin indicator={loadingIcon} style={{display: "none"}} id={"upload-loading-spinner"} tip="Uploading..."/>
                             <Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>
                                 <img
                                     alt="example"
@@ -57,7 +71,6 @@ const Post = (props) => {
                                     src={previewImage}
                                 />
                             </Modal>
-                            <TextArea type={"hidden"} style={{display: "none"}} id="postImageItem" rows={4}/>
                         </Form.Item>
                         <Form.Item>
                             <Button htmlType="submit" onClick={handleSubmitPost} type="primary">Make a Post</Button>
@@ -71,11 +84,20 @@ const Post = (props) => {
 
     // upload file
     const [fileList, setFileList] = useState([]);
+    let url;
     const handleFileUpload = (e) => {
+        // display loading state, no using hook cuz re-rendering cause upload issue
+        $("#upload-loading-spinner").css("display", "flex");
+
         let status = e.file.status;
         let event = e.event;
         let uid = e.file.uid;
         let name = e.file.name;
+        let type = e.file.type;
+
+
+        let fileExtension = type.replace(/(.*)\//g, '');
+        let fileUploadName = uid + '.' + fileExtension;
 
         let reader = new FileReader();
         reader.readAsDataURL(e.file.originFileObj);
@@ -84,8 +106,26 @@ const Post = (props) => {
         // this is to push the images only in the first time
         if (status === "uploading" && event === undefined) {
             reader.onload = function (e) {
-                fileList.push({"uid": uid, "name": name, "status": "done", "url": reader.result});
+
+                if(upload(fileUploadName, reader.result, type) !== ""){
+
+                    url = 'https://s3789585.s3.ap-southeast-2.amazonaws.com/fwp-a1/' + fileUploadName
+
+                    setTimeout(function() {
+                        fileList.push({"uid": uid, "name": name, "status": "done", "url": url});
+                    }, 1500);
+
+                } else {
+                    alert("AWS upload promise issue");
+                }
+
             }
+
+        // error means end, cuz we are not handling upload official
+        } else if(status === "error"){
+            // when end, hide loading state
+            $("#upload-loading-spinner").css("display", "none");
+
         }
     }
 

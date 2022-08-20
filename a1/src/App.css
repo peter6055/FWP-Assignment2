@@ -325,3 +325,16 @@ html {
 .ant-comment-actions > li{
     width: 100%;
 }
+
+#upload-loading-spinner{
+    margin-top: 20px;
+}
+
+#upload-loading-spinner > .ant-spin-text{
+    margin-left: 10px;
+}
+
+#upload-loading-spinner > .ant-spin-text,  #upload-loading-spinner {
+    color: #ff6783 !important;
+
+}
