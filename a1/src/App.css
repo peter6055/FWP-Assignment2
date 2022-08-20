@@ -131,6 +131,8 @@ a {
     align-items: center;
     color: rgb(255, 255, 255);
 }
+/* Footer styling END*/
+
 
 .ant-input-prefix{
     margin-right: 10px !important;
@@ -142,10 +144,10 @@ a {
 
 .ant-input:focus, .ant-input-focused, .ant-input:hover{
     border-color: #ff6783;
-    box-shadow: 0 0 0 2px rgba(255, 120, 117, 0.23);
+    /*box-shadow: 0 0 0 2px rgba(255, 120, 117, 0.23);*/
 }
 
-.ant-upload.ant-upload-select-picture-card:hover{
+.ant-upload.ant-upload-select-picture-card:hover, .ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover{
     border-color: #ff6783;
 }
 
@@ -156,7 +158,29 @@ html {
 ::selection {
     background: #ff6783;
 }
-/* Footer styling END*/
+
+.ant-input-affix-wrapper:focus, .ant-input-affix-wrapper-focused {
+    box-shadow: 0 0 0 2px rgba(255, 120, 117, 0.23);
+}
+
+
+.clickable-text{
+    color: #1890ff !important;
+}
+
+.clickable-text:hover, .clickable-text:active{
+    color: #096dd9 !important;
+}
+
+
+.danger-text{
+    color: #ff4d4f !important;
+}
+
+.danger-text:hover, .danger-text:active {
+    color: #983133 !important;
+}
+
 /* ----------------------------------------------------------------- GLOBAL ---- */
 
 
@@ -298,3 +322,6 @@ html {
 
 /* ----------------------------------------------------------------- Profile ---- */
 
+.ant-comment-actions > li{
+    width: 100%;
+}
