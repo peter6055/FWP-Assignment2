@@ -1,12 +1,74 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Card, Comment, Image, Row, Col, Form, Input, Button, Upload, Modal} from "antd";
+import {Avatar, Card, Comment, Image, Row, Col, Form, Input, Button, Upload, Modal, message} from "antd";
 import {PlusOutlined} from '@ant-design/icons';
+import $ from 'jquery';
+
 import {getUserName} from "../data/repository";
+
 
 
 const {TextArea} = Input;
 
 const Post = (props) => {
+    const [Name, setName] = useState(getUserName(props.id));
+
+
+    // ============================================================== Make Post ===============================
+    const MakePostElement = () => (
+        <Card style={{width: "100%"}}>
+            <Comment
+                avatar={
+                    <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
+                        backgroundColor: "#f56a00",
+                        verticalAlign: 'middle',
+                        fontSize: '17px'
+                    }}>
+                        {JSON.stringify(Name).charAt(1).toUpperCase()}
+                    </Avatar>
+                }
+                content={
+                    <div>
+                        <Form.Item>
+                            <TextArea id="postTextItem" rows={4} placeholder={"Write a post..."}/>
+                        </Form.Item>
+                        <Form.Item>
+                            <Upload
+                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                accept="image/*"
+                                listType="picture-card"
+                                fileList={fileList}
+                                onPreview={handleFilePreview}
+                                onChange={handleFileUpload}
+                                onRemove={handleFileRemove}
+                            >
+                                {fileList.length >= 8 ? null :
+                                    <div>
+                                        <PlusOutlined/>
+                                        <div style={{marginTop: 8,}}>Upload</div>
+                                    </div>
+                                }
+                            </Upload>
+                            <Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>
+                                <img
+                                    alt="example"
+                                    style={{
+                                        width: '100%',
+                                    }}
+                                    src={previewImage}
+                                />
+                            </Modal>
+                            <TextArea type={"hidden"} style={{display: "none"}} id="postImageItem" rows={4}/>
+                        </Form.Item>
+                        <Form.Item>
+                            <Button htmlType="submit" onClick={handleSubmitPost} type="primary">Make a Post</Button>
+                        </Form.Item>
+                    </div>
+                }
+            >
+            </Comment>
+        </Card>
+    );
+
     // upload file
     const [fileList, setFileList] = useState([]);
     const handleFileUpload = (e) => {
@@ -68,69 +130,82 @@ const Post = (props) => {
         // this is images of post
         console.log(fileList)
 
-        // TODO: validations and save to storage
+        // TODO DI: make a post validations and save to storage
+
+        // successful msg
+        message.success({
+            content: 'Post successful',
+            style: {
+                marginTop: '80px',
+            },
+        });
+    };
+    // ============================================================== Make Post ===============================
+
+
+    const handleReplyOnClick = (e) => {
+        var currentReplyInputDisplay = $(e.target).children().css("display")
+
+        if(currentReplyInputDisplay == "none"){
+            $(e.target).children().css({display: "inline"});
+
+        } else if(currentReplyInputDisplay == "inline") {
+            $(e.target).children().css({display: "none"});
+
+        }
     };
 
 
-    const CommentElement = () => (
+    const handleReplySubmit = (e) => {
+        // TODO HD.2 reply post
+        //this is the value of input textarea
+        console.log($(e.target).closest('.ant-comment-content-detail').find('textarea').val())
+
+        // successful msg
+        message.success({
+            content: 'Reply posted',
+            style: {
+                marginTop: '80px',
+            },
+        });
+    }
+
+    // ============================================================== Post ===============================
+    // the children in post is comment(reply)
+    const PostElement = ({children}) => (
         <Card style={{width: "100%"}}>
             <Comment
-                avatar={
-                    <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
-                        backgroundColor: "#f56a00",
-                        verticalAlign: 'middle',
-                        fontSize: '17px'
-                    }}>
-                        {getUserName(props.id).charAt(1).toUpperCase()}
-                    </Avatar>
-                }
-                content={
+                actions={[
                     <div>
-                        <Form.Item>
-                            <TextArea id="postTextItem" rows={4} placeholder={"Write a post..."}/>
-                        </Form.Item>
-                        <Form.Item>
-                            <Upload
-                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                accept="image/*"
-                                listType="picture-card"
-                                fileList={fileList}
-                                onPreview={handleFilePreview}
-                                onChange={handleFileUpload}
-                                onRemove={handleFileRemove}
-                            >
-                                {fileList.length >= 8 ? null :
-                                    <div>
-                                        <PlusOutlined/>
-                                        <div style={{marginTop: 8,}}>Upload</div>
-                                    </div>
-                                }
-                            </Upload>
-                            <Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>
-                                <img
-                                    alt="example"
-                                    style={{
-                                        width: '100%',
-                                    }}
-                                    src={previewImage}
-                                />
-                            </Modal>
-                            <TextArea type={"hidden"} style={{display: "none"}} id="postImageItem" rows={4}/>
-                        </Form.Item>
-                        <Form.Item>
-                            <Button htmlType="submit" onClick={handleSubmitPost} type="primary">Make a Post</Button>
-                        </Form.Item>
+                        <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
+                            Reply post
+                            <replyinput style={{display: "none"}}>
+                                <Comment
+                                    avatar={
+                                        <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
+                                            backgroundColor: "#f56a00",
+                                            verticalAlign: 'middle',
+                                            fontSize: '17px'
+                                        }}>
+                                            {JSON.stringify(Name).charAt(1).toUpperCase()}
+                                        </Avatar>
+                                    }
+                                    content={
+                                        <div>
+                                            <Form.Item>
+                                                <TextArea rows={2} placeholder={"Write a reply..."}/>
+                                            </Form.Item>
+                                            <Form.Item>
+                                                <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
+                                            </Form.Item>
+                                        </div>
+                                    }
+                                >
+                                </Comment>
+                            </replyinput>
+                        </span>
                     </div>
-                }
-            >
-            </Comment>
-        </Card>
-    );
-
-    const PostElement = () => (
-        <Card style={{width: "100%"}}>
-
-            <Comment
+                ]}
                 author={<a>Han Solo</a>}
                 avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
                                 className={"postAvatar"}/>}
@@ -153,19 +228,78 @@ const Post = (props) => {
                     "2022-08-09 23:08:41"
                 }
             >
-
+                {children}
             </Comment>
         </Card>
-
     );
+    // ============================================================== Post ===============================
+
+
+    // ============================================================== Comment ===============================
+    // the children in comment(reply) is sub-comment(sub-reply)
+    const CommentElement  = ({children}) => (
+        <Comment
+            actions={[
+                <div>
+                        <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
+                            Reply post
+                            <replyinput style={{display: "none"}}>
+                                <Comment
+                                    avatar={
+                                        <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
+                                            backgroundColor: "#f56a00",
+                                            verticalAlign: 'middle',
+                                            fontSize: '17px'
+                                        }}>
+                                            {JSON.stringify(Name).charAt(1).toUpperCase()}
+                                        </Avatar>
+                                    }
+                                    content={
+                                        <div>
+                                            <Form.Item>
+                                                <TextArea rows={2} placeholder={"Write a reply..."}/>
+                                            </Form.Item>
+                                            <Form.Item>
+                                                <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
+                                            </Form.Item>
+                                        </div>
+                                    }
+                                >
+                                </Comment>
+                            </replyinput>
+                        </span>
+                </div>
+            ]}
+            author={<a>Han Solo</a>}
+            avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />}
+            content={
+                <p>
+                    We supply a series of design principles, practical patterns and high quality design
+                    resources (Sketch and Axure).
+                </p>
+            }
+        >
+            {children}
+        </Comment>
+    );
+    // ============================================================== Comment ===============================
 
 
     return (
         <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
             <Col span={24} style={{maxWidth: "1000px"}}>
                 <div className={"postContainer"}>
-                    <CommentElement></CommentElement>
-                    <PostElement></PostElement>
+                    <MakePostElement></MakePostElement>
+                    <PostElement>
+                        <CommentElement>
+                            <CommentElement>
+                                <CommentElement>
+                                    <CommentElement>
+                                    </CommentElement>
+                                </CommentElement>
+                            </CommentElement>
+                        </CommentElement>
+                    </PostElement>
                     <PostElement></PostElement>
                     <PostElement></PostElement>
                     <PostElement></PostElement>

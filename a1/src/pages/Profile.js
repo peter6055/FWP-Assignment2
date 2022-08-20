@@ -1,13 +1,11 @@
 import React, {useState} from "react";
 import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
-import {QuestionCircleOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
+import {QuestionCircleOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 
-import editLogo from '../assets/edit.png'
-import deleteLogo from '../assets/delete.png'
 import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA} from "../data/repository";
 
-const {Text, Paragraph, Title} = Typography;
+const {Text, Paragraph} = Typography;
 
 const Profile = (props) => {
     const navigate = useNavigate();
@@ -42,17 +40,18 @@ const Profile = (props) => {
         }
     }
 
-    // TODO: spec hd.1: on click handle hook
-    const actions = [
-        <div className={"button"} style={{backgroundImage: `url(${editLogo})`, color: "#1d9ce2"}}>Edit Post</div>,
-        <div className={"button"} style={{backgroundImage: `url(${deleteLogo})`, color: "#e62332"}}>Delete Post</div>
-    ];
 
 
-    const CommentElement = () => (
+
+    // ============================================================== Post ===============================
+    // the children in post is comment(reply)
+    const PostElement = ({children}) => (
         <Card style={{width: "100%"}}>
             <Comment
-                actions={actions}
+                actions={[
+                    <span key="comment-nested-reply-to" onClick={handleEditPost}>Edit post</span>,
+                    <span key="comment-nested-reply-to" onClick={handleDeletePost}>Delete post</span>
+                ]}
                 author={<a>Han Solo</a>}
                 avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
                                 className={"postAvatar"}/>}
@@ -75,9 +74,43 @@ const Profile = (props) => {
                     "2022-08-09 23:08:41"
                 }
             >
+                {children}
             </Comment>
         </Card>
     );
+
+    // TODO HD.1 edit post
+    const handleEditPost = () => (
+        null
+    );
+
+    // TODO HD.1 delete post
+    const handleDeletePost = () => (
+        null
+    );
+    // ============================================================== Post ===============================
+
+
+    // ============================================================== Comment ===============================
+    // the children in comment(reply) is sub-comment(sub-reply)
+    const CommentElement  = ({children}) => (
+        <Comment
+            // no need reply in profile page
+            // actions={[<span key="comment-nested-reply-to">Reply to</span>]}
+            author={<a>Han Solo</a>}
+            avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />}
+            content={
+                <p>
+                    We supply a series of design principles, practical patterns and high quality design
+                    resources (Sketch and Axure).
+                </p>
+            }
+        >
+            {children}
+        </Comment>
+    );
+    // ============================================================== Comment ===============================
+
 
     // ============================================================== MFA ===============================
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -152,7 +185,6 @@ const Profile = (props) => {
         }
     };
 
-
     const handleCancel = () => {
         setIsModalVisible(false);
     };
@@ -170,7 +202,6 @@ const Profile = (props) => {
                             {JSON.stringify(Name).charAt(1).toUpperCase()}
                         </Avatar>
 
-                        {/* TODO: spec pa.d: hide editable, delete account btn + list users' post in this page*/}
                         <Typography.Title
                             editable={{
                                 onChange: handleNameChange,
@@ -231,96 +262,20 @@ const Profile = (props) => {
             </Col>
             <Col span={17} style={{maxWidth: "855px"}}>
                 <div className={"postContainer"}>
-                    <CommentElement></CommentElement>
-                    <CommentElement></CommentElement>
-                    <CommentElement></CommentElement>
-                    <CommentElement></CommentElement>
-                    <CommentElement></CommentElement>
+
+                    <PostElement>
+                        <CommentElement>
+                            <CommentElement>
+                            </CommentElement>
+                        </CommentElement>
+                    </PostElement>
+
+                    <PostElement></PostElement>
+                    <PostElement></PostElement>
+                    <PostElement></PostElement>
+                    <PostElement></PostElement>
                 </div>
             </Col>
-            {/*<Col span={6} style={{}}>*/}
-            {/*    <div className={"infoContainer"}>*/}
-            {/*        <Alert*/}
-            {/*            message={*/}
-            {/*                <Title level={4}>Getting Start</Title>*/}
-
-            {/*            }*/}
-            {/*            description={*/}
-            {/*                <div>*/}
-            {/*                    <li>Take a post</li>*/}
-            {/*                    <li>Discover your friend</li>*/}
-            {/*                    <li>Manage profile</li>*/}
-            {/*                    <li>Connect with friends</li>*/}
-
-            {/*                </div>*/}
-            {/*            }*/}
-            {/*            type="warning"*/}
-            {/*        />*/}
-            {/*        <Card style={{ width: "100%", marginTop: "20px" }}>*/}
-            {/*            <Title level={4}>Discover</Title>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*            <div className={"discoverFriendContainer"}>*/}
-            {/*                <Avatar size={50} icon={<UserOutlined />} />*/}
-            {/*                <div className={"discoverFriendProfile"}>*/}
-            {/*                    <span><strong>Name Smith</strong></span>*/}
-            {/*                    <span>name@loopagile.com</span>*/}
-            {/*                </div>*/}
-            {/*                <div className={"discoverFriendBtn"}>*/}
-            {/*                    View*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*        </Card>*/}
-            {/*    </div>*/}
-            {/*</Col>*/}
         </Row>
     );
 
