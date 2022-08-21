@@ -47,21 +47,10 @@ function createUsers(username, password, email) {
             id: id        
          };
 
-    
-    const reply = {
-            UserId : id,
-            parentId: "",
-            replyId : "",
-            reply_data:"",
-            reply_time:""
-        }
     const users = getUsers();
-    const replys = getReplys();
     users.push(user);
-    replys.push(reply);
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
     localStorage.setItem(USER_KEY, JSON.stringify(id));
-    localStorage.setItem(REPLY_DATABASE, JSON.stringify(replys));
     return id;
 }
 
@@ -88,7 +77,25 @@ function createPost(userId, text, images){
     posts.push(post);
     localStorage.setItem(POST_DATABASE, JSON.stringify(posts));
 }
-
+function createReply(userId, parentId,text){
+    const replys = getReplys();
+    const d = new Date();
+    let date = d.getDate()
+    let month = d.getMonth();
+    let year = d.getFullYear();
+    let hour=d.getHours();
+    let minutes=d.getMinutes()
+    const reply_time = `${year}-${month}-${date} ${hour}:${minutes}`;
+    const reply = {
+        userId : userId,
+        parentId: parentId,
+        replyId : generateId(),
+        reply_data:text,
+        reply_time:reply_time
+    }
+    replys.push(reply);
+    localStorage.setItem(REPLY_DATABASE, JSON.stringify(replys));
+}
 
 function generateId(){
     return uuidv4();
@@ -175,6 +182,21 @@ function removeUser() {
     localStorage.removeItem(USER_KEY);
 }
 
+function getNameByReplyId(id){
+    const users = getUsers();
+    const replys =getReplys();
+    let userId="";
+    for (const reply of replys) {
+        if (id === reply.replyId) {
+            userId=reply.userId;
+        }
+    }
+    for (const user of users) {
+        if (userId === user.id) {
+            return user.username
+        }
+    }
+}
 
 function changeName(id, newUsername) {
     const newUsers = [];
@@ -201,7 +223,9 @@ function changeEmail(id, newEmail) {
         }
         return true
     } else {
-        alert("Please input a valid email address " + newEmail)
+        message.error({
+            content: 'Please input a valid email address',
+        });
     }
 }
 
@@ -355,7 +379,7 @@ function printPost(handleReplySubmit, handleReplyOnClick){
                                                 <TextArea rows={2} placeholder={"Write a reply..."}/>
                                             </Form.Item>
                                             <Form.Item>
-                                                <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
+                                                <Button htmlType="submit" parentId={post.postId} onClick={handleReplySubmit} type="primary">Reply</Button>
                                             </Form.Item>
                                         </div>
                                     }
@@ -366,8 +390,13 @@ function printPost(handleReplySubmit, handleReplyOnClick){
                     </div>
                 ]}
                 author={<a>{getUserName(id)}</a>}
-                avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
-                                className={"postAvatar"}/>}
+                avatar={<Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
+                    backgroundColor: "#f56a00",
+                    verticalAlign: 'middle',
+                    fontSize: '17px'
+                }}>
+                    {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
+                </Avatar>}
                 content={
                     <div>
                         <p>
@@ -382,6 +411,7 @@ function printPost(handleReplySubmit, handleReplyOnClick){
                     post.post_time
                 }
             >
+                {printPostReplys(post.postId,handleReplyOnClick, handleReplySubmit)}
             </Comment>
             </Card>
             );
@@ -389,7 +419,8 @@ function printPost(handleReplySubmit, handleReplyOnClick){
     return <div>{print}</div>;
 }
 
-function printProfilePost(id, editPostOnClick){
+
+function printProfilePost(id, editPostOnClick, deletePost, handleEditPost, handleReplyOnClick, handleReplySubmit){
     const {TextArea} = Input;
     let print = [];
     const posts=getPosts();
@@ -426,8 +457,13 @@ function printProfilePost(id, editPostOnClick){
                     </Popconfirm>
                 ]}
                 author={<a>{getUserName(id)}</a>}
-                avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
-                                className={"postAvatar"}/>}
+                avatar={<Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
+                    backgroundColor: "#f56a00",
+                    verticalAlign: 'middle',
+                    fontSize: '17px'
+                }}>
+                    {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
+                </Avatar>}
                 content={
                     <div>
                         <div className={"postText"}>
@@ -445,6 +481,7 @@ function printProfilePost(id, editPostOnClick){
                     post.post_time
                 }
             >
+                {printProfileReplys(post.postId,handleReplyOnClick, handleReplySubmit)}
             </Comment>
         </Card>
             );
@@ -453,57 +490,101 @@ function printProfilePost(id, editPostOnClick){
     return <div>{print}</div>;
 }
 
-function deletePost(e){
-    // get post id
-    console.log($(e.target).closest(".ant-popover-inner-content").find('input').val());
-
-    // alert("confirmed");
-    // const posts=getPosts();
-    // const newPosts=[];
-    // for(const post of posts){
-    //     if (post.postId!==id){
-    //         newPosts.push(post);
-    //         //delete reply here
-    //     }
-    // }
-    // localStorage.setItem(POST_DATABASE, JSON.stringify(newPosts));
-    // message.success({
-    //     content: 'Post message deleted!',
-    // });
+function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit){
+    console.log(parentId);
+    const {TextArea} = Input;
+    const replys=getReplys();
+    let print = [];
+    for (const reply of replys) {
+        if (reply.parentId===parentId){
+            const name=getNameByReplyId(reply.replyId);
+            print.push(<Comment
+                actions={[
+                    <div>
+                            <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
+                                Reply post
+                                <replyinput style={{display: "none"}}>
+                                    <Comment
+                                        avatar={
+                                            <Avatar alt={name} className={"postAvatar"} size="default" style={{
+                                                backgroundColor: "#f56a00",
+                                                verticalAlign: 'middle',
+                                                fontSize: '17px'
+                                            }}>
+                                                {JSON.stringify(name).charAt(1).toUpperCase()}
+                                            </Avatar>
+                                        }
+                                        content={
+                                            <div>
+                                                <Form.Item>
+                                                    <TextArea rows={2} placeholder={"Write a reply..."}/>
+                                                </Form.Item>
+                                                <Form.Item>
+                                                    <Button htmlType="submit" parentId={reply.replyId} onClick={handleReplySubmit} type="primary">Reply</Button>
+                                                </Form.Item>
+                                            </div>
+                                        }
+                                    >
+                                    </Comment>
+                                </replyinput>
+                            </span>
+                    </div>
+                ]}
+                author={<a>{name}</a>}
+                avatar={
+                    <Avatar alt={name} className={"postAvatar"} size="default" style={{
+                        backgroundColor: "#f56a00",
+                        verticalAlign: 'middle',
+                        fontSize: '17px'
+                    }}>
+                        {JSON.stringify(name).charAt(1).toUpperCase()}
+                    </Avatar>
+                }                content={
+                    <p>
+                        {reply.reply_data}
+                    </p>
+                }
+            >
+                {printPostReplys(reply.replyId, handleReplyOnClick, handleReplySubmit)}
+            </Comment>)
+        }
+    }
+    return <div>{print}</div>;
 }
 
-
-function handleEditPost(e){
-    // get post id
-    // reply similar
-    console.log($(e.target).closest(".postText").find('button').attr( "postId"));
-
-    // this is the value user type
-    console.log($(e.target).closest('.ant-comment-content').find('.postText > textarea').val());
-
-    //TODO HD.1 save edit to localstorage
-
-    // recover to non-editable mode
-    // remove text area
-    $(e.target).closest('.ant-comment-content').find('.postText > textarea').remove();
-
-    // show read only text
-    $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "inline"})
-
-    // hide save btn
-    $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "none"});
-
-    // show edit post btn
-    $(e.target).closest('.ant-comment-content').find('.ant-comment-actions > li:first > span').css({display: "inline"});
-
-    // successful msg
-    message.success({
-        content: "Edit successful",
-    });
-
+function printProfileReplys(parentId, handleReplyOnClick, handleReplySubmit){
+    const replys=getReplys();
+    let print = [];
+    for (const reply of replys) {
+        if (reply.parentId===parentId){
+            const name=getNameByReplyId(reply.replyId);
+            print.push(<Comment
+                author={<a>{name}</a>}
+                avatar={
+                    <Avatar alt={name} className={"postAvatar"} size="default" style={{
+                        backgroundColor: "#f56a00",
+                        verticalAlign: 'middle',
+                        fontSize: '17px'
+                    }}>
+                        {JSON.stringify(name).charAt(1).toUpperCase()}
+                    </Avatar>
+                }                content={
+                    <p>
+                        {reply.reply_data}
+                    </p>
+                }
+            >
+                {printProfileReplys(reply.replyId, handleReplyOnClick, handleReplySubmit)}
+            </Comment>)
+        }
+    }
+    return <div>{print}</div>;
 }
 
 export {
+    getReplys,
+    createReply,
+    getPosts,
     printProfilePost,
     printPost,
     createPost,

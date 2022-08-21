@@ -3,7 +3,7 @@ import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comm
 import {QuestionCircleOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 
-import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA, printProfilePost} from "../data/repository";
+import {changeEmail, getPosts,getReplys,changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA, printProfilePost} from "../data/repository";
 import $ from "jquery";
 
 const {Text, Paragraph} = Typography;
@@ -19,10 +19,41 @@ const Profile = (props) => {
         props.logoutUser();
         navigate("/");
 
+        const posts=getPosts();
+        const newPosts=[];
+        for(const post of posts){
+            if (post.userId!==props.id){
+                newPosts.push(post);
+            }else{
+                //delete reply here
+                deleteReply(post.postId);
+            }
+        }
+        localStorage.setItem("posts", JSON.stringify(newPosts));
+        // delete reply message to others
+        deleteReplied(props.id);
+
         message.success({
             content: 'Account deleted! You are now logout.',
         });
     };
+
+
+    function deleteReplied(userId){
+        const replys=getReplys();
+        const newReplys=[];
+        let nextID="";
+        for (const reply of replys){
+            if (reply.userId!==userId){
+                newReplys.push(reply);
+            }else{
+                nextID=reply.replyId;
+            }
+        }
+        localStorage.setItem("replys", JSON.stringify(newReplys));
+        if(nextID!==""){deleteReply(nextID);}
+    }
+    
 
     const handleNameChange = (event) => {
         if (changeName(props.id, event)) {
@@ -40,7 +71,157 @@ const Profile = (props) => {
 
 
 
+    //useless
 
+    // ============================================================== Post ===============================
+    // the children in post is comment(reply)
+    // const PostElement = ({children}) => (
+    //     <Card style={{width: "100%"}}>
+    //         <Comment
+    //             actions={[
+    //                 <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
+    //                 <Popconfirm
+    //                     title={"You sure you want to delete this post?"}
+    //                     icon={
+    //                         <QuestionCircleOutlined
+    //                             style={{
+    //                                 color: 'red',
+    //                             }}
+    //                         />
+    //                     }
+    //                     onConfirm={handleDeletePost}
+    //                     placement="bottom"
+    //                     okText="Delete Forever!"
+    //                     cancelText="No"
+    //                 >
+    //                     <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
+    //                 </Popconfirm>
+    //             ]}
+    //             author={<a>Han Solo</a>}
+    //             avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
+    //                             className={"postAvatar"}/>}
+    //             content={
+    //                 <div>
+    //                     <div className={"postText"}>
+    //                         <p>
+    //                             We supply a series of design principles, practical patterns and high quality design
+    //                             resources (Sketch and Axure), to help people create their product prototypes beautifully
+    //                             and efficiently.
+    //                         </p>
+    //                         <Button type="primary" onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
+    //                     </div>
+    //                     <div className={"postImageGroup"}>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //
+    //                     </div>
+    //                 </div>
+    //             }
+    //             datetime={
+    //                 "2022-08-09 23:08:41"
+    //             }
+    //         >
+    //             {children}
+    //         </Comment>
+    //     </Card>
+    // );
+
+    const editPostOnClick = (e) => {
+        // this is the post content text already display on the entry
+        var currentPostText = $(e.target).closest('.ant-comment-content').find('.postText > p').text();
+
+        // hide read only and add a textarea
+        $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "none"})
+        $(e.target).closest('.ant-comment-content').find('.postText').prepend('' +
+            '<textarea class="ant-input" rows="4" style="width: 100%">' + currentPostText + '</textarea>'
+        );
+
+        // add a save btn after the content text
+        $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "inline"});
+
+        // hide edit post btn
+        $(e.target).css({display: "none"});
+
+    };
+
+    function handleEditPost(e){
+        // get post id
+        const id=$(e.target).closest(".postText").find('button').attr( "postId");
+    
+        // this is the value user type
+        const newText = $(e.target).closest('.ant-comment-content').find('.postText > textarea').val();
+        if (newText.length>200 || !newText){
+            message.error({
+                content: 'Post message can not be empty or exceed 250 characters',
+            });
+            return
+        }
+        //TODO HD.1 save edit to localstorage
+        const posts=getPosts();
+        for(const post of posts){
+            if (post.postId===id){
+                post.post_data[0]=newText;
+            }
+        }
+        localStorage.setItem("posts", JSON.stringify(posts));
+        setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost));
+
+        // recover to non-editable mode
+        // remove text area
+        $(e.target).closest('.ant-comment-content').find('.postText > textarea').remove();
+    
+        // show read only text
+        $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "inline"})
+    
+        // hide save btn
+        $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "none"});
+    
+        // show edit post btn
+        $(e.target).closest('.ant-comment-content').find('.ant-comment-actions > li:first > span').css({display: "inline"});
+    
+        // successful msg
+        message.success({
+            content: "Edit successful",
+        });
+    }
+
+    function deleteReply(id){
+        const replys=getReplys();
+        const newReplys=[];
+        let nextID="";
+        for (const reply of replys){
+            if (reply.parentId!==id){
+                newReplys.push(reply);
+            }else{
+                nextID=id;
+            }
+
+        }
+        localStorage.setItem("replys", JSON.stringify(newReplys));
+        if(nextID!==""){deleteReply(nextID);}
+    }
+
+    function deletePost(e){
+        // get post id
+        const id=$(e.target).closest(".ant-popover-inner-content").find('input').val();
+        const posts=getPosts();
+        const newPosts=[];
+        for(const post of posts){
+            if (post.postId!==id){
+                newPosts.push(post);
+            }else{
+                //delete reply here
+                deleteReply(id);
+            }
+        }
+        localStorage.setItem("posts", JSON.stringify(newPosts));
+        message.success({
+            content: 'Post message deleted!',
+        });
+        setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost));
+    }
+    const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
     // ============================================================== Post ===============================
     // the children in post is comment(reply)
     // const PostElement = ({children}) => (
@@ -127,7 +308,7 @@ const Profile = (props) => {
     const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id, editPostOnClick));
     // ============================================================== Post ===============================
 
-
+    //useless
     // ============================================================== Comment ===============================
     // the children in comment(reply) is sub-comment(sub-reply)
     // const CommentElement  = ({children}) => (
@@ -294,18 +475,6 @@ const Profile = (props) => {
             </Col>
             <Col span={17} style={{maxWidth: "855px"}}>
                 <div className={"postContainer"}>
-
-                    {/* <PostElement>
-                        <CommentElement>
-                            <CommentElement>
-                            </CommentElement>
-                        </CommentElement>
-                    </PostElement>
-
-                    <PostElement></PostElement>
-                    <PostElement></PostElement>
-                    <PostElement></PostElement>
-                    <PostElement></PostElement> */}
                     {postsProfileData}
                 </div>
             </Col>

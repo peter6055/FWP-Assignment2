@@ -17,7 +17,7 @@ import {
 import {PlusOutlined, LoadingOutlined} from '@ant-design/icons';
 import $ from 'jquery';
 
-import {getUserName, createPost, printPost} from "../data/repository";
+import {getUserName, createPost, printPost, createReply} from "../data/repository";
 import {upload} from "../data/aws";
 
 
@@ -35,18 +35,19 @@ const Post = (props) => {
 
         } else if(currentReplyInputDisplay == "inline") {
             $(e.target).children().css({display: "none"});
-
         }
     };
     const handleReplySubmit = (e) => {
         // TODO HD.2 reply post
         //this is the value of input textarea
-        console.log($(e.target).closest('.ant-comment-content-detail').find('textarea').val())
-
+        const text=$(e.target).closest('.ant-comment-content-detail').find('textarea').val();
+        const parentId=$(e.target).closest(".ant-form-item").find('button').attr( "parentId");
+        createReply(props.id, parentId,text);
         // successful msg
         message.success({
             content: 'Reply posted',
         });
+        setPostData(printPost(handleReplySubmit, handleReplyOnClick));
     }
 
 
@@ -216,121 +217,123 @@ const Post = (props) => {
             content: 'Post successful',
         });
     };
+        //useless
     // ============================================================== Make Post ===============================
 
     // ============================================================== Post ===============================
     // the children in post is comment(reply)
-    const PostElement = ({children}) => (
-        <Card style={{width: "100%"}}>
-            <Comment
-                actions={[
-                    <div>
-                        <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
-                            Reply post
-                            <replyinput style={{display: "none"}}>
-                                <Comment
-                                    avatar={
-                                        <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
-                                            backgroundColor: "#f56a00",
-                                            verticalAlign: 'middle',
-                                            fontSize: '17px'
-                                        }}>
-                                            {JSON.stringify(Name).charAt(1).toUpperCase()}
-                                        </Avatar>
-                                    }
-                                    content={
-                                        <div>
-                                            <Form.Item>
-                                                <TextArea rows={2} placeholder={"Write a reply..."}/>
-                                            </Form.Item>
-                                            <Form.Item>
-                                                <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
-                                            </Form.Item>
-                                        </div>
-                                    }
-                                >
-                                </Comment>
-                            </replyinput>
-                        </span>
-                    </div>
-                ]}
-                author={<a>Han Solo</a>}
-                avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
-                                className={"postAvatar"}/>}
-                content={
-                    <div>
-                        <p>
-                            We supply a series of design principles, practical patterns and high quality design
-                            resources (Sketch and Axure), to help people create their product prototypes beautifully
-                            and efficiently.
-                        </p>
-                        <div className={"postImageGroup"}>
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    // const PostElement = ({children}) => (
+    //     <Card style={{width: "100%"}}>
+    //         <Comment
+    //             actions={[
+    //                 <div>
+    //                     <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
+    //                         Reply post
+    //                         <replyinput style={{display: "none"}}>
+    //                             <Comment
+    //                                 avatar={
+    //                                     <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
+    //                                         backgroundColor: "#f56a00",
+    //                                         verticalAlign: 'middle',
+    //                                         fontSize: '17px'
+    //                                     }}>
+    //                                         {JSON.stringify(Name).charAt(1).toUpperCase()}
+    //                                     </Avatar>
+    //                                 }
+    //                                 content={
+    //                                     <div>
+    //                                         <Form.Item>
+    //                                             <TextArea rows={2} placeholder={"Write a reply..."}/>
+    //                                         </Form.Item>
+    //                                         <Form.Item>
+    //                                             <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
+    //                                         </Form.Item>
+    //                                     </div>
+    //                                 }
+    //                             >
+    //                             </Comment>
+    //                         </replyinput>
+    //                     </span>
+    //                 </div>
+    //             ]}
+    //             author={<a>Han Solo</a>}
+    //             avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
+    //                             className={"postAvatar"}/>}
+    //             content={
+    //                 <div>
+    //                     <p>
+    //                         We supply a series of design principles, practical patterns and high quality design
+    //                         resources (Sketch and Axure), to help people create their product prototypes beautifully
+    //                         and efficiently.
+    //                     </p>
+    //                     <div className={"postImageGroup"}>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
 
-                        </div>
-                    </div>
-                }
-                datetime={
-                    "2022-08-09 23:08:41"
-                }
-            >
-                {children}
-            </Comment>
-        </Card>
-    );
+    //                     </div>
+    //                 </div>
+    //             }
+    //             datetime={
+    //                 "2022-08-09 23:08:41"
+    //             }
+    //         >
+    //             {children}
+    //         </Comment>
+    //     </Card>
+    // );
     // ============================================================== Post ===============================
 
 
     // ============================================================== Comment ===============================
     // the children in comment(reply) is sub-comment(sub-reply)
-    const CommentElement  = ({children}) => (
-        <Comment
-            actions={[
-                <div>
-                        <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
-                            Reply post
-                            <replyinput style={{display: "none"}}>
-                                <Comment
-                                    avatar={
-                                        <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
-                                            backgroundColor: "#f56a00",
-                                            verticalAlign: 'middle',
-                                            fontSize: '17px'
-                                        }}>
-                                            {JSON.stringify(Name).charAt(1).toUpperCase()}
-                                        </Avatar>
-                                    }
-                                    content={
-                                        <div>
-                                            <Form.Item>
-                                                <TextArea rows={2} placeholder={"Write a reply..."}/>
-                                            </Form.Item>
-                                            <Form.Item>
-                                                <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
-                                            </Form.Item>
-                                        </div>
-                                    }
-                                >
-                                </Comment>
-                            </replyinput>
-                        </span>
-                </div>
-            ]}
-            author={<a>Han Solo</a>}
-            avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />}
-            content={
-                <p>
-                    We supply a series of design principles, practical patterns and high quality design
-                    resources (Sketch and Axure).
-                </p>
-            }
-        >
-            {children}
-        </Comment>
-    );
+    // const CommentElement  = ({children}) => (
+    //     <Comment
+    //         actions={[
+    //             <div>
+    //                     <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
+    //                         Reply post
+    //                         <replyinput style={{display: "none"}}>
+    //                             <Comment
+    //                                 avatar={
+    //                                     <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
+    //                                         backgroundColor: "#f56a00",
+    //                                         verticalAlign: 'middle',
+    //                                         fontSize: '17px'
+    //                                     }}>
+    //                                         {JSON.stringify(Name).charAt(1).toUpperCase()}
+    //                                     </Avatar>
+    //                                 }
+    //                                 content={
+    //                                     <div>
+    //                                         <Form.Item>
+    //                                             <TextArea rows={2} placeholder={"Write a reply..."}/>
+    //                                         </Form.Item>
+    //                                         <Form.Item>
+    //                                             <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
+    //                                         </Form.Item>
+    //                                     </div>
+    //                                 }
+    //                             >
+    //                             </Comment>
+    //                         </replyinput>
+    //                     </span>
+    //             </div>
+    //         ]}
+    //         author={<a>Han Solo</a>}
+    //         avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />}
+    //         content={
+    //             <p>
+    //                 We supply a series of design principles, practical patterns and high quality design
+    //                 resources (Sketch and Axure).
+    //             </p>
+    //         }
+    //     >
+    //         {children}
+    //     </Comment>
+    // );
     // ============================================================== Comment ===============================
+    //useless
 
 
     return (
@@ -338,19 +341,6 @@ const Post = (props) => {
             <Col span={24} style={{maxWidth: "1000px"}}>
                 <div className={"postContainer"}>
                     <MakePostElement></MakePostElement>
-                    {/* <PostElement>
-                        <CommentElement>
-                            <CommentElement>
-                                <CommentElement>
-                                    <CommentElement>
-                                    </CommentElement>
-                                </CommentElement>
-                            </CommentElement>
-                        </CommentElement>
-                    </PostElement>
-                    <PostElement></PostElement>
-                    <PostElement></PostElement>
-                    <PostElement></PostElement> */}
                     {postsData}
                 </div>
             </Col>

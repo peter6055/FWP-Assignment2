@@ -46,7 +46,7 @@ const Login = (props) => {
             }
 
         }
-
+    //useless
         // Reset password field to blank.
         // TODO this seem to have bug
         // const temp = {...fields};
