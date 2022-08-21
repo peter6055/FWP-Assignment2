@@ -331,7 +331,7 @@ function printPost(handleReplySubmit, handleReplyOnClick){
             i++;
         }
         print.push(
-            <Card style={{width: "100%"}}>
+            <Card style={{width: "100%", marginTop: "12px"}}>
             <Comment
                 actions={[
                     <div>
@@ -450,6 +450,7 @@ function printProfilePost(id,handleEditPost, editPostOnClick){
     }
     return <div>{print}</div>;
 }
+
 function deletePost(id){
     alert("confirmed");
     const posts=getPosts();
@@ -463,9 +464,6 @@ function deletePost(id){
     localStorage.setItem(POST_DATABASE, JSON.stringify(newPosts));
     message.success({
         content: 'Post message deleted!',
-        style: {
-            marginTop: '80px',
-        },
     });
 }
 export {

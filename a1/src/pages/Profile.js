@@ -21,9 +21,6 @@ const Profile = (props) => {
 
         message.success({
             content: 'Account deleted! You are now logout.',
-            style: {
-                marginTop: '80px',
-            },
         });
     };
 
@@ -139,9 +136,6 @@ const Profile = (props) => {
         // successful msg
         message.success({
             content: "Edit successful",
-            style: {
-                marginTop: '80px',
-            },
         });
 
     }
@@ -153,9 +147,6 @@ const Profile = (props) => {
         // successful msg
         message.success({
             content: "Completed!",
-            style: {
-                marginTop: '80px',
-            },
         });
 
     };
@@ -180,6 +171,7 @@ const Profile = (props) => {
         >
             {children}
         </Comment>
+    );
     // ============================================================== Comment ===============================
 
 
@@ -244,9 +236,6 @@ const Profile = (props) => {
             setIsModalVisible(false);
             message.success({
                 content: "Completed!",
-                style: {
-                    marginTop: '80px',
-                },
             });
 
         } else {

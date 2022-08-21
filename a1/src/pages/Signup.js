@@ -34,9 +34,6 @@ const Signup = (props) => {
             navigate("/Profile");
             message.success({
                 content: 'Sign up successful',
-                style: {
-                    marginTop: '80px',
-                },
             });
         }
         // Set error message.

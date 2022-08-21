@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
     Avatar,
     Card,
@@ -26,6 +26,30 @@ const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 
 const Post = (props) => {
+
+    const handleReplyOnClick = (e) => {
+        var currentReplyInputDisplay = $(e.target).children().css("display")
+
+        if(currentReplyInputDisplay == "none"){
+            $(e.target).children().css({display: "inline"});
+
+        } else if(currentReplyInputDisplay == "inline") {
+            $(e.target).children().css({display: "none"});
+
+        }
+    };
+    const handleReplySubmit = (e) => {
+        // TODO HD.2 reply post
+        //this is the value of input textarea
+        console.log($(e.target).closest('.ant-comment-content-detail').find('textarea').val())
+
+        // successful msg
+        message.success({
+            content: 'Reply posted',
+        });
+    }
+
+
     const [Name, setName] = useState(getUserName(props.id));
     const [postsData, setPostData] = useState(printPost(handleReplySubmit, handleReplyOnClick));
 
@@ -93,6 +117,8 @@ const Post = (props) => {
     const handleFileUpload = (e) => {
         // display loading state, no using hook cuz re-rendering cause upload issue
         $("#upload-loading-spinner").css("display", "flex");
+
+        console.log(e);
 
         let status = e.file.status;
         let event = e.event;
@@ -175,9 +201,6 @@ const Post = (props) => {
         if (text.length>200 || !text){
             message.error({
                 content: 'Post message can not be empty or exceed 250 characters',
-                style: {
-                    marginTop: '80px',
-                },
             });
             return
         }
@@ -191,39 +214,9 @@ const Post = (props) => {
         // successful msg
         message.success({
             content: 'Post successful',
-            style: {
-                marginTop: '80px',
-            },
         });
     };
     // ============================================================== Make Post ===============================
-
-
-
-    const handleReplyOnClick = (e) => {
-        var currentReplyInputDisplay = $(e.target).children().css("display")
-
-        if(currentReplyInputDisplay == "none"){
-            $(e.target).children().css({display: "inline"});
-
-        } else if(currentReplyInputDisplay == "inline") {
-            $(e.target).children().css({display: "none"});
-
-        }
-    };
-    const handleReplySubmit = (e) => {
-        // TODO HD.2 reply post
-        //this is the value of input textarea
-        console.log($(e.target).closest('.ant-comment-content-detail').find('textarea').val())
-
-        // successful msg
-        message.success({
-            content: 'Reply posted',
-            style: {
-                marginTop: '80px',
-            },
-        });
-    }
 
     // ============================================================== Post ===============================
     // the children in post is comment(reply)
@@ -336,6 +329,7 @@ const Post = (props) => {
         >
             {children}
         </Comment>
+    );
     // ============================================================== Comment ===============================
 
 
