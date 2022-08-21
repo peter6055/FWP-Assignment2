@@ -7,7 +7,6 @@ import React, {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {getMFA, getMFAStatus, verifyMFAAnswer, verifyUser, setUser} from "../data/repository";
 import {Link} from "react-router-dom";
-import $ from 'jquery';
 
 
 const Login = (props) => {
@@ -47,7 +46,7 @@ const Login = (props) => {
             }
 
         }
-
+    //useless
         // Reset password field to blank.
         // TODO this seem to have bug
         // const temp = {...fields};
@@ -67,9 +66,6 @@ const Login = (props) => {
 
         message.success({
             content: 'Login successful',
-            style: {
-                marginTop: '80px',
-            },
         });
     }
 

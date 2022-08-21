@@ -234,6 +234,7 @@ html {
 .profilePage {
     background: #f9f9f5;
     padding: 30px 200px 0px calc(200px - 1%);
+    height: 100vh;
 }
 
 
@@ -324,4 +325,17 @@ html {
 
 .ant-comment-actions > li{
     width: 100%;
+}
+
+#upload-loading-spinner{
+    margin-top: 20px;
+}
+
+#upload-loading-spinner > .ant-spin-text{
+    margin-left: 10px;
+}
+
+#upload-loading-spinner > .ant-spin-text,  #upload-loading-spinner {
+    color: #ff6783 !important;
+
 }
