@@ -388,7 +388,7 @@ function printPost(handleReplySubmit, handleReplyOnClick){
     return <div>{print}</div>;
 }
 
-function printProfilePost(id,handleEditPost, editPostOnClick, handleDeletePost){
+function printProfilePost(id,handleEditPost, editPostOnClick){
     const {TextArea} = Input;
     let print = [];
     const posts=getPosts();
@@ -415,7 +415,7 @@ function printProfilePost(id,handleEditPost, editPostOnClick, handleDeletePost){
                                 }}
                             />
                         }
-                        onConfirm={handleDeletePost}
+                        onConfirm={deletePost(post.postId)}
                         placement="bottom"
                         okText="Delete Forever!"
                         cancelText="No"
@@ -449,6 +449,24 @@ function printProfilePost(id,handleEditPost, editPostOnClick, handleDeletePost){
         }
     }
     return <div>{print}</div>;
+}
+function deletePost(id){
+    alert("confirmed");
+    const posts=getPosts();
+    const newPosts=[];
+    for(const post of posts){
+        if (post.postId!==id){
+            newPosts.push(post);
+            //delete reply here
+        }
+    }
+    localStorage.setItem(POST_DATABASE, JSON.stringify(newPosts));
+    message.success({
+        content: 'Post message deleted!',
+        style: {
+            marginTop: '80px',
+        },
+    });
 }
 export {
     printProfilePost,
