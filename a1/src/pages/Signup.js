@@ -36,8 +36,6 @@ const Signup = (props) => {
                 content: 'Sign up successful',
             });
         }
-        // Set error message.
-        //setErrorMessage("Username and / or password invalid, please try again.");
     }
     // Generic change handler.
     const handleInputChange = (event) => {
@@ -50,7 +48,7 @@ const Signup = (props) => {
         setFields(temp);
     }
     return (
-        <Row style={{height: 'calc(100vh - 120px)'}}>
+        <Row style={{height: 'calc(100vh - 50px)'}}>
             <Col className={"login-page login-page-left"} span={12} style={{}}>
                 <img src={Logo} width={300} style={{paddingBottom: "20px"}} alt="Logo"></img>
                 <img src={AccountPageBg} width={400} alt="AccountPageBg"></img>

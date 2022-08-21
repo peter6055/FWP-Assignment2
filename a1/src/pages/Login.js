@@ -46,14 +46,6 @@ const Login = (props) => {
             }
 
         }
-    //useless
-        // Reset password field to blank.
-        // TODO this seem to have bug
-        // const temp = {...fields};
-        // temp.password = "";
-        // setFields(temp);
-        // document.getElementById("passwordInputBox").value = "";
-
     }
 
     const credentialVerified = () =>{
@@ -124,7 +116,7 @@ const Login = (props) => {
 
 
     return (
-        <Row style={{height: 'calc(100vh - 120px)'}}>
+        <Row style={{height: 'calc(100vh - 50px)'}}>
             <Col className={"login-page login-page-left"} span={12} style={{}}>
                 <img src={Logo} width={300} style={{paddingBottom: "20px"}} alt="Logo"></img>
                 <img src={AccountPageBg} width={400} alt="AccountPageBg"></img>

@@ -38,15 +38,21 @@ const Post = (props) => {
         }
     };
     const handleReplySubmit = (e) => {
-        // TODO HD.2 reply post
         //this is the value of input textarea
         const text=$(e.target).closest('.ant-comment-content-detail').find('textarea').val();
         const parentId=$(e.target).closest(".ant-form-item").find('button').attr( "parentId");
-        createReply(props.id, parentId,text);
+        $(e.target).closest('.ant-comment-content-detail').find('textarea').val('').change();
+
+        createReply(props.id, parentId, text);
         // successful msg
         message.success({
             content: 'Reply posted',
         });
+
+        // after successful reply
+        // hide reply input
+        $(e.target).closest("replyinput").css({display: "none"});
+
         setPostData(printPost(handleReplySubmit, handleReplyOnClick));
     }
 
@@ -116,10 +122,9 @@ const Post = (props) => {
     const [fileList, setFileList] = useState([]);
     let url;
     const handleFileUpload = (e) => {
+        console.log(e);
         // display loading state, no using hook cuz re-rendering cause upload issue
         $("#upload-loading-spinner").css("display", "flex");
-
-        console.log(e);
 
         let status = e.file.status;
         let event = e.event;
@@ -139,13 +144,15 @@ const Post = (props) => {
         if (status === "uploading" && event === undefined) {
             reader.onload = function (e) {
 
-                if(upload(fileUploadName, reader.result, type) !== ""){
+                var result = upload(fileUploadName, reader.result, type);
+
+                if(result !== ""){
 
                     url = 'https://s3789585.s3.ap-southeast-2.amazonaws.com/fwp-a1/' + fileUploadName
 
                     setTimeout(function() {
-                        fileList.push({"uid": uid, "name": name, "status": "done", "url": url});
-                    }, 1500);
+                        fileList.push({"uid": uid, "name": name, "status": "done", "url": url})
+                    }, 2500);
 
                 } else {
                     alert("AWS upload promise issue");
@@ -197,7 +204,6 @@ const Post = (props) => {
     // onclick make a post
     const handleSubmitPost = () => {
         // this is text of post
-        console.log(document.getElementById("postTextItem").value)
         const text = document.getElementById("postTextItem").value;
         if (text.length>200 || !text){
             message.error({
@@ -206,135 +212,18 @@ const Post = (props) => {
             return
         }
 
-        // this is images of post
-        console.log(fileList)
-
-        // TODO DI: make a post validations and save to storage
         createPost(props.id ,text, fileList);
         setPostData(printPost(handleReplySubmit, handleReplyOnClick));
+
         // successful msg
         message.success({
             content: 'Post successful',
         });
+
+        // clear file list
+        setFileList([]);
     };
-        //useless
     // ============================================================== Make Post ===============================
-
-    // ============================================================== Post ===============================
-    // the children in post is comment(reply)
-    // const PostElement = ({children}) => (
-    //     <Card style={{width: "100%"}}>
-    //         <Comment
-    //             actions={[
-    //                 <div>
-    //                     <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
-    //                         Reply post
-    //                         <replyinput style={{display: "none"}}>
-    //                             <Comment
-    //                                 avatar={
-    //                                     <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
-    //                                         backgroundColor: "#f56a00",
-    //                                         verticalAlign: 'middle',
-    //                                         fontSize: '17px'
-    //                                     }}>
-    //                                         {JSON.stringify(Name).charAt(1).toUpperCase()}
-    //                                     </Avatar>
-    //                                 }
-    //                                 content={
-    //                                     <div>
-    //                                         <Form.Item>
-    //                                             <TextArea rows={2} placeholder={"Write a reply..."}/>
-    //                                         </Form.Item>
-    //                                         <Form.Item>
-    //                                             <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
-    //                                         </Form.Item>
-    //                                     </div>
-    //                                 }
-    //                             >
-    //                             </Comment>
-    //                         </replyinput>
-    //                     </span>
-    //                 </div>
-    //             ]}
-    //             author={<a>Han Solo</a>}
-    //             avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
-    //                             className={"postAvatar"}/>}
-    //             content={
-    //                 <div>
-    //                     <p>
-    //                         We supply a series of design principles, practical patterns and high quality design
-    //                         resources (Sketch and Axure), to help people create their product prototypes beautifully
-    //                         and efficiently.
-    //                     </p>
-    //                     <div className={"postImageGroup"}>
-    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-
-    //                     </div>
-    //                 </div>
-    //             }
-    //             datetime={
-    //                 "2022-08-09 23:08:41"
-    //             }
-    //         >
-    //             {children}
-    //         </Comment>
-    //     </Card>
-    // );
-    // ============================================================== Post ===============================
-
-
-    // ============================================================== Comment ===============================
-    // the children in comment(reply) is sub-comment(sub-reply)
-    // const CommentElement  = ({children}) => (
-    //     <Comment
-    //         actions={[
-    //             <div>
-    //                     <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
-    //                         Reply post
-    //                         <replyinput style={{display: "none"}}>
-    //                             <Comment
-    //                                 avatar={
-    //                                     <Avatar alt={getUserName(props.id)} className={"postAvatar"} size="default" style={{
-    //                                         backgroundColor: "#f56a00",
-    //                                         verticalAlign: 'middle',
-    //                                         fontSize: '17px'
-    //                                     }}>
-    //                                         {JSON.stringify(Name).charAt(1).toUpperCase()}
-    //                                     </Avatar>
-    //                                 }
-    //                                 content={
-    //                                     <div>
-    //                                         <Form.Item>
-    //                                             <TextArea rows={2} placeholder={"Write a reply..."}/>
-    //                                         </Form.Item>
-    //                                         <Form.Item>
-    //                                             <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
-    //                                         </Form.Item>
-    //                                     </div>
-    //                                 }
-    //                             >
-    //                             </Comment>
-    //                         </replyinput>
-    //                     </span>
-    //             </div>
-    //         ]}
-    //         author={<a>Han Solo</a>}
-    //         avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />}
-    //         content={
-    //             <p>
-    //                 We supply a series of design principles, practical patterns and high quality design
-    //                 resources (Sketch and Axure).
-    //             </p>
-    //         }
-    //     >
-    //         {children}
-    //     </Comment>
-    // );
-    // ============================================================== Comment ===============================
-    //useless
-
 
     return (
         <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>

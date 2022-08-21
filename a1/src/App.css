@@ -36,7 +36,7 @@ a {
     background-repeat: no-repeat;
     background-position: 16px center;
 
-    box-shadow: rgb(16 16 17 / 11%) 0px 3px 6px 3px;
+    box-shadow: rgba(16 16 17 0.11) 0px 3px 6px 3px;
     border-radius: 200px;
 
     font-weight: 500;
@@ -45,7 +45,7 @@ a {
 
 
 .center-cropped {
-    object-fit: none; /* Do not scale the image */
+    object-fit: cover; /* Do not scale the image */
     object-position: center; /* Center the image within the element */
     height: 12vh;
     width: 12vh;
@@ -181,6 +181,11 @@ html {
     color: #983133 !important;
 }
 
+
+html {
+    background: #f9f9f5;
+    height: 100%;
+}
 /* ----------------------------------------------------------------- GLOBAL ---- */
 
 
@@ -338,4 +343,12 @@ html {
 #upload-loading-spinner > .ant-spin-text,  #upload-loading-spinner {
     color: #ff6783 !important;
 
+}
+
+replyinput > .ant-comment > .ant-comment-inner > .ant-comment-avatar{
+    display: none !important;
+}
+
+.reply-input-box > .ant-form-item{
+    margin-bottom: 0px!important;
 }
