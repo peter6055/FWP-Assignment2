@@ -18,6 +18,7 @@ const Profile = (props) => {
         deleteAccount(props.id);
         props.logoutUser();
         navigate("/");
+
         const posts=getPosts();
         const newPosts=[];
         for(const post of posts){
@@ -31,10 +32,12 @@ const Profile = (props) => {
         localStorage.setItem("posts", JSON.stringify(newPosts));
         // delete reply message to others
         deleteReplied(props.id);
+
         message.success({
             content: 'Account deleted! You are now logout.',
         });
     };
+
 
     function deleteReplied(userId){
         const replys=getReplys();
@@ -193,6 +196,7 @@ const Profile = (props) => {
             }else{
                 nextID=id;
             }
+
         }
         localStorage.setItem("replys", JSON.stringify(newReplys));
         if(nextID!==""){deleteReply(nextID);}
@@ -218,6 +222,90 @@ const Profile = (props) => {
         setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost));
     }
     const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
+    // ============================================================== Post ===============================
+    // the children in post is comment(reply)
+    // const PostElement = ({children}) => (
+    //     <Card style={{width: "100%"}}>
+    //         <Comment
+    //             actions={[
+    //                 <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
+    //                 <Popconfirm
+    //                     title={"You sure you want to delete this post?"}
+    //                     icon={
+    //                         <QuestionCircleOutlined
+    //                             style={{
+    //                                 color: 'red',
+    //                             }}
+    //                         />
+    //                     }
+    //                     onConfirm={handleDeletePost}
+    //                     placement="bottom"
+    //                     okText="Delete Forever!"
+    //                     cancelText="No"
+    //                 >
+    //                     <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
+    //                 </Popconfirm>
+    //             ]}
+    //             author={<a>Han Solo</a>}
+    //             avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
+    //                             className={"postAvatar"}/>}
+    //             content={
+    //                 <div>
+    //                     <div className={"postText"}>
+    //                         <p>
+    //                             We supply a series of design principles, practical patterns and high quality design
+    //                             resources (Sketch and Axure), to help people create their product prototypes beautifully
+    //                             and efficiently.
+    //                         </p>
+    //                         <Button type="primary" onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
+    //                     </div>
+    //                     <div className={"postImageGroup"}>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //
+    //                     </div>
+    //                 </div>
+    //             }
+    //             datetime={
+    //                 "2022-08-09 23:08:41"
+    //             }
+    //         >
+    //             {children}
+    //         </Comment>
+    //     </Card>
+    // );
+
+    const editPostOnClick = (e) => {
+        // this is the post content text already display on the entry
+        var currentPostText = $(e.target).closest('.ant-comment-content').find('.postText > p').text();
+
+        // hide read only and add a textarea
+        $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "none"})
+        $(e.target).closest('.ant-comment-content').find('.postText').prepend('' +
+            '<textarea class="ant-input" rows="4" style="width: 100%">' + currentPostText + '</textarea>'
+        );
+
+        // add a save btn after the content text
+        $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "inline"});
+
+        // hide edit post btn
+        $(e.target).css({display: "none"});
+
+    };
+
+
+
+    // TODO HD.1 delete post
+    // const handleDeletePost = (e) => {
+    //
+    //     // successful msg
+    //     message.success({
+    //         content: "Completed!",
+    //     });
+    //
+    // };
+    const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id, editPostOnClick));
     // ============================================================== Post ===============================
 
     //useless

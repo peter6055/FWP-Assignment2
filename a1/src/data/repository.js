@@ -419,6 +419,7 @@ function printPost(handleReplySubmit, handleReplyOnClick){
     return <div>{print}</div>;
 }
 
+
 function printProfilePost(id, editPostOnClick, deletePost, handleEditPost, handleReplyOnClick, handleReplySubmit){
     const {TextArea} = Input;
     let print = [];
@@ -488,6 +489,7 @@ function printProfilePost(id, editPostOnClick, deletePost, handleEditPost, handl
     }
     return <div>{print}</div>;
 }
+
 function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit){
     console.log(parentId);
     const {TextArea} = Input;
@@ -578,6 +580,7 @@ function printProfileReplys(parentId, handleReplyOnClick, handleReplySubmit){
     }
     return <div>{print}</div>;
 }
+
 export {
     getReplys,
     createReply,
