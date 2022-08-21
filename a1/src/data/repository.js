@@ -374,12 +374,12 @@ function printPost(handleReplySubmit, handleReplyOnClick){
                                         </Avatar>
                                     }
                                     content={
-                                        <div>
+                                        <div className={"reply-input-box"}>
                                             <Form.Item>
                                                 <TextArea rows={2} placeholder={"Write a reply..."}/>
                                             </Form.Item>
                                             <Form.Item>
-                                                <Button htmlType="submit" parentId={post.postId} onClick={handleReplySubmit} type="primary">Reply</Button>
+                                                <Button htmlType="submit" style={{marginTop: "10px"}} parentId={post.postId} onClick={handleReplySubmit} type="primary">Reply</Button>
                                             </Form.Item>
                                         </div>
                                     }
@@ -432,7 +432,7 @@ function printProfilePost(id, editPostOnClick, deletePost, handleEditPost){
         }
         if (post.userId===id){
             print.push(
-                <Card style={{width: "100%"}}>
+                <Card style={{width: "100%", marginTop: "12px"}}>
             <Comment
                 actions={[
                     <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
@@ -512,12 +512,12 @@ function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit){
                                             </Avatar>
                                         }
                                         content={
-                                            <div>
+                                            <div className={"reply-input-box"}>
                                                 <Form.Item>
                                                     <TextArea rows={2} placeholder={"Write a reply..."}/>
                                                 </Form.Item>
                                                 <Form.Item>
-                                                    <Button htmlType="submit" parentId={reply.replyId} onClick={handleReplySubmit} type="primary">Reply</Button>
+                                                    <Button htmlType="submit" style={{marginTop: "10px"}} parentId={reply.replyId} onClick={handleReplySubmit} type="primary">Reply</Button>
                                                 </Form.Item>
                                             </div>
                                         }

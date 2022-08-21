@@ -50,7 +50,7 @@ const Profile = (props) => {
         localStorage.setItem("replys", JSON.stringify(newReplys));
         if(nextID!==""){deleteReply(nextID);}
     }
-    
+
 
     const handleNameChange = (event) => {
         if (changeName(props.id, event)) {
@@ -66,63 +66,6 @@ const Profile = (props) => {
         }
     }
 
-
-
-    //useless
-
-    // ============================================================== Post ===============================
-    // the children in post is comment(reply)
-    // const PostElement = ({children}) => (
-    //     <Card style={{width: "100%"}}>
-    //         <Comment
-    //             actions={[
-    //                 <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
-    //                 <Popconfirm
-    //                     title={"You sure you want to delete this post?"}
-    //                     icon={
-    //                         <QuestionCircleOutlined
-    //                             style={{
-    //                                 color: 'red',
-    //                             }}
-    //                         />
-    //                     }
-    //                     onConfirm={handleDeletePost}
-    //                     placement="bottom"
-    //                     okText="Delete Forever!"
-    //                     cancelText="No"
-    //                 >
-    //                     <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
-    //                 </Popconfirm>
-    //             ]}
-    //             author={<a>Han Solo</a>}
-    //             avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
-    //                             className={"postAvatar"}/>}
-    //             content={
-    //                 <div>
-    //                     <div className={"postText"}>
-    //                         <p>
-    //                             We supply a series of design principles, practical patterns and high quality design
-    //                             resources (Sketch and Axure), to help people create their product prototypes beautifully
-    //                             and efficiently.
-    //                         </p>
-    //                         <Button type="primary" onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
-    //                     </div>
-    //                     <div className={"postImageGroup"}>
-    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-    //
-    //                     </div>
-    //                 </div>
-    //             }
-    //             datetime={
-    //                 "2022-08-09 23:08:41"
-    //             }
-    //         >
-    //             {children}
-    //         </Comment>
-    //     </Card>
-    // );
 
     const editPostOnClick = (e) => {
         // this is the post content text already display on the entry
@@ -167,16 +110,16 @@ const Profile = (props) => {
         // recover to non-editable mode
         // remove text area
         $(e.target).closest('.ant-comment-content').find('.postText > textarea').remove();
-    
+
         // show read only text
         $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "inline"})
-    
+
         // hide save btn
         $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "none"});
-    
+
         // show edit post btn
         $(e.target).closest('.ant-comment-content').find('.ant-comment-actions > li:first > span').css({display: "inline"});
-    
+
         // successful msg
         message.success({
             content: "Edit successful",
@@ -240,6 +183,7 @@ const Profile = (props) => {
     //     </Comment>
     // );
     // ============================================================== Comment ===============================
+
 
 
     // ============================================================== MFA ===============================
