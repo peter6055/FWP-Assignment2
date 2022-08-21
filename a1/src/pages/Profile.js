@@ -14,7 +14,6 @@ const Profile = (props) => {
     const [Name, setName] = useState(getUserName(props.id));
     const date = getJoinDate((props.id));
     const confirmSelected = () => {
-        // TODO: delete account & post, clear session
         deleteAccount(props.id);
         props.logoutUser();
         navigate("/");
@@ -87,8 +86,8 @@ const Profile = (props) => {
 
     function handleEditPost(e){
         // get post id
-        alert("aa")
         const id=$(e.target).closest(".postText").find('button').attr( "postId");
+
         // this is the value user type
         const newText = $(e.target).closest('.ant-comment-content').find('.postText > textarea').val();
         if (newText.length>200 || !newText){
@@ -97,13 +96,14 @@ const Profile = (props) => {
             });
             return
         }
-        //TODO HD.1 save edit to localstorage
+
         const posts=getPosts();
         for(const post of posts){
             if (post.postId===id){
                 post.post_data[0]=newText;
             }
         }
+
         localStorage.setItem("posts", JSON.stringify(posts));
         setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
 
@@ -162,28 +162,6 @@ const Profile = (props) => {
     }
     const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
     // ============================================================== Post ===============================
-
-    //useless
-    // ============================================================== Comment ===============================
-    // the children in comment(reply) is sub-comment(sub-reply)
-    // const CommentElement  = ({children}) => (
-    //     <Comment
-    //         // no need reply in profile page
-    //         // actions={[<span key="comment-nested-reply-to">Reply to</span>]}
-    //         author={<a>Han Solo</a>}
-    //         avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />}
-    //         content={
-    //             <p>
-    //                 We supply a series of design principles, practical patterns and high quality design
-    //                 resources (Sketch and Axure).
-    //             </p>
-    //         }
-    //     >
-    //         {children}
-    //     </Comment>
-    // );
-    // ============================================================== Comment ===============================
-
 
 
     // ============================================================== MFA ===============================
