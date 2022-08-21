@@ -40,6 +40,14 @@ const Post = (props) => {
     const handleReplySubmit = (e) => {
         //this is the value of input textarea
         const text=$(e.target).closest('.ant-comment-content-detail').find('textarea').val();
+        console.log(text);
+        if (text.length>200 || !text){
+            message.error({
+                content: 'Reply message can not be empty or exceed 250 characters',
+            });
+            return
+        }
+
         const parentId=$(e.target).closest(".ant-form-item").find('button').attr( "parentId");
         $(e.target).closest('.ant-comment-content-detail').find('textarea').val('').change();
 

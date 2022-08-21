@@ -419,9 +419,7 @@ function printPost(handleReplySubmit, handleReplyOnClick){
     return <div>{print}</div>;
 }
 
-
-function printProfilePost(id, editPostOnClick, deletePost, handleEditPost, handleReplyOnClick, handleReplySubmit){
-    const {TextArea} = Input;
+function printProfilePost(id, editPostOnClick, deletePost, handleEditPost){
     let print = [];
     const posts=getPosts();
     for (const post of posts) {
@@ -481,7 +479,7 @@ function printProfilePost(id, editPostOnClick, deletePost, handleEditPost, handl
                     post.post_time
                 }
             >
-                {printProfileReplys(post.postId,handleReplyOnClick, handleReplySubmit)}
+                {printProfileReplys(post.postId)}
             </Comment>
         </Card>
             );
@@ -489,7 +487,6 @@ function printProfilePost(id, editPostOnClick, deletePost, handleEditPost, handl
     }
     return <div>{print}</div>;
 }
-
 function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit){
     console.log(parentId);
     const {TextArea} = Input;
@@ -552,7 +549,7 @@ function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit){
     return <div>{print}</div>;
 }
 
-function printProfileReplys(parentId, handleReplyOnClick, handleReplySubmit){
+function printProfileReplys(parentId){
     const replys=getReplys();
     let print = [];
     for (const reply of replys) {
@@ -574,13 +571,12 @@ function printProfileReplys(parentId, handleReplyOnClick, handleReplySubmit){
                     </p>
                 }
             >
-                {printProfileReplys(reply.replyId, handleReplyOnClick, handleReplySubmit)}
+                {printProfileReplys(reply.replyId)}
             </Comment>)
         }
     }
     return <div>{print}</div>;
 }
-
 export {
     getReplys,
     createReply,
