@@ -43,57 +43,57 @@ const Profile = (props) => {
 
     // ============================================================== Post ===============================
     // the children in post is comment(reply)
-    const PostElement = ({children}) => (
-        <Card style={{width: "100%"}}>
-            <Comment
-                actions={[
-                    <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
-                    <Popconfirm
-                        title={"You sure you want to delete this post?"}
-                        icon={
-                            <QuestionCircleOutlined
-                                style={{
-                                    color: 'red',
-                                }}
-                            />
-                        }
-                        onConfirm={handleDeletePost}
-                        placement="bottom"
-                        okText="Delete Forever!"
-                        cancelText="No"
-                    >
-                        <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
-                    </Popconfirm>
-                ]}
-                author={<a>Han Solo</a>}
-                avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
-                                className={"postAvatar"}/>}
-                content={
-                    <div>
-                        <div className={"postText"}>
-                            <p>
-                                We supply a series of design principles, practical patterns and high quality design
-                                resources (Sketch and Axure), to help people create their product prototypes beautifully
-                                and efficiently.
-                            </p>
-                            <Button type="primary" onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
-                        </div>
-                        <div className={"postImageGroup"}>
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-                            <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
-
-                        </div>
-                    </div>
-                }
-                datetime={
-                    "2022-08-09 23:08:41"
-                }
-            >
-                {children}
-            </Comment>
-        </Card>
-    );
+    // const PostElement = ({children}) => (
+    //     <Card style={{width: "100%"}}>
+    //         <Comment
+    //             actions={[
+    //                 <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
+    //                 <Popconfirm
+    //                     title={"You sure you want to delete this post?"}
+    //                     icon={
+    //                         <QuestionCircleOutlined
+    //                             style={{
+    //                                 color: 'red',
+    //                             }}
+    //                         />
+    //                     }
+    //                     onConfirm={handleDeletePost}
+    //                     placement="bottom"
+    //                     okText="Delete Forever!"
+    //                     cancelText="No"
+    //                 >
+    //                     <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
+    //                 </Popconfirm>
+    //             ]}
+    //             author={<a>Han Solo</a>}
+    //             avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
+    //                             className={"postAvatar"}/>}
+    //             content={
+    //                 <div>
+    //                     <div className={"postText"}>
+    //                         <p>
+    //                             We supply a series of design principles, practical patterns and high quality design
+    //                             resources (Sketch and Axure), to help people create their product prototypes beautifully
+    //                             and efficiently.
+    //                         </p>
+    //                         <Button type="primary" onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
+    //                     </div>
+    //                     <div className={"postImageGroup"}>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //                         <Image className={"center-cropped"} width={"12vh"} src="https://picsum.photos/200/300"/>
+    //
+    //                     </div>
+    //                 </div>
+    //             }
+    //             datetime={
+    //                 "2022-08-09 23:08:41"
+    //             }
+    //         >
+    //             {children}
+    //         </Comment>
+    //     </Card>
+    // );
 
     const editPostOnClick = (e) => {
         // this is the post content text already display on the entry
@@ -114,64 +114,38 @@ const Profile = (props) => {
     };
 
 
-    function handleEditPost(e){
-        // this is the value user type
-        console.log($(e.target).closest('.ant-comment-content').find('.postText > textarea').val());
-
-        //TODO HD.1 save edit to localstorage
-
-        // recover to non-editable mode
-        // remove text area
-        $(e.target).closest('.ant-comment-content').find('.postText > textarea').remove();
-
-        // show read only text
-        $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "inline"})
-
-        // hide save btn
-        $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "none"});
-
-        // show edit post btn
-        $(e.target).closest('.ant-comment-content').find('.ant-comment-actions > li:first > span').css({display: "inline"});
-
-        // successful msg
-        message.success({
-            content: "Edit successful",
-        });
-
-    }
-
 
     // TODO HD.1 delete post
-    const handleDeletePost = (e) => {
-
-        // successful msg
-        message.success({
-            content: "Completed!",
-        });
-
-    };
-    const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id,handleEditPost, editPostOnClick, handleDeletePost));
+    // const handleDeletePost = (e) => {
+    //
+    //     // successful msg
+    //     message.success({
+    //         content: "Completed!",
+    //     });
+    //
+    // };
+    const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id, editPostOnClick));
     // ============================================================== Post ===============================
 
 
     // ============================================================== Comment ===============================
     // the children in comment(reply) is sub-comment(sub-reply)
-    const CommentElement  = ({children}) => (
-        <Comment
-            // no need reply in profile page
-            // actions={[<span key="comment-nested-reply-to">Reply to</span>]}
-            author={<a>Han Solo</a>}
-            avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />}
-            content={
-                <p>
-                    We supply a series of design principles, practical patterns and high quality design
-                    resources (Sketch and Axure).
-                </p>
-            }
-        >
-            {children}
-        </Comment>
-    );
+    // const CommentElement  = ({children}) => (
+    //     <Comment
+    //         // no need reply in profile page
+    //         // actions={[<span key="comment-nested-reply-to">Reply to</span>]}
+    //         author={<a>Han Solo</a>}
+    //         avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />}
+    //         content={
+    //             <p>
+    //                 We supply a series of design principles, practical patterns and high quality design
+    //                 resources (Sketch and Axure).
+    //             </p>
+    //         }
+    //     >
+    //         {children}
+    //     </Comment>
+    // );
     // ============================================================== Comment ===============================
 
 

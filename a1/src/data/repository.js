@@ -1,6 +1,7 @@
 import {v4 as uuidv4} from 'uuid';
 import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
 import {QuestionCircleOutlined} from '@ant-design/icons';
+import $ from 'jquery';
 
 const USERS_KEY = "users";
 const USER_KEY = "user";
@@ -388,7 +389,7 @@ function printPost(handleReplySubmit, handleReplyOnClick){
     return <div>{print}</div>;
 }
 
-function printProfilePost(id,handleEditPost, editPostOnClick){
+function printProfilePost(id, editPostOnClick){
     const {TextArea} = Input;
     let print = [];
     const posts=getPosts();
@@ -407,7 +408,7 @@ function printProfilePost(id,handleEditPost, editPostOnClick){
                 actions={[
                     <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
                     <Popconfirm
-                        title={"You sure you want to delete this post?"}
+                        title={<div><p>You sure you want to delete this post?</p><input type={"hidden"} name="postId" value={post.postId}></input></div>}
                         icon={
                             <QuestionCircleOutlined
                                 style={{
@@ -415,12 +416,13 @@ function printProfilePost(id,handleEditPost, editPostOnClick){
                                 }}
                             />
                         }
-                        onConfirm={deletePost(post.postId)}
+                        onConfirm={deletePost}
                         placement="bottom"
                         okText="Delete Forever!"
                         cancelText="No"
                     >
                         <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
+
                     </Popconfirm>
                 ]}
                 author={<a>{getUserName(id)}</a>}
@@ -432,7 +434,7 @@ function printProfilePost(id,handleEditPost, editPostOnClick){
                             <p>
                             {post.post_data[0]}
                             </p>
-                            <Button type="primary" onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
+                            <Button type="primary" postId={post.postId} onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
                         </div>
                         <div className={"postImageGroup"}>
                         {images}
@@ -451,21 +453,56 @@ function printProfilePost(id,handleEditPost, editPostOnClick){
     return <div>{print}</div>;
 }
 
-function deletePost(id){
-    alert("confirmed");
-    const posts=getPosts();
-    const newPosts=[];
-    for(const post of posts){
-        if (post.postId!==id){
-            newPosts.push(post);
-            //delete reply here
-        }
-    }
-    localStorage.setItem(POST_DATABASE, JSON.stringify(newPosts));
-    message.success({
-        content: 'Post message deleted!',
-    });
+function deletePost(e){
+    // get post id
+    console.log($(e.target).closest(".ant-popover-inner-content").find('input').val());
+
+    // alert("confirmed");
+    // const posts=getPosts();
+    // const newPosts=[];
+    // for(const post of posts){
+    //     if (post.postId!==id){
+    //         newPosts.push(post);
+    //         //delete reply here
+    //     }
+    // }
+    // localStorage.setItem(POST_DATABASE, JSON.stringify(newPosts));
+    // message.success({
+    //     content: 'Post message deleted!',
+    // });
 }
+
+
+function handleEditPost(e){
+    // get post id
+    // reply similar
+    console.log($(e.target).closest(".postText").find('button').attr( "postId"));
+
+    // this is the value user type
+    console.log($(e.target).closest('.ant-comment-content').find('.postText > textarea').val());
+
+    //TODO HD.1 save edit to localstorage
+
+    // recover to non-editable mode
+    // remove text area
+    $(e.target).closest('.ant-comment-content').find('.postText > textarea').remove();
+
+    // show read only text
+    $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "inline"})
+
+    // hide save btn
+    $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "none"});
+
+    // show edit post btn
+    $(e.target).closest('.ant-comment-content').find('.ant-comment-actions > li:first > span').css({display: "inline"});
+
+    // successful msg
+    message.success({
+        content: "Edit successful",
+    });
+
+}
+
 export {
     printProfilePost,
     printPost,
