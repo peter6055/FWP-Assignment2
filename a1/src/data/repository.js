@@ -1,5 +1,11 @@
+import {v4 as uuidv4} from 'uuid';
+import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
+import {QuestionCircleOutlined} from '@ant-design/icons';
+
 const USERS_KEY = "users";
 const USER_KEY = "user";
+const POST_DATABASE = "posts";
+const REPLY_DATABASE = "replys";
 
 // Initialise local storage "users" with data, if the data is already set this function returns immediately.
 function initUsers() {
@@ -7,12 +13,17 @@ function initUsers() {
     if (localStorage.getItem(USERS_KEY) !== null)
         return;
 
-    // User data is hard-coded, passwords are in plain-text.
     const users = [];
+    const posts = [];
+    const replys = [];
     // Set data into local storage.
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    localStorage.setItem(POST_DATABASE, JSON.stringify(posts));
+    localStorage.setItem(REPLY_DATABASE, JSON.stringify(replys));
 }
+// Initialise
 
+// creating
 function createUsers(username, password, email) {
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -35,38 +46,73 @@ function createUsers(username, password, email) {
             id: id        
          };
 
-    const post =
-        {
-            UserId : id,
-            postId : id,
-            post_data:[],
-        };
     
     const reply = {
             UserId : id,
-            parentId: id,
-            replyId : id,
-            reply_data:[],
+            parentId: "",
+            replyId : "",
+            reply_data:"",
+            reply_time:""
         }
     const users = getUsers();
+    const replys = getReplys();
     users.push(user);
+    replys.push(reply);
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
     localStorage.setItem(USER_KEY, JSON.stringify(id));
+    localStorage.setItem(REPLY_DATABASE, JSON.stringify(replys));
     return id;
 }
 
-function generateId(){
-    const users = getUsers();
-    if (users[0]===undefined){
-        return 1
-    }else{
-        return users[users.length-1].id+1
+function createPost(userId, text, images){
+    const posts = getPosts();
+    const postData =[text];
+    for(const image of images){
+        postData.push(image);
     }
+    const d = new Date();
+    let date = d.getDate()
+    let month = d.getMonth();
+    let year = d.getFullYear();
+    let hour=d.getHours();
+    let minutes=d.getMinutes()
+    const post_time = `${year}-${month}-${date} ${hour}:${minutes}`;
+    const post =
+        {
+            userId : userId,
+            postId : generateId(),
+            post_data: postData,
+            post_time:post_time
+        };
+    posts.push(post);
+    localStorage.setItem(POST_DATABASE, JSON.stringify(posts));
 }
 
+
+function generateId(){
+    return uuidv4();
+}
+// creating
+
+// getter setter delete
 function getUsers() {
     // Extract user data from local storage.
     const data = localStorage.getItem(USERS_KEY);
+
+    // Convert data to objects.
+    return JSON.parse(data);
+}
+
+function getPosts() {
+    // Extract posts data from local storage.
+    const data = localStorage.getItem(POST_DATABASE);
+
+    // Convert data to objects.
+    return JSON.parse(data);
+}
+function getReplys() {
+    // Extract reply data from local storage.
+    const data = localStorage.getItem(REPLY_DATABASE);
 
     // Convert data to objects.
     return JSON.parse(data);
@@ -169,6 +215,7 @@ function deleteAccount(id) {
     localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
     removeUser();
 }
+// getter setter delete
 
 // ============================================================== MFA ===============================
 function setMFA(id, mfaQuestion, mfaAnswer){
@@ -242,14 +289,10 @@ function getMFAStatus(id){
 }
 
 function verifyMFAAnswer(id, mfaAnswer){
-    console.log(id);
-
     if(id !== "" && mfaAnswer!== ""){
         const users = getUsers();
         for (const user of users) {
             if (id === user.id) {
-                console.log(user);
-
                 if(user.mfaStatus === true){
                     if(user.mfaAnswer === mfaAnswer){
                         return true;
@@ -274,8 +317,161 @@ function verifyMFAAnswer(id, mfaAnswer){
     }
 }
 // ============================================================== MFA ===============================
+function printPost(handleReplySubmit, handleReplyOnClick){
+    const {TextArea} = Input;
+    let print = [];
+    const posts=getPosts();
+    for (const post of posts) {
+        const id = post.userId;
+        const images =[];
+        let i=1;
+        while(i<post.post_data.length){
+            let URL=post.post_data[i].url;
+            images.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>)
+            i++;
+        }
+        print.push(
+            <Card style={{width: "100%"}}>
+            <Comment
+                actions={[
+                    <div>
+                        <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
+                            Reply post
+                            <replyinput style={{display: "none"}}>
+                                <Comment
+                                    avatar={
+                                        <Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
+                                            backgroundColor: "#f56a00",
+                                            verticalAlign: 'middle',
+                                            fontSize: '17px'
+                                        }}>
+                                            {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
+                                        </Avatar>
+                                    }
+                                    content={
+                                        <div>
+                                            <Form.Item>
+                                                <TextArea rows={2} placeholder={"Write a reply..."}/>
+                                            </Form.Item>
+                                            <Form.Item>
+                                                <Button htmlType="submit" onClick={handleReplySubmit} type="primary">Reply</Button>
+                                            </Form.Item>
+                                        </div>
+                                    }
+                                >
+                                </Comment>
+                            </replyinput>
+                        </span>
+                    </div>
+                ]}
+                author={<a>{getUserName(id)}</a>}
+                avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
+                                className={"postAvatar"}/>}
+                content={
+                    <div>
+                        <p>
+                            {post.post_data[0]}
+                        </p>
+                        <div className={"postImageGroup"}>
+                            {images}
+                        </div>
+                    </div>
+                }
+                datetime={
+                    post.post_time
+                }
+            >
+            </Comment>
+            </Card>
+            );
+    }
+    return <div>{print}</div>;
+}
 
+function printProfilePost(id,handleEditPost, editPostOnClick){
+    const {TextArea} = Input;
+    let print = [];
+    const posts=getPosts();
+    for (const post of posts) {
+        const images =[];
+        let i=1;
+        while(i<post.post_data.length){
+            let URL=post.post_data[i].url;
+            images.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>)
+            i++;
+        }
+        if (post.userId===id){
+            print.push(
+                <Card style={{width: "100%"}}>
+            <Comment
+                actions={[
+                    <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
+                    <Popconfirm
+                        title={"You sure you want to delete this post?"}
+                        icon={
+                            <QuestionCircleOutlined
+                                style={{
+                                    color: 'red',
+                                }}
+                            />
+                        }
+                        onConfirm={deletePost(post.postId)}
+                        placement="bottom"
+                        okText="Delete Forever!"
+                        cancelText="No"
+                    >
+                        <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
+                    </Popconfirm>
+                ]}
+                author={<a>{getUserName(id)}</a>}
+                avatar={<Avatar size="large" src="https://joeschmoe.io/api/v1/random" alt="Han Solo"
+                                className={"postAvatar"}/>}
+                content={
+                    <div>
+                        <div className={"postText"}>
+                            <p>
+                            {post.post_data[0]}
+                            </p>
+                            <Button type="primary" onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
+                        </div>
+                        <div className={"postImageGroup"}>
+                        {images}
+                        </div>
+                    </div>
+                }
+                datetime={
+                    post.post_time
+                }
+            >
+            </Comment>
+        </Card>
+            );
+        }
+    }
+    return <div>{print}</div>;
+}
+function deletePost(id){
+    alert("confirmed");
+    const posts=getPosts();
+    const newPosts=[];
+    for(const post of posts){
+        if (post.postId!==id){
+            newPosts.push(post);
+            //delete reply here
+        }
+    }
+    localStorage.setItem(POST_DATABASE, JSON.stringify(newPosts));
+    message.success({
+        content: 'Post message deleted!',
+        style: {
+            marginTop: '80px',
+        },
+    });
+}
 export {
+    printProfilePost,
+    printPost,
+    createPost,
     getUserName,
     deleteAccount,
     changeEmail,

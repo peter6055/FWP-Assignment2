@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Avatar,
     Card,
@@ -17,8 +17,9 @@ import {
 import {PlusOutlined, LoadingOutlined} from '@ant-design/icons';
 import $ from 'jquery';
 
-import {getUserName} from "../data/repository";
+import {getUserName, createPost, printPost} from "../data/repository";
 import {upload} from "../data/aws";
+
 
 const {TextArea} = Input;
 const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -26,6 +27,9 @@ const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 const Post = (props) => {
     const [Name, setName] = useState(getUserName(props.id));
+    const [postsData, setPostData] = useState(printPost(handleReplySubmit, handleReplyOnClick));
+
+
     // ============================================================== Make Post ===============================
     const MakePostElement = () => (
         <Card style={{width: "100%"}}>
@@ -71,6 +75,7 @@ const Post = (props) => {
                                     src={previewImage}
                                 />
                             </Modal>
+                            <TextArea type={"hidden"} style={{display: "none"}} id="postImageItem" rows={4}/>
                         </Form.Item>
                         <Form.Item>
                             <Button htmlType="submit" onClick={handleSubmitPost} type="primary">Make a Post</Button>
@@ -166,12 +171,23 @@ const Post = (props) => {
     const handleSubmitPost = () => {
         // this is text of post
         console.log(document.getElementById("postTextItem").value)
+        const text = document.getElementById("postTextItem").value;
+        if (text.length>200 || !text){
+            message.error({
+                content: 'Post message can not be empty or exceed 250 characters',
+                style: {
+                    marginTop: '80px',
+                },
+            });
+            return
+        }
 
         // this is images of post
         console.log(fileList)
 
         // TODO DI: make a post validations and save to storage
-
+        createPost(props.id ,text, fileList);
+        setPostData(printPost(handleReplySubmit, handleReplyOnClick));
         // successful msg
         message.success({
             content: 'Post successful',
@@ -181,6 +197,7 @@ const Post = (props) => {
         });
     };
     // ============================================================== Make Post ===============================
+
 
 
     const handleReplyOnClick = (e) => {
@@ -194,8 +211,6 @@ const Post = (props) => {
 
         }
     };
-
-
     const handleReplySubmit = (e) => {
         // TODO HD.2 reply post
         //this is the value of input textarea
@@ -321,7 +336,6 @@ const Post = (props) => {
         >
             {children}
         </Comment>
-    );
     // ============================================================== Comment ===============================
 
 
@@ -330,7 +344,7 @@ const Post = (props) => {
             <Col span={24} style={{maxWidth: "1000px"}}>
                 <div className={"postContainer"}>
                     <MakePostElement></MakePostElement>
-                    <PostElement>
+                    {/* <PostElement>
                         <CommentElement>
                             <CommentElement>
                                 <CommentElement>
@@ -342,7 +356,8 @@ const Post = (props) => {
                     </PostElement>
                     <PostElement></PostElement>
                     <PostElement></PostElement>
-                    <PostElement></PostElement>
+                    <PostElement></PostElement> */}
+                    {postsData}
                 </div>
             </Col>
         </Row>

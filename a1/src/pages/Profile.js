@@ -3,11 +3,10 @@ import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comm
 import {QuestionCircleOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 
-import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA} from "../data/repository";
+import {changeEmail, changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA, printProfilePost} from "../data/repository";
 import $ from "jquery";
 
 const {Text, Paragraph} = Typography;
-
 
 const Profile = (props) => {
     const navigate = useNavigate();
@@ -160,6 +159,7 @@ const Profile = (props) => {
         });
 
     };
+    const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id,handleEditPost, editPostOnClick, handleDeletePost));
     // ============================================================== Post ===============================
 
 
@@ -180,7 +180,6 @@ const Profile = (props) => {
         >
             {children}
         </Comment>
-    );
     // ============================================================== Comment ===============================
 
 
@@ -333,7 +332,7 @@ const Profile = (props) => {
             <Col span={17} style={{maxWidth: "855px"}}>
                 <div className={"postContainer"}>
 
-                    <PostElement>
+                    {/* <PostElement>
                         <CommentElement>
                             <CommentElement>
                             </CommentElement>
@@ -343,7 +342,8 @@ const Profile = (props) => {
                     <PostElement></PostElement>
                     <PostElement></PostElement>
                     <PostElement></PostElement>
-                    <PostElement></PostElement>
+                    <PostElement></PostElement> */}
+                    {postsProfileData}
                 </div>
             </Col>
         </Row>
