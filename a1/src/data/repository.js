@@ -491,7 +491,6 @@ function printProfilePost(id, editPostOnClick, deletePost, handleEditPost){
     return <div>{print}</div>;
 }
 function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit){
-    console.log(parentId);
     const {TextArea} = Input;
     const replys=getReplys();
     let print = [];
