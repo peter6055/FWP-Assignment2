@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) =>
             type: DataTypes.STRING(300),
             primaryKey: true
         },
+        username: {
+            type: DataTypes.STRING(300),
+            primaryKey: false
+        },
         password: {
             type: DataTypes.STRING(300),
             allowNull: false
@@ -27,6 +31,10 @@ module.exports = (sequelize, DataTypes) =>
         mfa_answer: {
             type: DataTypes.STRING(300),
             allowNull: true
+        },
+        is_del: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
         }
     }, {
         timestamps: false

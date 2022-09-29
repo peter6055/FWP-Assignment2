@@ -1,14 +1,14 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const {Sequelize, DataTypes} = require("sequelize");
 const config = require("./config.js");
 
 const db = {
-  Op: Sequelize.Op
+    Op: Sequelize.Op
 };
 
 // Create Sequelize.
 db.sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
-  host: config.HOST,
-  dialect: config.DIALECT
+    host: config.HOST,
+    dialect: config.DIALECT
 });
 
 // Include models.
@@ -21,34 +21,34 @@ db.reaction = require("./models/reaction.js")(db.sequelize, DataTypes);
 // ------------------------------------------------------------------------------ associations --------------------
 // --------- Post ---------
 // Relate post and user.
-db.post.belongsTo(db.user, { foreignKey: { name: "user_id", allowNull: false } });
+db.post.belongsTo(db.user, {foreignKey: {name: "user_id", allowNull: false}});
 
 // --------- Reply ---------
-db.reply.belongsTo(db.user, { foreignKey: { name: "user_id", allowNull: false } });
-db.reply.belongsTo(db.post, { foreignKey: { name: "parent_id", allowNull: false } });
+db.reply.belongsTo(db.user, {foreignKey: {name: "user_id", allowNull: false}});
+db.reply.belongsTo(db.post, {foreignKey: {name: "parent_post_id", allowNull: false}});
+db.reply.belongsTo(db.reply, {foreignKey: {name: "parent_reply_id", allowNull: false}});
 
 
 // --------- Follow ---------
-db.follow.belongsTo(db.user, { foreignKey: { name: "user_id", allowNull: false } });
-db.follow.belongsTo(db.user, { foreignKey: { name: "followed_user_id", allowNull: false } });
+db.follow.belongsTo(db.user, {foreignKey: {name: "user_id", allowNull: false}});
+db.follow.belongsTo(db.user, {foreignKey: {name: "followed_user_id", allowNull: false}});
 
 
 // --------- Reaction ---------
-db.reaction.belongsTo(db.user, { foreignKey: { name: "user_id", allowNull: false } });
-db.reaction.belongsTo(db.post, { foreignKey: { name: "post_id", allowNull: false } });
-
+db.reaction.belongsTo(db.user, {foreignKey: {name: "user_id", allowNull: false}});
+db.reaction.belongsTo(db.post, {foreignKey: {name: "post_id", allowNull: false}});
 
 
 // ------------------------------------------------------------------------------ associations --------------------
 // Include a sync option with seed data logic included.
 db.sync = async () => {
-  // Sync schema.
-  await db.sequelize.sync();
+    // Sync schema.
+    await db.sequelize.sync();
 
-  // Can sync with force if the schema has become out of date - note that syncing with force is a destructive operation.
-  await db.sequelize.sync({ force: true });
-  
-  // await seedData();
+    // Can sync with force if the schema has become out of date - note that syncing with force is a destructive operation.
+    // await db.sequelize.sync({force: true});
+
+    // await seedData();
 };
 
 // async function seedData() {

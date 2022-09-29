@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) =>
         reply_time: {
             type: DataTypes.STRING(300),
             allowNull: false
+        },
+        is_del: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
         }
     }, {
         // Don't add the timestamp attributes (updatedAt, createdAt).

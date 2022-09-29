@@ -1,13 +1,24 @@
+const controller = require("../controllers/user.controller.js");
 module.exports = (express, app) => {
-  const controller = require("../controllers/post.controller.js");
-  const router = express.Router();
+    const controller = require("../controllers/post.controller.js");
+    const router = express.Router();
 
-  // Select all posts.
-  router.get("/", controller.all);
+    // get all post
+    router.get("/getAll", controller.getAll);
 
-  // Create a new post.
-  router.post("/", controller.create);
+    // get single post
+    router.post("/getSingle", controller.getSingle);
 
-  // Add routes to server.
-  app.use("/api/posts", router);
+    // create a new post.
+    router.post("/create", controller.create);
+
+    // edit post
+    router.post("/edit", controller.edit);
+
+    // delete post
+    router.post("/delete", controller.delete);
+
+
+    // add routes to server.
+    app.use("/api/v1/posts", router);
 };

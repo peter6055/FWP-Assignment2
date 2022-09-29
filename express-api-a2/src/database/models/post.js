@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) =>
             type: DataTypes.STRING(300),
             allowNull: false
         },
+        is_del: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
+        }
     }, {
         // Don't add the timestamp attributes (updatedAt, createdAt).
         timestamps: false
