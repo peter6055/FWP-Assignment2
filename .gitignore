@@ -6,3 +6,12 @@ a1/public/.DS_Store
 a1/src/.DS_Store
 a1/src/assets/.DS_Store
 /a1/node_modules/
+/react-app-a2/package-lock.json
+/react-app-a2/package.json
+/react-app-a2/src/
+/react-app-a2/public/
+/README.md
+/express-api-a2/server.js
+/express-api-a2/package-lock.json
+/express-api-a2/package.json
+/express-api-a2/src/
