@@ -2,12 +2,12 @@
 // import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
 // import {QuestionCircleOutlined} from '@ant-design/icons';
 // import {useNavigate} from 'react-router-dom';
-
+//
 // import {changeEmail, getPosts,getReplys,changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA, printProfilePost} from "../data/repository";
 // import $ from "jquery";
-
+//
 // const {Text, Paragraph} = Typography;
-
+//
 // const Profile = (props) => {
 //     const navigate = useNavigate();
 //     const [Email, setEmail] = useState(getEmail(props.id));
@@ -50,8 +50,8 @@
 //         localStorage.setItem("replys", JSON.stringify(newReplys));
 //         if(nextID!==""){deleteReply(nextID);}
 //     }
-
-
+//
+//
 //     const handleNameChange = (event) => {
 //         if (changeName(props.id, event)) {
 //             setName(event);
@@ -65,30 +65,30 @@
 //             setEmail(event);
 //         }
 //     }
-
-
+//
+//
 //     const editPostOnClick = (e) => {
 //         // this is the post content text already display on the entry
 //         var currentPostText = $(e.target).closest('.ant-comment-content').find('.postText > p').text();
-
+//
 //         // hide read only and add a textarea
 //         $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "none"})
 //         $(e.target).closest('.ant-comment-content').find('.postText').prepend('' +
 //             '<textarea class="ant-input" rows="4" style="width: 100%">' + currentPostText + '</textarea>'
 //         );
-
+//
 //         // add a save btn after the content text
 //         $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "inline"});
-
+//
 //         // hide edit post btn
 //         $(e.target).css({display: "none"});
-
+//
 //     };
-
+//
 //     function handleEditPost(e){
 //         // get post id
 //         const id=$(e.target).closest(".postText").find('button').attr( "postId");
-
+//
 //         // this is the value user type
 //         const newText = $(e.target).closest('.ant-comment-content').find('.postText > textarea').val();
 //         if (newText.length>200 || !newText){
@@ -97,36 +97,36 @@
 //             });
 //             return
 //         }
-
+//
 //         const posts=getPosts();
 //         for(const post of posts){
 //             if (post.postId===id){
 //                 post.post_data[0]=newText;
 //             }
 //         }
-
+//
 //         localStorage.setItem("posts", JSON.stringify(posts));
 //         setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
-
+//
 //         // recover to non-editable mode
 //         // remove text area
 //         $(e.target).closest('.ant-comment-content').find('.postText > textarea').remove();
-
+//
 //         // show read only text
 //         $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "inline"})
-
+//
 //         // hide save btn
 //         $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "none"});
-
+//
 //         // show edit post btn
 //         $(e.target).closest('.ant-comment-content').find('.ant-comment-actions > li:first > span').css({display: "inline"});
-
+//
 //         // successful msg
 //         message.success({
 //             content: "Edit successful",
 //         });
 //     }
-
+//
 //     function deleteReply(id){
 //         const replys=getReplys();
 //         const newReplys=[];
@@ -141,7 +141,7 @@
 //         localStorage.setItem("replys", JSON.stringify(newReplys));
 //         if(nextID!==""){deleteReply(nextID);}
 //     }
-
+//
 //     function deletePost(e){
 //         // get post id
 //         const id=$(e.target).closest(".ant-popover-inner-content").find('input').val();
@@ -163,13 +163,13 @@
 //     }
 //     const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
 //     // ============================================================== Post ===============================
-
-
+//
+//
 //     // ============================================================== MFA ===============================
 //     const [isModalVisible, setIsModalVisible] = useState(false);
 //     const [mfaInputQuestion, setMfaInputQuestion] = useState("");
 //     const [mfaInputAnswer, setMfaInputAnswer] = useState("");
-
+//
 //     // question sources: https://www.beyondtrust.com/blog/entry/reused-security-questions-can-pose-a-high-risk-learn-tips-tricks-to-mitigate-the-threat
 //     const mfaQuestionRecommendationOption = [
 //         { value: 'In what city were you born?' },
@@ -182,8 +182,8 @@
 //         { value: 'Where did you meet your spouse?' },
 //         { value: 'What year was your father (or mother) born?' },
 //     ];
-
-
+//
+//
 //     // Intro content source: https://www.onelogin.com/learn/what-is-mfa
 //     const MFAModal = () =>(
 //         <Modal className={"mfaSetupModal"} title="Set up Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Confirm to set MFA"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
@@ -200,12 +200,12 @@
 //             </Form.Item>
 //         </Modal>
 //     );
-
+//
 //     const showModal = () => {
 //         // getMFA value first
 //         var result = getMFA(props.id);
 //         setIsModalVisible(true);
-
+//
 //         console.log(result["mfaStatus"]);
 //         // hide answer
 //         if(result["mfaStatus"] == true){
@@ -216,31 +216,31 @@
 //             setMfaInputAnswer("Input your answer...");
 //         }
 //     };
-
+//
 //     const handleOk = () => {
 //         let mfaQuestion = document.getElementById("mfaTextQuestion").value;
 //         let mfaAnswer = document.getElementById("mfaTextAnswer").value;
 //         let result = setMFA(props.id, mfaQuestion, mfaAnswer);
-
+//
 //         if(result === true){
 //             setIsModalVisible(false);
 //             message.success({
 //                 content: "Completed!",
 //             });
-
+//
 //         } else {
 //             message.error({
 //                 content: result,
 //             });
 //         }
 //     };
-
+//
 //     const handleCancel = () => {
 //         setIsModalVisible(false);
 //     };
 //     // ============================================================== MFA ===============================
-
-
+//
+//
 //     return (
 //         <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
 //             <Col span={5} style={{display: "flex", justifyContent: "flex-end"}}>
@@ -251,7 +251,7 @@
 //                                 style={{backgroundColor: "#f56a00", verticalAlign: 'middle', fontSize: '70px'}}>
 //                             {JSON.stringify(Name).charAt(1).toUpperCase()}
 //                         </Avatar>
-
+//
 //                         <Typography.Title
 //                             editable={{
 //                                 onChange: handleNameChange,
@@ -265,7 +265,7 @@
 //                         >
 //                             {Name}
 //                         </Typography.Title>
-
+//
 //                         <Paragraph
 //                             editable={{
 //                                 onChange: handleEmailChange,
@@ -278,7 +278,7 @@
 //                         >
 //                             {Email}
 //                         </Paragraph>
-
+//
 //                         <Button type="primary" onClick={showModal}>Setup MFA</Button>
 //                         <MFAModal></MFAModal>
 //                         <br/>
@@ -286,9 +286,9 @@
 //                         <Text type="secondary">{date}</Text>
 //                         <br/>
 //                         <br/>
-
+//
 //                         <Divider orientation="center" plain>Danger Zone</Divider>
-
+//
 //                         <Popconfirm
 //                             title={"After you delete your account, you are not able to login as a user. All of you post will be delete as well."}
 //                             icon={
@@ -315,8 +315,8 @@
 //             </Col>
 //         </Row>
 //     );
-
+//
 // }
-
-
+//
+//
 // export default Profile;

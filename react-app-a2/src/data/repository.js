@@ -42,7 +42,7 @@ async function createUsers(username, password, email) {
             password: password,
             email: email,
             join_date: JoinDate,
-         };
+        };
     const response = await axios.post(API_HOST + "/api/v1/users/create", user);
 
     return response.data;

@@ -26,7 +26,7 @@ db.post.belongsTo(db.user, {foreignKey: {name: "user_id", allowNull: false}});
 // --------- Reply ---------
 db.reply.belongsTo(db.user, {foreignKey: {name: "user_id", allowNull: false}});
 db.reply.belongsTo(db.post, {foreignKey: {name: "parent_post_id", allowNull: false}});
-db.reply.belongsTo(db.reply, {foreignKey: {name: "parent_reply_id", allowNull: false}});
+db.reply.belongsTo(db.reply, {foreignKey: {name: "parent_reply_id", allowNull: true}});
 
 
 // --------- Follow ---------
@@ -36,8 +36,8 @@ db.follow.belongsTo(db.user, {foreignKey: {name: "followed_user_id", allowNull: 
 
 // --------- Reaction ---------
 db.reaction.belongsTo(db.user, {foreignKey: {name: "user_id", allowNull: false}});
-db.reaction.belongsTo(db.post, {foreignKey: {name: "post_id", allowNull: false}});
-
+db.reaction.belongsTo(db.post, {as: 'target_post_id', foreignKey: {name: "post_id", allowNull: true}});
+db.reaction.belongsTo(db.reply, {as: 'target_reply_id', foreignKey: {name: "reply_id", allowNull: true}});
 
 // ------------------------------------------------------------------------------ associations --------------------
 // Include a sync option with seed data logic included.

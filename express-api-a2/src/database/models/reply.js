@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) =>
             type: DataTypes.STRING(300),
             primaryKey: true
         },
-        reply_data: {
+        reply_text: {
             type: DataTypes.STRING(5000),
             allowNull: false
         },
