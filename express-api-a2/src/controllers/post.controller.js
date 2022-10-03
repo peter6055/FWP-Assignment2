@@ -1,7 +1,7 @@
 const db = require("../database");
 const generateRestfulResponse = require("../routes/restful.js")
 var uuid = require('uuid');
-const argon2 = require("argon2");
+const sanitizeHtml = require('sanitize-html');
 
 
 // get all posts
@@ -73,7 +73,7 @@ exports.create = async (request, response) => {
             const post = await db.post.create({
                 user_id: request.body.user_id,
                 post_id: generated_uuid,
-                post_text: request.body.post_text,
+                post_text: sanitizeHtml(request.body.post_text),
                 post_img: request.body.post_img,
                 post_time: request.body.post_time,
                 is_del: "0"
@@ -85,7 +85,7 @@ exports.create = async (request, response) => {
 };
 
 
-// Edit username and email
+// Edit post
 exports.edit = async (request, response) => {
 
     if (request.body.post_id == "") {
@@ -107,7 +107,7 @@ exports.edit = async (request, response) => {
             response.json(generateRestfulResponse(404, null, "Post not found"));
 
         } else {
-            await db.post.update({post_text: request.body.new_post_text}, {
+            await db.post.update({post_text: sanitizeHtml(request.body.new_post_text)}, {
                 raw: true,
                 where: {
                     post_id: request.body.post_id
