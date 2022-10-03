@@ -1,6 +1,13 @@
 import {v4 as uuidv4} from 'uuid';
 import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
-import {QuestionCircleOutlined} from '@ant-design/icons';
+import {
+    QuestionCircleOutlined,
+    LikeFilled,
+    DislikeFilled,
+    StarFilled,
+    PlusCircleFilled,
+    CloseCircleFilled
+} from '@ant-design/icons';
 import axios from "axios";
 
 // TODO ------------------------------------------------------------------------------------------
@@ -346,16 +353,18 @@ function removeUser() {
 // }
 // // ============================================================== MFA ===============================
 
-// function printPost(handleReplySubmit, handleReplyOnClick){
-//
+// // generate post and reply depends on local storage database
+// function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit) {
 //     let print = [];
-//     const posts=getPosts();
+//     const posts = getPosts();
 //     for (const post of posts) {
 //         const id = post.userId;
-//         const images =[];
-//         let i=1;
-//         while(i<post.post_data.length){
-//             let URL=post.post_data[i].url;
+//         const post_id = post.postId;
+//         // generate image tags depends on local storage
+//         const images = [];
+//         let i = 1;
+//         while (i < post.post_data.length) {
+//             let URL = post.post_data[i].url;
 //             images.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>)
 //             i++;
 //         }
@@ -364,8 +373,9 @@ function removeUser() {
 //                 <Comment
 //                     actions={[
 //                         <div>
-//                         <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
-//                             Reply post
+//                         <span key="comment-nested-reply-to" className={"reply"} onClick={handleReplyOnClick}
+//                               style={{cursor: "pointer"}}>
+//                             Reply
 //                             <replyinput style={{display: "none"}}>
 //                                 <Comment
 //                                     avatar={
@@ -382,12 +392,15 @@ function removeUser() {
 //                                             <Form.Item>
 //
 //                                                 {/*TODO -------------------------------------------------------------------------------*/}
-//                                                 <ReactQuill id="postTextItem" theme="snow" placeholder={"Write a post..."}></ReactQuill>
+//                                                 <ReactQuill id="postTextItem" theme="snow"
+//                                                             placeholder={"Write a post..."}></ReactQuill>
 //                                                 {/*TODO -------------------------------------------------------------------------------*/}
 //
 //                                             </Form.Item>
 //                                             <Form.Item>
-//                                                 <Button htmlType="submit" style={{marginTop: "10px"}} parentId={post.postId} onClick={handleReplySubmit} type="primary">Reply</Button>
+//                                                 <Button htmlType="submit" style={{marginTop: "10px"}}
+//                                                         parentId={post.postId} onClick={handleReplySubmit}
+//                                                         type="primary">Reply</Button>
 //                                             </Form.Item>
 //                                         </div>
 //                                     }
@@ -395,6 +408,15 @@ function removeUser() {
 //                                 </Comment>
 //                             </replyinput>
 //                         </span>
+//                             <br/><br/>
+//                             <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
+//                                   target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
+//                             <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}}
+//                                   reaction={"dislike"} target_id={post_id} target_type={"post"}
+//                                   onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
+//                             <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
+//                                   target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
+//
 //                         </div>
 //                     ]}
 //                     author={<a>{getUserName(id)}</a>}
@@ -416,10 +438,22 @@ function removeUser() {
 //                         </div>
 //                     }
 //                     datetime={
-//                         post.post_time
+//                         <div>
+//                             <div style={{display: "flex"}}>{post.post_time}
+//                                 {/* TODO: if have follow this user, display this*/}
+//                                 {/*<div className={"follow-btn has-follow"} style={{position: "absolute", right: 0, top: 0}}*/}
+//                                 {/*     user_id={id} action={"unfollow"} username={getUserName(id)} onClick={handleFollowSubmit}><CloseCircleFilled/> Unfollow*/}
+//                                 {/*</div>*/}
+//
+//                                 {/* TODO: if have not follow this user, display this*/}
+//                                 <div className={"follow-btn"} style={{position: "absolute", right: 0, top: 0}}
+//                                      user_id={id} action={"follow"} username={getUserName(id)} onClick={handleFollowSubmit}><PlusCircleFilled />  Follow @{getUserName(id)}
+//                                 </div>
+//                             </div>
+//                         </div>
 //                     }
 //                 >
-//                     {printPostReplys(post.postId,handleReplyOnClick, handleReplySubmit)}
+//                     {printPostReplys(post.postId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
 //                 </Comment>
 //             </Card>
 //         );
@@ -427,25 +461,28 @@ function removeUser() {
 //     return <div>{print}</div>;
 // }
 //
-// function printProfilePost(id, editPostOnClick, deletePost, handleEditPost){
+// function printProfilePost(id, editPostOnClick, deletePost, handleEditPost) {
 //     let print = [];
-//     const posts=getPosts();
+//     const posts = getPosts();
 //     for (const post of posts) {
-//         const images =[];
-//         let i=1;
-//         while(i<post.post_data.length){
-//             let URL=post.post_data[i].url;
+//         const images = [];
+//         let i = 1;
+//         while (i < post.post_data.length) {
+//             let URL = post.post_data[i].url;
 //             images.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>)
 //             i++;
 //         }
-//         if (post.userId===id){
+//         if (post.userId === id) {
 //             print.push(
 //                 <Card style={{width: "100%", marginTop: "12px"}}>
 //                     <Comment
 //                         actions={[
 //                             <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
 //                             <Popconfirm
-//                                 title={<div><p>You sure you want to delete this post?</p><input type={"hidden"} name="postId" value={post.postId}></input></div>}
+//                                 title={<div><p>You sure you want to delete this post?</p><input type={"hidden"}
+//                                                                                                 name="postId"
+//                                                                                                 value={post.postId}></input>
+//                                 </div>}
 //                                 icon={
 //                                     <QuestionCircleOutlined
 //                                         style={{
@@ -458,7 +495,8 @@ function removeUser() {
 //                                 okText="Delete Forever!"
 //                                 cancelText="No"
 //                             >
-//                                 <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
+//                                 <span className={"danger-text"} key="comment-nested-reply-to"
+//                                       type="danger">Delete post</span>
 //
 //                             </Popconfirm>
 //                         ]}
@@ -477,9 +515,11 @@ function removeUser() {
 //                                         {post.post_data[0]}
 //                                     </p>
 //                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-//                                     <ReactQuill theme="snow" placeholder={"Write a post..."} style={{display:"none"}} value={post.post_data[0]}/>
+//                                     <ReactQuill theme="snow" placeholder={"Write a post..."} style={{display: "none"}}
+//                                                 value={post.post_data[0]}/>
 //                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-//                                     <Button type="primary" postId={post.postId} onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
+//                                     <Button type="primary" postId={post.postId} onClick={handleEditPost}
+//                                             style={{marginTop: "20px", display: "none"}}>Save changes</Button>
 //                                 </div>
 //                                 <div className={"postImageGroup"}>
 //                                     {images}
@@ -498,18 +538,21 @@ function removeUser() {
 //     }
 //     return <div>{print}</div>;
 // }
-// function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit){
-//     const {TextArea} = Input;
-//     const replys=getReplys();
+//
+// function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit) {
+//     const replys = getReplys();
 //     let print = [];
 //     for (const reply of replys) {
-//         if (reply.parentId===parentId){
-//             const name=getNameByReplyId(reply.replyId);
+//         if (reply.parentId === parentId) {
+//             const name = getNameByReplyId(reply.replyId);
+//             const reply_id = reply.replyId;
+//
 //             print.push(<Comment
 //                 actions={[
 //                     <div>
-//                             <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
-//                                 Reply post
+//                             <span key="comment-nested-reply-to" onClick={handleReplyOnClick} className={"reply"}
+//                                   style={{cursor: "pointer"}}>
+//                                 Reply
 //                                 <replyinput style={{display: "none"}}>
 //                                     <Comment
 //                                         avatar={
@@ -525,10 +568,14 @@ function removeUser() {
 //                                             <div className={"reply-input-box"}>
 //                                                 <Form.Item>
 //                                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-//                                                     <ReactQuill id="postTextItem" theme="snow" placeholder={"Write a post..."}/>
-//                                                     {/*// TODO ------------------------------------------------------------------------------------------*/}                                                </Form.Item>
+//                                                     <ReactQuill id="postTextItem" theme="snow"
+//                                                                 placeholder={"Write a post..."}/>
+//                                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
+//                                                 </Form.Item>
 //                                                 <Form.Item>
-//                                                     <Button htmlType="submit" style={{marginTop: "10px"}} parentId={reply.replyId} onClick={handleReplySubmit} type="primary">Reply</Button>
+//                                                     <Button htmlType="submit" style={{marginTop: "10px"}}
+//                                                             parentId={reply.replyId} onClick={handleReplySubmit}
+//                                                             type="primary">Reply</Button>
 //                                                 </Form.Item>
 //                                             </div>
 //                                         }
@@ -536,6 +583,13 @@ function removeUser() {
 //                                     </Comment>
 //                                 </replyinput>
 //                             </span>
+//                         <br/><br/>
+//                         <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
+//                               target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
+//                         <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}} reaction={"dislike"}
+//                               target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
+//                         <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
+//                               target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
 //                     </div>
 //                 ]}
 //                 author={<a>{name}</a>}
@@ -547,25 +601,25 @@ function removeUser() {
 //                     }}>
 //                         {JSON.stringify(name).charAt(1).toUpperCase()}
 //                     </Avatar>
-//                 }                content={
+//                 } content={
 //                 <p>
 //                     {reply.reply_data}
 //                 </p>
 //             }
 //             >
-//                 {printPostReplys(reply.replyId, handleReplyOnClick, handleReplySubmit)}
+//                 {printPostReplys(reply.replyId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
 //             </Comment>)
 //         }
 //     }
 //     return <div>{print}</div>;
 // }
 //
-// function printProfileReplys(parentId){
-//     const replys=getReplys();
+// function printProfileReplys(parentId) {
+//     const replys = getReplys();
 //     let print = [];
 //     for (const reply of replys) {
-//         if (reply.parentId===parentId){
-//             const name=getNameByReplyId(reply.replyId);
+//         if (reply.parentId === parentId) {
+//             const name = getNameByReplyId(reply.replyId);
 //             print.push(<Comment
 //                 author={<a>{name}</a>}
 //                 avatar={
@@ -576,7 +630,7 @@ function removeUser() {
 //                     }}>
 //                         {JSON.stringify(name).charAt(1).toUpperCase()}
 //                     </Avatar>
-//                 }                content={
+//                 } content={
 //                 <p>
 //                     {reply.reply_data}
 //                 </p>
@@ -588,6 +642,7 @@ function removeUser() {
 //     }
 //     return <div>{print}</div>;
 // }
+//
 // export {
 //     getReplys,
 //     createReply,
