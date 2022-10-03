@@ -16,50 +16,59 @@ const Login = (props) => {
     const [errorMessage, setErrorMessage] = useState(null);
     const navigate = useNavigate();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        const result = verifyUser(fields.username, fields.password);
-
+        const result = await verifyUser(fields.username, fields.password);
         //set a temp id for later use
-        idTemp.current = result;
+        // idTemp.current = result;
 
         // If verified login the user.
+        if(result.data === null){
+            setErrorMessage("Username or password incorrect");
+        }else{
+            setUser(result.data.user_id);
+            props.loginUser(result.data.user_id);
 
-        if(result === "error.usr.isempty"){
-            setErrorMessage("Username should not be empty.");
+            // Navigate to the home page.
+            navigate("/profile");
 
-        } else if (result === "error.pswd.isempty") {
-            setErrorMessage("Password should not be empty.");
-
-        } else if (result === "not-authorised.credential.incorrect") {
-            // Set error message.
-            setErrorMessage("Username and / or password invalid, please try again.");
-
-            // no error means user is correct
-        } else {
-            // verify MFA if they setup MFA
-            if(getMFAStatus(idTemp.current) == true){
-                //handle verify
-                handleVerify();
-            } else {
-                credentialVerified();
-            }
-
+            message.success({
+                content: 'Login successful',
+            });
         }
+        // else if (result === "error.pswd.isempty") {
+        //     setErrorMessage("Password should not be empty.");
+
+        // } else if (result === "not-authorised.credential.incorrect") {
+        //     // Set error message.
+        //     setErrorMessage("Username and / or password invalid, please try again.");
+
+        //     // no error means user is correct
+        // } 
+        // else {
+        //     // verify MFA if they setup MFA
+        //     if(getMFAStatus(idTemp.current) == true){
+        //         //handle verify
+        //         handleVerify();
+        //     } else {
+        //         credentialVerified();
+        //     }
+
+        // }
     }
 
-    const credentialVerified = () =>{
-        setUser(idTemp.current);
-        props.loginUser(idTemp.current);
-        localStorage.setItem("user", JSON.stringify(idTemp.current));
+    // const credentialVerified = () =>{
+    //     setUser(idTemp.current);
+    //     props.loginUser(idTemp.current);
+    //     localStorage.setItem("user", JSON.stringify(idTemp.current));
 
-        // Navigate to the home page.
-        navigate("/profile");
+    //     // Navigate to the home page.
+    //     navigate("/profile");
 
-        message.success({
-            content: 'Login successful',
-        });
-    }
+    //     message.success({
+    //         content: 'Login successful',
+    //     });
+    // }
 
 
     // Generic change handler.
@@ -75,43 +84,43 @@ const Login = (props) => {
 
 
     // ============================================================== MFA ===============================
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [mfaInputQuestion, setMfaInputQuestion] = useState("");
-    const MFAModal = () =>(
-        <Modal title="Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Submit"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
-            <p><strong>You had setup MFA, please answer:</strong></p>
-            <p>Question: {mfaInputQuestion}</p>
-            <Form.Item label="Answer">
-                <Input id={"mfaTextAnswer"} placeholder="Please enter the answer. (Case sensitive)" />
-            </Form.Item>
-        </Modal>
-    );
+    // const [isModalVisible, setIsModalVisible] = useState(false);
+    // const [mfaInputQuestion, setMfaInputQuestion] = useState("");
+    // const MFAModal = () =>(
+    //     <Modal title="Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Submit"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
+    //         <p><strong>You had setup MFA, please answer:</strong></p>
+    //         <p>Question: {mfaInputQuestion}</p>
+    //         <Form.Item label="Answer">
+    //             <Input id={"mfaTextAnswer"} placeholder="Please enter the answer. (Case sensitive)" />
+    //         </Form.Item>
+    //     </Modal>
+    // );
 
-    const handleVerify = () => {
-        // getMFA value first
-        var result = getMFA(idTemp.current);
-        setIsModalVisible(true);
-        setMfaInputQuestion(result["mfaQuestion"]);
-    };
+    // const handleVerify = () => {
+    //     // getMFA value first
+    //     var result = getMFA(idTemp.current);
+    //     setIsModalVisible(true);
+    //     setMfaInputQuestion(result["mfaQuestion"]);
+    // };
 
-    const handleOk = () => {
-        let mfaAnswer = document.getElementById("mfaTextAnswer").value;
-        let result = verifyMFAAnswer(idTemp.current, mfaAnswer);
+    // const handleOk = () => {
+    //     let mfaAnswer = document.getElementById("mfaTextAnswer").value;
+    //     let result = verifyMFAAnswer(idTemp.current, mfaAnswer);
 
 
-        if(result === true){
-            credentialVerified();
-        } else {
-            setErrorMessage(result);
-        }
-        setIsModalVisible(false);
-    };
+    //     if(result === true){
+    //         credentialVerified();
+    //     } else {
+    //         setErrorMessage(result);
+    //     }
+    //     setIsModalVisible(false);
+    // };
 
-    const handleCancel = () => {
-        document.getElementById("mfaTextAnswer").value = "";
-        setIsModalVisible(false);
-        setErrorMessage("MFA Cancel, not authorised, please try again!");
-    };
+    // const handleCancel = () => {
+    //     document.getElementById("mfaTextAnswer").value = "";
+    //     setIsModalVisible(false);
+    //     setErrorMessage("MFA Cancel, not authorised, please try again!");
+    // };
     // ============================================================== MFA ===============================
 
 
@@ -145,7 +154,7 @@ const Login = (props) => {
                     </Space>
                     <br/>
                     <br/>
-                    <MFAModal></MFAModal>
+                    {/* <MFAModal></MFAModal> */}
                     {errorMessage !== null && <Alert message={errorMessage} type="error" showIcon />}
 
                     <br/>

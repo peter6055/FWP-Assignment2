@@ -16,7 +16,7 @@ const Signup = (props) => {
     const [fields, setFields] = useState({username: "", password: "", email: ""});
     const [errorMessage, setErrorMessage] = useState(null);
     //const navigate = useNavigate();
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         if (!fields.username) {
             setErrorMessage("User name can not be empty");
@@ -29,8 +29,8 @@ const Signup = (props) => {
         } else if (!/[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/.test(fields.password) || !/[A-Z]/.test(fields.password) || !/[0-9]/.test(fields.password) || !/[a-z]/.test(fields.password)) {
             setErrorMessage("Password should be strong");
         } else {
-            const id=createUsers(fields.username, fields.password, fields.email);
-            props.loginUser(id);
+            const id= await createUsers(fields.username, fields.password, fields.email);
+            props.loginUser(id.data);
             navigate("/Profile");
             message.success({
                 content: 'Sign up successful',

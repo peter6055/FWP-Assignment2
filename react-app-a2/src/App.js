@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState,useEffect} from "react";
 import 'antd/dist/antd.css';
 import './App.css';
 
@@ -12,19 +12,32 @@ import {Avatar, Button, Col, Menu, Row} from "antd";
 import Logo from "./assets/logo.svg";
 import {HomeOutlined, LoginOutlined, LogoutOutlined, PicRightOutlined, UserOutlined} from "@ant-design/icons";
 import {BrowserRouter, NavLink, Routes, Route} from 'react-router-dom';
-import {getUser, removeUser, initUsers, getUserName} from "./data/repository";
+import {getUserDetail, removeUser, initUsers, getUserName, setUser,getUser} from "./data/repository";
 
 let activeClassName = "link-active";
 
 
 function App() {
-    initUsers();
-    const [id, setId] = useState(getUser());
-    const [name, setName] = useState(getUserName(id));
+    // initUsers();
+    // const [id, setId] = useState(getUser());
+    // const [name, setName] = useState(getUserName(id));
+    const [id, setId] = useState(null);
+    const [name, setName] = useState(null);
+    // Load profiles.
+    useEffect(() => {
+    async function loadUser() {
+        const currentUser = await getUserDetail(getUser())
+        setId(currentUser.data.user_id);
+        setName(currentUser.data.username);
+    }
+    loadUser();
+    }, []);
 
-    const loginUser = (id) => {
+    const loginUser = async (id) => {
         setId(id);
-        setName(getUserName(id))
+        setUser(id);
+        const response = await getUserDetail(id);
+        setName(response.data.username);
     }
 
     const logoutUser = () => {
@@ -59,9 +72,9 @@ function App() {
                                     :
                                     <></>
                             }
-                            {/*<NavLink to="login" className={({ isActive }) => isActive && activeClassName}>*/}
-                            {/*    <Menu.Item icon={<UserOutlined />}>Account</Menu.Item>*/}
-                            {/*</NavLink>*/}
+                            <NavLink to="login" className={({ isActive }) => isActive && activeClassName}>
+                               <Menu.Item icon={<UserOutlined />}>Account</Menu.Item>
+                            </NavLink>
 
                             {
                                 name ?
@@ -119,10 +132,10 @@ function App() {
 
                 <Routes>
                     <Route path="/" element={<Home id={id}/>}/>
-                    <Route path="post" element={<Post id={id}/>}/>
+                    {/* <Route path="post" element={<Post id={id}/>}/> */}
                     <Route path="login" element={<Login loginUser={loginUser}/>}/>
                     <Route path="signup" element={<Signup loginUser={loginUser}/>}/>
-                    <Route path="profile" element={<Profile id={id} logoutUser={logoutUser} editName={editName}/>}/>
+                    {/* <Route path="profile" element={<Profile id={id} logoutUser={logoutUser} editName={editName}/>}/> */}
 
                 </Routes>
 
