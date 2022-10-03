@@ -3,6 +3,13 @@ import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comm
 import {QuestionCircleOutlined} from '@ant-design/icons';
 import axios from "axios";
 
+// TODO ------------------------------------------------------------------------------------------
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+// TODO ------------------------------------------------------------------------------------------
+
+
+
 // --- Constants ----------------------------------------------------------------------------------
 const API_HOST = "http://localhost:40003";
 // import $ from 'jquery';
@@ -339,14 +346,12 @@ function removeUser() {
 // }
 // // ============================================================== MFA ===============================
 
-// generate post and reply depends on local storage database
 // function printPost(handleReplySubmit, handleReplyOnClick){
-//     const {TextArea} = Input;
+//
 //     let print = [];
 //     const posts=getPosts();
 //     for (const post of posts) {
 //         const id = post.userId;
-//         // generate image tags depends on local storage
 //         const images =[];
 //         let i=1;
 //         while(i<post.post_data.length){
@@ -356,9 +361,9 @@ function removeUser() {
 //         }
 //         print.push(
 //             <Card style={{width: "100%", marginTop: "12px"}}>
-//             <Comment
-//                 actions={[
-//                     <div>
+//                 <Comment
+//                     actions={[
+//                         <div>
 //                         <span key="comment-nested-reply-to" onClick={handleReplyOnClick} style={{cursor: "pointer"}}>
 //                             Reply post
 //                             <replyinput style={{display: "none"}}>
@@ -375,7 +380,11 @@ function removeUser() {
 //                                     content={
 //                                         <div className={"reply-input-box"}>
 //                                             <Form.Item>
-//                                                 <TextArea rows={2} placeholder={"Write a reply..."}/>
+//
+//                                                 {/*TODO -------------------------------------------------------------------------------*/}
+//                                                 <ReactQuill id="postTextItem" theme="snow" placeholder={"Write a post..."}></ReactQuill>
+//                                                 {/*TODO -------------------------------------------------------------------------------*/}
+//
 //                                             </Form.Item>
 //                                             <Form.Item>
 //                                                 <Button htmlType="submit" style={{marginTop: "10px"}} parentId={post.postId} onClick={handleReplySubmit} type="primary">Reply</Button>
@@ -386,38 +395,38 @@ function removeUser() {
 //                                 </Comment>
 //                             </replyinput>
 //                         </span>
-//                     </div>
-//                 ]}
-//                 author={<a>{getUserName(id)}</a>}
-//                 avatar={<Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
-//                     backgroundColor: "#f56a00",
-//                     verticalAlign: 'middle',
-//                     fontSize: '17px'
-//                 }}>
-//                     {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
-//                 </Avatar>}
-//                 content={
-//                     <div>
-//                         <p>
-//                             {post.post_data[0]}
-//                         </p>
-//                         <div className={"postImageGroup"}>
-//                             {images}
 //                         </div>
-//                     </div>
-//                 }
-//                 datetime={
-//                     post.post_time
-//                 }
-//             >
-//                 {printPostReplys(post.postId,handleReplyOnClick, handleReplySubmit)}
-//             </Comment>
+//                     ]}
+//                     author={<a>{getUserName(id)}</a>}
+//                     avatar={<Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
+//                         backgroundColor: "#f56a00",
+//                         verticalAlign: 'middle',
+//                         fontSize: '17px'
+//                     }}>
+//                         {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
+//                     </Avatar>}
+//                     content={
+//                         <div>
+//                             <p>
+//                                 {post.post_data[0]}
+//                             </p>
+//                             <div className={"postImageGroup"}>
+//                                 {images}
+//                             </div>
+//                         </div>
+//                     }
+//                     datetime={
+//                         post.post_time
+//                     }
+//                 >
+//                     {printPostReplys(post.postId,handleReplyOnClick, handleReplySubmit)}
+//                 </Comment>
 //             </Card>
-//             );
+//         );
 //     }
 //     return <div>{print}</div>;
 // }
-
+//
 // function printProfilePost(id, editPostOnClick, deletePost, handleEditPost){
 //     let print = [];
 //     const posts=getPosts();
@@ -432,55 +441,58 @@ function removeUser() {
 //         if (post.userId===id){
 //             print.push(
 //                 <Card style={{width: "100%", marginTop: "12px"}}>
-//             <Comment
-//                 actions={[
-//                     <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
-//                     <Popconfirm
-//                         title={<div><p>You sure you want to delete this post?</p><input type={"hidden"} name="postId" value={post.postId}></input></div>}
-//                         icon={
-//                             <QuestionCircleOutlined
-//                                 style={{
-//                                     color: 'red',
-//                                 }}
-//                             />
+//                     <Comment
+//                         actions={[
+//                             <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
+//                             <Popconfirm
+//                                 title={<div><p>You sure you want to delete this post?</p><input type={"hidden"} name="postId" value={post.postId}></input></div>}
+//                                 icon={
+//                                     <QuestionCircleOutlined
+//                                         style={{
+//                                             color: 'red',
+//                                         }}
+//                                     />
+//                                 }
+//                                 onConfirm={deletePost}
+//                                 placement="bottom"
+//                                 okText="Delete Forever!"
+//                                 cancelText="No"
+//                             >
+//                                 <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
+//
+//                             </Popconfirm>
+//                         ]}
+//                         author={<a>{getUserName(id)}</a>}
+//                         avatar={<Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
+//                             backgroundColor: "#f56a00",
+//                             verticalAlign: 'middle',
+//                             fontSize: '17px'
+//                         }}>
+//                             {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
+//                         </Avatar>}
+//                         content={
+//                             <div>
+//                                 <div className={"postText"}>
+//                                     <p>
+//                                         {post.post_data[0]}
+//                                     </p>
+//                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
+//                                     <ReactQuill theme="snow" placeholder={"Write a post..."} style={{display:"none"}} value={post.post_data[0]}/>
+//                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
+//                                     <Button type="primary" postId={post.postId} onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
+//                                 </div>
+//                                 <div className={"postImageGroup"}>
+//                                     {images}
+//                                 </div>
+//                             </div>
 //                         }
-//                         onConfirm={deletePost}
-//                         placement="bottom"
-//                         okText="Delete Forever!"
-//                         cancelText="No"
+//                         datetime={
+//                             post.post_time
+//                         }
 //                     >
-//                         <span className={"danger-text"} key="comment-nested-reply-to" type="danger">Delete post</span>
-
-//                     </Popconfirm>
-//                 ]}
-//                 author={<a>{getUserName(id)}</a>}
-//                 avatar={<Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
-//                     backgroundColor: "#f56a00",
-//                     verticalAlign: 'middle',
-//                     fontSize: '17px'
-//                 }}>
-//                     {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
-//                 </Avatar>}
-//                 content={
-//                     <div>
-//                         <div className={"postText"}>
-//                             <p>
-//                             {post.post_data[0]}
-//                             </p>
-//                             <Button type="primary" postId={post.postId} onClick={handleEditPost} style={{marginTop: "20px", display: "none"}}>Save changes</Button>
-//                         </div>
-//                         <div className={"postImageGroup"}>
-//                         {images}
-//                         </div>
-//                     </div>
-//                 }
-//                 datetime={
-//                     post.post_time
-//                 }
-//             >
-//                 {printProfileReplys(post.postId)}
-//             </Comment>
-//         </Card>
+//                         {printProfileReplys(post.postId)}
+//                     </Comment>
+//                 </Card>
 //             );
 //         }
 //     }
@@ -512,8 +524,9 @@ function removeUser() {
 //                                         content={
 //                                             <div className={"reply-input-box"}>
 //                                                 <Form.Item>
-//                                                     <TextArea rows={2} placeholder={"Write a reply..."}/>
-//                                                 </Form.Item>
+//                                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
+//                                                     <ReactQuill id="postTextItem" theme="snow" placeholder={"Write a post..."}/>
+//                                                     {/*// TODO ------------------------------------------------------------------------------------------*/}                                                </Form.Item>
 //                                                 <Form.Item>
 //                                                     <Button htmlType="submit" style={{marginTop: "10px"}} parentId={reply.replyId} onClick={handleReplySubmit} type="primary">Reply</Button>
 //                                                 </Form.Item>
@@ -535,10 +548,10 @@ function removeUser() {
 //                         {JSON.stringify(name).charAt(1).toUpperCase()}
 //                     </Avatar>
 //                 }                content={
-//                     <p>
-//                         {reply.reply_data}
-//                     </p>
-//                 }
+//                 <p>
+//                     {reply.reply_data}
+//                 </p>
+//             }
 //             >
 //                 {printPostReplys(reply.replyId, handleReplyOnClick, handleReplySubmit)}
 //             </Comment>)
@@ -546,7 +559,7 @@ function removeUser() {
 //     }
 //     return <div>{print}</div>;
 // }
-
+//
 // function printProfileReplys(parentId){
 //     const replys=getReplys();
 //     let print = [];
@@ -564,10 +577,10 @@ function removeUser() {
 //                         {JSON.stringify(name).charAt(1).toUpperCase()}
 //                     </Avatar>
 //                 }                content={
-//                     <p>
-//                         {reply.reply_data}
-//                     </p>
-//                 }
+//                 <p>
+//                     {reply.reply_data}
+//                 </p>
+//             }
 //             >
 //                 {printProfileReplys(reply.replyId)}
 //             </Comment>)
@@ -588,6 +601,7 @@ function removeUser() {
 //     changeName,
 //     getEmail,
 //     getJoinDate,
+//     initUsers,
 //     verifyUser,
 //     getUser,
 //     removeUser,
@@ -598,6 +612,7 @@ function removeUser() {
 //     verifyMFAAnswer,
 //     setUser
 // }
+
 export {
     getUser,
     getUserDetail,

@@ -1,4 +1,4 @@
-// import React, {useEffect, useState} from 'react';
+// import React, {useState} from 'react';
 // import {
 //     Avatar,
 //     Card,
@@ -20,13 +20,17 @@
 // import {getUserName, createPost, printPost, createReply} from "../data/repository";
 // import {upload} from "../data/aws";
 //
+// // TODO ------------------------------------------------------------------------------------------
+// import ReactQuill from 'react-quill';
+// import 'react-quill/dist/quill.snow.css';
+// // TODO ------------------------------------------------------------------------------------------
+//
 //
 // const {TextArea} = Input;
 // const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 //
 //
 // const Post = (props) => {
-//
 //     const handleReplyOnClick = (e) => {
 //         var currentReplyInputDisplay = $(e.target).children().css("display")
 //
@@ -37,13 +41,20 @@
 //             $(e.target).children().css({display: "none"});
 //         }
 //     };
+//
 //     const handleReplySubmit = (e) => {
-//         //this is the value of input textarea
-//         const text=$(e.target).closest('.ant-comment-content-detail').find('textarea').val();
-//         console.log(text);
-//         if (text.length>200 || !text){
+//
+//
+//         {/*TODO -------------------------------------------------------------------------------*/}
+//         // this is text of post
+//         const text = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerHTML;
+//         const text_length = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerText.length;
+//         {/*TODO -------------------------------------------------------------------------------*/}
+//
+//         // frocen: this a new way to detect word limit due to formatted text implementation
+//         if (text_length > 600 || !text){
 //             message.error({
-//                 content: 'Reply message can not be empty or exceed 250 characters',
+//                 content: 'Reply message can not be empty or exceed 600 characters',
 //             });
 //             return
 //         }
@@ -59,7 +70,7 @@
 //
 //         // after successful reply
 //         // hide reply input
-//         $(e.target).closest("replyinput").css({display: "none"});
+//         $(e.target).closest('replyinput').css({display: "none"});
 //
 //         setPostData(printPost(handleReplySubmit, handleReplyOnClick));
 //     }
@@ -70,13 +81,7 @@
 //
 //
 //     // ============================================================== Make Post ===============================
-//     const [fileList, setFileList] = useState([]);
-//
-//     useEffect(() => {
-//         // Update the document title using the browser API
-//         console.log(fileList);
-//     },[fileList]);
-//
+//     const [value, setValue] = useState('');
 //     const MakePostElement = () => (
 //         <Card style={{width: "100%"}}>
 //             <Comment
@@ -92,7 +97,10 @@
 //                 content={
 //                     <div>
 //                         <Form.Item>
-//                             <TextArea id="postTextItem" rows={4} placeholder={"Write a post..."}/>
+//                             {/*TODO -------------------------------------------------------------------------------*/}
+//                             <ReactQuill id="postTextItem" theme="snow" placeholder={"Write a post..."}/>
+//                             {/*TODO -------------------------------------------------------------------------------*/}
+//
 //                         </Form.Item>
 //                         <Form.Item>
 //                             <Upload
@@ -134,8 +142,7 @@
 //     );
 //
 //     // upload file
-//     const [forceRendering, setForceStatus] = useState(0);
-//
+//     const [fileList, setFileList] = useState([]);
 //     let url;
 //     const handleFileUpload = (e) => {
 //         console.log(e);
@@ -157,7 +164,7 @@
 //
 //         // because render.onLoad will fire onChange three times
 //         // this is to push the images only in the first time
-//         if (status === "uploading" && e.event === undefined) {
+//         if (status === "uploading" && event === undefined) {
 //             reader.onload = function (e) {
 //
 //                 var result = upload(fileUploadName, reader.result, type);
@@ -167,10 +174,8 @@
 //                     url = 'https://s3789585.s3.ap-southeast-2.amazonaws.com/fwp-a1/' + fileUploadName
 //
 //                     setTimeout(function() {
-//                         fileList.push({"uid": uid, "name": name, "status": "done", "url": url});
-//                     }, 500);
-//
-//                     // setForceStatus(forceRendering + 1);
+//                         fileList.push({"uid": uid, "name": name, "status": "done", "url": url})
+//                     }, 2500);
 //
 //                 } else {
 //                     alert("AWS upload promise issue");
@@ -178,16 +183,10 @@
 //
 //             }
 //
-//         // error means end, cuz we are not handling upload official
+//             // error means end, cuz we are not handling upload official
 //         } else if(status === "error"){
 //             // when end, hide loading state
 //             $("#upload-loading-spinner").css("display", "none");
-//
-//             // re-render after finish to flush the image display from s3
-//             // avoid the list push faster than s3 upload finalise
-//             setTimeout(function() {
-//                 setForceStatus(forceRendering+1);
-//             }, 1500);
 //
 //         }
 //     }
@@ -227,11 +226,18 @@
 //
 //     // onclick make a post
 //     const handleSubmitPost = () => {
+//
+//         {/*TODO -------------------------------------------------------------------------------*/}
 //         // this is text of post
-//         const text = document.getElementById("postTextItem").value;
-//         if (text.length>200 || !text){
+//         const text = document.getElementById("postTextItem").getElementsByTagName('div')[1].getElementsByClassName("ql-editor")[0].innerHTML;
+//         const text_length = document.getElementById("postTextItem").getElementsByTagName('div')[1].getElementsByClassName("ql-editor")[0].innerText.length;
+//         {/*TODO -------------------------------------------------------------------------------*/}
+//
+//
+//         // frocen: this a new way to detect word limit due to formatted text implementation
+//         if (text_length > 600 || !text){
 //             message.error({
-//                 content: 'Post message can not be empty or exceed 250 characters',
+//                 content: 'Post message can not be empty or exceed 600 characters',
 //             });
 //             return
 //         }

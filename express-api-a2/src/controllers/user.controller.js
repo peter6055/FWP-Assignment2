@@ -40,24 +40,39 @@ exports.create = async (request, response) => {
         response.json(generateRestfulResponse(400, null, "Required value missing"));
 
     } else {
-        // do hash password
-        const hash = await argon2.hash(request.body.password, {type: argon2.argon2id});
-
-        // generate uuid
-        const generated_uuid = uuid.v4();
-
-        // add user
-        await db.user.create({
-            user_id: generated_uuid,
-            username: request.body.username,
-            password: hash,
-            email: request.body.email,
-            join_date: request.body.join_date,
-            mfa_status: "0",
-            is_del: "0"
+        // check is username duplication
+        const founded_username = await db.user.findAll({
+            raw: true,
+            where: {
+                username: request.body.username
+            }
         });
 
-        response.json(generateRestfulResponse(200, generated_uuid, "Welcome " + request.body.username + "!"));
+        if(founded_username == ""){
+            // do hash password
+            const hash = await argon2.hash(request.body.password, {type: argon2.argon2id});
+
+            // generate uuid
+            const generated_uuid = uuid.v4();
+
+            // add user
+            await db.user.create({
+                user_id: generated_uuid,
+                username: request.body.username,
+                password: hash,
+                email: request.body.email,
+                join_date: request.body.join_date,
+                mfa_status: "0",
+                is_del: "0"
+            });
+
+            response.json(generateRestfulResponse(200, generated_uuid, "Welcome " + request.body.username + "!"));
+
+        } else {
+            response.json(generateRestfulResponse(400, null, "Username exist"));
+
+        }
+
     }
 };
 
