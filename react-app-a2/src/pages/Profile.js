@@ -1,9 +1,38 @@
 // import React, {useState} from "react";
-// import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
-// import {QuestionCircleOutlined} from '@ant-design/icons';
+// import {
+//     message,
+//     Avatar,
+//     Button,
+//     Typography,
+//     Divider,
+//     Popconfirm,
+//     Row,
+//     Col,
+//     Comment,
+//     Card,
+//     Image,
+//     Modal,
+//     Form,
+//     Input,
+//     Alert,
+//     AutoComplete
+// } from "antd";
+// import {QuestionCircleOutlined, MinusCircleFilled} from '@ant-design/icons';
 // import {useNavigate} from 'react-router-dom';
 //
-// import {changeEmail, getPosts,getReplys,changeName, getEmail, getJoinDate, deleteAccount ,getUserName, setMFA, getMFA, printProfilePost} from "../data/repository";
+// import {
+//     changeEmail,
+//     getPosts,
+//     getReplys,
+//     changeName,
+//     getEmail,
+//     getJoinDate,
+//     deleteAccount,
+//     getUserName,
+//     setMFA,
+//     getMFA,
+//     printProfilePost
+// } from "../data/repository";
 // import $ from "jquery";
 //
 // // TODO ------------------------------------------------------------------------------------------
@@ -19,16 +48,17 @@
 //     const [Email, setEmail] = useState(getEmail(props.id));
 //     const [Name, setName] = useState(getUserName(props.id));
 //     const date = getJoinDate((props.id));
+//     //delete account
 //     const confirmSelected = () => {
 //         deleteAccount(props.id);
 //         props.logoutUser();
 //         navigate("/");
-//         const posts=getPosts();
-//         const newPosts=[];
-//         for(const post of posts){
-//             if (post.userId!==props.id){
+//         const posts = getPosts();
+//         const newPosts = [];
+//         for (const post of posts) {
+//             if (post.userId !== props.id) {
 //                 newPosts.push(post);
-//             }else{
+//             } else {
 //                 //delete reply here
 //                 deleteReply(post.postId);
 //             }
@@ -41,19 +71,22 @@
 //         });
 //     };
 //
-//     function deleteReplied(userId){
-//         const replys=getReplys();
-//         const newReplys=[];
-//         let nextID="";
-//         for (const reply of replys){
-//             if (reply.userId!==userId){
+//     // when user account delete, call this function to delete this user's reply message
+//     function deleteReplied(userId) {
+//         const replys = getReplys();
+//         const newReplys = [];
+//         let nextID = "";
+//         for (const reply of replys) {
+//             if (reply.userId !== userId) {
 //                 newReplys.push(reply);
-//             }else{
-//                 nextID=reply.replyId;
+//             } else {
+//                 nextID = reply.replyId;
 //             }
 //         }
 //         localStorage.setItem("replys", JSON.stringify(newReplys));
-//         if(nextID!==""){deleteReply(nextID);}
+//         if (nextID !== "") {
+//             deleteReply(nextID);
+//         }
 //     }
 //
 //
@@ -79,9 +112,11 @@
 //         // hide read only and add a textarea
 //         $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "none"})
 //
-//         {/*// TODO ------------------------------------------------------------------------------------------*/}
+//         {/*// TODO ------------------------------------------------------------------------------------------*/
+//         }
 //         $(e.target).closest('.ant-comment-content').find('.postText > .quill ').css({display: "inline"});
-//         {/*// TODO ------------------------------------------------------------------------------------------*/}
+//         {/*// TODO ------------------------------------------------------------------------------------------*/
+//         }
 //
 //         // add a save btn after the content text
 //         $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "inline"});
@@ -91,29 +126,31 @@
 //
 //     };
 //
-//     function handleEditPost(e){
+//     function handleEditPost(e) {
 //         // get post id
-//         const id=$(e.target).closest(".postText > button").attr( "postId");
+//         const id = $(e.target).closest(".postText > button").attr("postId");
 //
-//         {/*TODO -------------------------------------------------------------------------------*/}
+//         {/*TODO -------------------------------------------------------------------------------*/
+//         }
 //         // this is text of post
 //         const newText = $(e.target).closest('.ant-comment-content').find('.postText > .quill ').find('.ql-editor')[0].innerHTML;
 //         const newText_length = $(e.target).closest('.ant-comment-content').find('.postText > .quill ').find('.ql-editor')[0].innerText.length;
-//         {/*TODO -------------------------------------------------------------------------------*/}
+//         {/*TODO -------------------------------------------------------------------------------*/
+//         }
 //
 //         console.log(id);
 //
 //         // frocen: this a new way to detect word limit due to formatted text implementation
-//         if (newText_length > 600 || !newText){
+//         if (newText_length > 600 || !newText) {
 //             message.error({
 //                 content: 'Post message can not be empty or exceed 600 characters',
 //             });
 //             return
 //         }
 //
-//         const posts=getPosts();
-//         for(const post of posts){
-//             if (post.postId===id){
+//         const posts = getPosts();
+//         for (const post of posts) {
+//             if (post.postId === id) {
 //                 post.post_data[0] = newText;
 //             }
 //         }
@@ -123,9 +160,11 @@
 //
 //         // recover to non-editable mode
 //         // remove text area
-//         {/*// TODO ------------------------------------------------------------------------------------------*/}
+//         {/*// TODO ------------------------------------------------------------------------------------------*/
+//         }
 //         $(e.target).closest('.ant-comment-content').find('.postText > .quill ').css({display: "none"});
-//         {/*// TODO ------------------------------------------------------------------------------------------*/}
+//         {/*// TODO ------------------------------------------------------------------------------------------*/
+//         }
 //         // show read only text
 //         $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "inline"})
 //
@@ -141,30 +180,32 @@
 //         });
 //     }
 //
-//     function deleteReply(id){
-//         const replys=getReplys();
-//         const newReplys=[];
-//         let nextID="";
-//         for (const reply of replys){
-//             if (reply.parentId!==id){
+//     function deleteReply(id) {
+//         const replys = getReplys();
+//         const newReplys = [];
+//         let nextID = "";
+//         for (const reply of replys) {
+//             if (reply.parentId !== id) {
 //                 newReplys.push(reply);
-//             }else{
-//                 nextID=id;
+//             } else {
+//                 nextID = id;
 //             }
 //         }
 //         localStorage.setItem("replys", JSON.stringify(newReplys));
-//         if(nextID!==""){deleteReply(nextID);}
+//         if (nextID !== "") {
+//             deleteReply(nextID);
+//         }
 //     }
 //
-//     function deletePost(e){
+//     function deletePost(e) {
 //         // get post id
-//         const id=$(e.target).closest(".ant-popover-inner-content").find('input').val();
-//         const posts=getPosts();
-//         const newPosts=[];
-//         for(const post of posts){
-//             if (post.postId!==id){
+//         const id = $(e.target).closest(".ant-popover-inner-content").find('input').val();
+//         const posts = getPosts();
+//         const newPosts = [];
+//         for (const post of posts) {
+//             if (post.postId !== id) {
 //                 newPosts.push(post);
-//             }else{
+//             } else {
 //                 //delete reply here
 //                 deleteReply(id);
 //             }
@@ -175,6 +216,7 @@
 //         });
 //         setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
 //     }
+//
 //     const [postsProfileData, setProfilePostData] = useState(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
 //     // ============================================================== Post ===============================
 //
@@ -186,31 +228,37 @@
 //
 //     // question sources: https://www.beyondtrust.com/blog/entry/reused-security-questions-can-pose-a-high-risk-learn-tips-tricks-to-mitigate-the-threat
 //     const mfaQuestionRecommendationOption = [
-//         { value: 'In what city were you born?' },
-//         { value: 'What is the name of your favorite pet?' },
-//         { value: 'What is your mother\'s maiden name?' },
-//         { value: 'What high school did you attend?' },
-//         { value: 'What was the name of your elementary school?' },
-//         { value: 'What was the make of your first car?' },
-//         { value: 'What was your favorite food as a child?' },
-//         { value: 'Where did you meet your spouse?' },
-//         { value: 'What year was your father (or mother) born?' },
+//         {value: 'In what city were you born?'},
+//         {value: 'What is the name of your favorite pet?'},
+//         {value: 'What is your mother\'s maiden name?'},
+//         {value: 'What high school did you attend?'},
+//         {value: 'What was the name of your elementary school?'},
+//         {value: 'What was the make of your first car?'},
+//         {value: 'What was your favorite food as a child?'},
+//         {value: 'Where did you meet your spouse?'},
+//         {value: 'What year was your father (or mother) born?'},
 //     ];
 //
 //
 //     // Intro content source: https://www.onelogin.com/learn/what-is-mfa
-//     const MFAModal = () =>(
-//         <Modal className={"mfaSetupModal"} title="Set up Multi-factor Authentication" visible={isModalVisible} onOk={handleOk} okText={"Confirm to set MFA"} cancelButtonProps={{ style: { display: 'none' } }} onCancel={handleCancel}>
-//             <Alert message="You should remember the answer you put below. Following login will require you to answer this question. If you forgot it, we are not able to recover you account! Once setup you will not able to turn off it!" type="warning" showIcon />
+//     const MFAModal = () => (
+//         <Modal className={"mfaSetupModal"} title="Set up Multi-factor Authentication" visible={isModalVisible}
+//                onOk={handleOk} okText={"Confirm to set MFA"} cancelButtonProps={{style: {display: 'none'}}}
+//                onCancel={handleCancel}>
+//             <Alert
+//                 message="You should remember the answer you put below. Following login will require you to answer this question. If you forgot it, we are not able to recover you account! Once setup you will not able to turn off it!"
+//                 type="warning" showIcon/>
 //             <br/>
 //             <p><strong>What is Multi-factor Authentication (MFA)?</strong></p>
-//             <p>Rather than just asking for a username and password, MFA requires one or more additional verification factors, which decreases the likelihood of a successful cyber attack.</p>
+//             <p>Rather than just asking for a username and password, MFA requires one or more additional verification
+//                 factors, which decreases the likelihood of a successful cyber attack.</p>
 //             <br/>
 //             <Form.Item label="Question">
-//                 <AutoComplete id={"mfaTextQuestion"} placeholder={mfaInputQuestion} options={mfaQuestionRecommendationOption} />
+//                 <AutoComplete id={"mfaTextQuestion"} placeholder={mfaInputQuestion}
+//                               options={mfaQuestionRecommendationOption}/>
 //             </Form.Item>
 //             <Form.Item label="Answer">
-//                 <Input id={"mfaTextAnswer"} placeholder={mfaInputAnswer} />
+//                 <Input id={"mfaTextAnswer"} placeholder={mfaInputAnswer}/>
 //             </Form.Item>
 //         </Modal>
 //     );
@@ -222,7 +270,7 @@
 //
 //         console.log(result["mfaStatus"]);
 //         // hide answer
-//         if(result["mfaStatus"] == true){
+//         if (result["mfaStatus"] == true) {
 //             setMfaInputQuestion(result["mfaQuestion"]);
 //             setMfaInputAnswer("The actual answer is hidden...");
 //         } else {
@@ -236,7 +284,7 @@
 //         let mfaAnswer = document.getElementById("mfaTextAnswer").value;
 //         let result = setMFA(props.id, mfaQuestion, mfaAnswer);
 //
-//         if(result === true){
+//         if (result === true) {
 //             setIsModalVisible(false);
 //             message.success({
 //                 content: "Completed!",
@@ -254,6 +302,37 @@
 //     };
 //     // ============================================================== MFA ===============================
 //
+//     const FollowerPanel = () => (
+//         <div style={{display: "flex", alignItems: "center", margin: "0px 0px 25px 0px"}}>
+//             <Avatar
+//                 style={{
+//                     backgroundColor: "rgb(245, 106, 0)",
+//                     verticalAlign: 'middle',
+//                 }}
+//                 size="large"
+//                 gap={5}
+//             >
+//                 P
+//             </Avatar>
+//             <span style={{marginLeft: "10px"}}>Peter Liu</span>
+//             <Button
+//                 size="small"
+//                 icon={<MinusCircleFilled/>}
+//                 style={{
+//                     margin: '0 16px',
+//                     verticalAlign: 'middle',
+//                     position: "inherit",
+//                     right: "0px",
+//                     top: "0px",
+//                     padding: "0px 5px 0px 5px",
+//                     marginLeft: "auto"
+//                 }}
+//                 className={"follow-btn"}
+//             >
+//                 Unfollow
+//             </Button>
+//         </div>
+//     );
 //
 //     return (
 //         <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
@@ -323,9 +402,24 @@
 //                     </Card>
 //                 </div>
 //             </Col>
-//             <Col span={17} style={{maxWidth: "855px"}}>
+//             <Col span={13} style={{maxWidth: "855px"}}>
 //                 <div className={"postContainer"}>
 //                     {postsProfileData}
+//                 </div>
+//             </Col>
+//             <Col span={4} style={{maxWidth: "855px"}}>
+//                 <div className={"postContainer"}>
+//                     <Card
+//                         title="Followed"
+//                         style={{
+//                             width: 300,
+//                         }}
+//                     >
+//                         <FollowerPanel/>
+//                         <FollowerPanel/>
+//                         <FollowerPanel/>
+//
+//                     </Card>
 //                 </div>
 //             </Col>
 //         </Row>

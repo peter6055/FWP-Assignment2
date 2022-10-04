@@ -21,6 +21,55 @@ exports.getAll = async (request, response) => {
 };
 
 
+// get all post from user id
+exports.getAllFromUserId = async (request, response) => {
+
+    // check is there any user id
+    if (request.body.user_id == "") {
+        response.json(generateRestfulResponse(400, null, "Please pass user ID or call getAll instead."));
+        return null; // end function immediately
+
+    } else {
+        // verify user_id exist
+        const user = await db.user.findAll({
+            raw: true,
+            attributes: ['user_id'],
+            where: {
+                user_id: request.body.user_id
+            }
+        });
+
+        if (user == "") {
+            response.json(generateRestfulResponse(404, null, "User not found"));
+            return null; // end function immediately
+
+        } else {
+
+            // get the post belongs to user
+            const post = await db.post.findAll({
+                raw: true,
+                where: {
+                    user_id: request.body.user_id
+                }
+            });
+
+            // identify is there any posy made by this user
+            if (post == "") {
+                response.json(generateRestfulResponse(404, null, "No Post Found"));
+
+            } else {
+
+                response.json(generateRestfulResponse(200, post, "OK"));
+
+            }
+        }
+
+    }
+
+
+};
+
+
 // get a posts
 exports.getSingle = async (request, response) => {
     if (request.body.post_id == "") {

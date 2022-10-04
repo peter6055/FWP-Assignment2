@@ -6,6 +6,9 @@ module.exports = (express, app) => {
     // get all post
     router.get("/getAll", controller.getAll);
 
+    // get all post from user id
+    router.post("/getAllFromUserId", controller.getAllFromUserId);
+
     // get single post
     router.post("/getSingle", controller.getSingle);
 
