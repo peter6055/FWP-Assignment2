@@ -1,7 +1,7 @@
 const db = require("../database");
 const generateRestfulResponse = require("../routes/restful.js")
 var uuid = require('uuid');
-const argon2 = require("argon2");
+const sanitizeHtml = require('sanitize-html');
 
 
 // get all posts
@@ -17,6 +17,55 @@ exports.getAll = async (request, response) => {
     } else {
         response.json(generateRestfulResponse(200, post, ""));
     }
+
+};
+
+
+// get all post from user id
+exports.getAllFromUserId = async (request, response) => {
+
+    // check is there any user id
+    if (request.body.user_id == "") {
+        response.json(generateRestfulResponse(400, null, "Please pass user ID or call getAll instead."));
+        return null; // end function immediately
+
+    } else {
+        // verify user_id exist
+        const user = await db.user.findAll({
+            raw: true,
+            attributes: ['user_id'],
+            where: {
+                user_id: request.body.user_id
+            }
+        });
+
+        if (user == "") {
+            response.json(generateRestfulResponse(404, null, "User not found"));
+            return null; // end function immediately
+
+        } else {
+
+            // get the post belongs to user
+            const post = await db.post.findAll({
+                raw: true,
+                where: {
+                    user_id: request.body.user_id
+                }
+            });
+
+            // identify is there any posy made by this user
+            if (post == "") {
+                response.json(generateRestfulResponse(404, null, "No Post Found"));
+
+            } else {
+
+                response.json(generateRestfulResponse(200, post, "OK"));
+
+            }
+        }
+
+    }
+
 
 };
 
@@ -73,7 +122,7 @@ exports.create = async (request, response) => {
             const post = await db.post.create({
                 user_id: request.body.user_id,
                 post_id: generated_uuid,
-                post_text: request.body.post_text,
+                post_text: sanitizeHtml(request.body.post_text),
                 post_img: request.body.post_img,
                 post_time: request.body.post_time,
                 is_del: "0"
@@ -85,7 +134,7 @@ exports.create = async (request, response) => {
 };
 
 
-// Edit username and email
+// Edit post
 exports.edit = async (request, response) => {
 
     if (request.body.post_id == "") {
@@ -107,7 +156,7 @@ exports.edit = async (request, response) => {
             response.json(generateRestfulResponse(404, null, "Post not found"));
 
         } else {
-            await db.post.update({post_text: request.body.new_post_text}, {
+            await db.post.update({post_text: sanitizeHtml(request.body.new_post_text)}, {
                 raw: true,
                 where: {
                     post_id: request.body.post_id

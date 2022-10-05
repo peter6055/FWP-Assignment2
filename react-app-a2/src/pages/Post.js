@@ -20,12 +20,78 @@
 // import {getUserName, createPost, printPost, createReply} from "../data/repository";
 // import {upload} from "../data/aws";
 //
+// // TODO ------------------------------------------------------------------------------------------
+// import ReactQuill from 'react-quill';
+// import 'react-quill/dist/quill.snow.css';
+// // TODO ------------------------------------------------------------------------------------------
+//
 //
 // const {TextArea} = Input;
 // const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 //
 //
 // const Post = (props) => {
+//
+//     // handling reaction
+//     const handleReactionSubmit =(e) =>{
+//
+//         // TODO. "target_type" will tell you it is a reply or a post
+//         //       "target_id" will tell you the id of target
+//         //       "reaction" will tell you the reaction user made
+//         const target_type = e.target.getAttribute("target_type");
+//         const target_id = e.target.getAttribute("target_id");
+//         const reaction = e.target.getAttribute("reaction");
+//
+//         console.log(e.target.getAttribute("target_type"));
+//         console.log(e.target.getAttribute("target_id"));
+//         console.log(e.target.getAttribute("reaction"));
+//
+//         // TODO. call api
+//         //       when target_type==post, pass id to target_post_id
+//         //       when target_type==reply, pass id to target_post_id
+//
+//         // TODO. when success remove all reaction-has-.. from all action in this target
+//         //       then add the reaction-has-... to the current click one
+//         //       (reaction-has-like, reaction-has-dislike, reaction-has-star)
+//
+//     }
+//
+//     //handling follow
+//     const handleFollowSubmit = (e) =>{
+//         // TODO. "user_id" will tell you the id of user
+//         //       "action" will tell to follow or unfollow
+//
+//
+//         const username = e.target.getAttribute("username");
+//         const user_id = e.target.getAttribute("user_id");
+//         const action = e.target.getAttribute("action");
+//
+//         console.log(e.target.getAttribute("username"));
+//         console.log(e.target.getAttribute("user_id"));
+//         console.log(e.target.getAttribute("action"));
+//
+//
+//         if(action==="follow"){
+//             // message.success("You had follow " + username +", would you like to see " + username + "'s post? " + Click)
+//             message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span className={"clickable"} onClick={handleFollowPostFilter} user_id={user_id}>Yes, show me the posts!</span></div>, 10)
+//
+//         } else {
+//             message.success("You had successfully unfollow " + username + "!")
+//         }
+//     }
+//
+//
+//     const handleFollowPostFilter  = (e) => {
+//         // TODO. "user_id" will tell you the id of user
+//         //       please call api and rerender post page with this users' post
+//
+//         const user_id = e.target.getAttribute("user_id");
+//         console.log(e.target.getAttribute("user_id"));
+//
+//         // for testing, delete when finish
+//         alert("click " + user_id);
+//     }
+//
 //
 //     const handleReplyOnClick = (e) => {
 //         var currentReplyInputDisplay = $(e.target).children().css("display")
@@ -37,13 +103,18 @@
 //             $(e.target).children().css({display: "none"});
 //         }
 //     };
+//
 //     const handleReplySubmit = (e) => {
-//         //this is the value of input textarea
-//         const text=$(e.target).closest('.ant-comment-content-detail').find('textarea').val();
-//         console.log(text);
-//         if (text.length>200 || !text){
+//         {/*TODO -------------------------------------------------------------------------------*/}
+//         // this is text of post
+//         const text = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerHTML;
+//         const text_length = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerText.length;
+//         {/*TODO -------------------------------------------------------------------------------*/}
+//
+//         // frocen: this a new way to detect word limit due to formatted text implementation
+//         if (text_length > 600 || !text){
 //             message.error({
-//                 content: 'Reply message can not be empty or exceed 250 characters',
+//                 content: 'Reply message can not be empty or exceed 600 characters',
 //             });
 //             return
 //         }
@@ -59,14 +130,14 @@
 //
 //         // after successful reply
 //         // hide reply input
-//         $(e.target).closest("replyinput").css({display: "none"});
+//         $(e.target).closest('replyinput').css({display: "none"});
 //
-//         setPostData(printPost(handleReplySubmit, handleReplyOnClick));
+//         setPostData(printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit));
 //     }
 //
 //
 //     const [Name, setName] = useState(getUserName(props.id));
-//     const [postsData, setPostData] = useState(printPost(handleReplySubmit, handleReplyOnClick));
+//     const [postsData, setPostData] = useState(printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit));
 //
 //
 //     // ============================================================== Make Post ===============================
@@ -92,7 +163,10 @@
 //                 content={
 //                     <div>
 //                         <Form.Item>
-//                             <TextArea id="postTextItem" rows={4} placeholder={"Write a post..."}/>
+//                             {/*TODO -------------------------------------------------------------------------------*/}
+//                             <ReactQuill id="postTextItem" theme="snow" placeholder={"Write a post..."}/>
+//                             {/*TODO -------------------------------------------------------------------------------*/}
+//
 //                         </Form.Item>
 //                         <Form.Item>
 //                             <Upload
@@ -132,6 +206,8 @@
 //             </Comment>
 //         </Card>
 //     );
+//
+//
 //
 //     // upload file
 //     const [forceRendering, setForceStatus] = useState(0);
@@ -178,7 +254,7 @@
 //
 //             }
 //
-//         // error means end, cuz we are not handling upload official
+//             // error means end, cuz we are not handling upload official
 //         } else if(status === "error"){
 //             // when end, hide loading state
 //             $("#upload-loading-spinner").css("display", "none");
@@ -227,17 +303,24 @@
 //
 //     // onclick make a post
 //     const handleSubmitPost = () => {
+//
+//         {/*TODO -------------------------------------------------------------------------------*/}
 //         // this is text of post
-//         const text = document.getElementById("postTextItem").value;
-//         if (text.length>200 || !text){
+//         const text = document.getElementById("postTextItem").getElementsByTagName('div')[1].getElementsByClassName("ql-editor")[0].innerHTML;
+//         const text_length = document.getElementById("postTextItem").getElementsByTagName('div')[1].getElementsByClassName("ql-editor")[0].innerText.length;
+//         {/*TODO -------------------------------------------------------------------------------*/}
+//
+//
+//         // frocen: this a new way to detect word limit due to formatted text implementation
+//         if (text_length > 600 || !text){
 //             message.error({
-//                 content: 'Post message can not be empty or exceed 250 characters',
+//                 content: 'Post message can not be empty or exceed 600 characters',
 //             });
 //             return
 //         }
 //
 //         createPost(props.id ,text, fileList);
-//         setPostData(printPost(handleReplySubmit, handleReplyOnClick));
+//         setPostData(printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit));
 //
 //         // successful msg
 //         message.success({

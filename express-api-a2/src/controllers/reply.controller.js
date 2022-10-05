@@ -1,6 +1,8 @@
 const db = require("../database");
 const generateRestfulResponse = require("../routes/restful.js")
 var uuid = require('uuid');
+const sanitizeHtml = require('sanitize-html');
+
 
 // get all reply
 exports.getAll = async (request, response) => {
@@ -190,7 +192,7 @@ exports.create = async (request, response) => {
                 parent_post_id: request.body.parent_post_id,
                 parent_reply_id: parent_reply_id,
                 reply_id: generated_uuid,
-                reply_text: request.body.reply_text,
+                reply_text: sanitizeHtml(request.body.reply_text),
                 reply_time: request.body.reply_time,
                 is_del: "0"
             });
