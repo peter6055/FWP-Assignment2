@@ -104,7 +104,7 @@ const Post = (props) => {
         }
     };
 
-    const handleReplySubmit = (e) => {
+    const handleReplySubmit = async(e) => {
         {/*TODO -------------------------------------------------------------------------------*/}
         // this is text of post
         const text = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerHTML;
@@ -122,6 +122,7 @@ const Post = (props) => {
         const parentId=$(e.target).closest(".ant-form-item").find('button').attr( "parentId");
         $(e.target).closest('.ant-comment-content-detail').find('textarea').val('').change();
 
+        //Notice!!! 我拿不到reply的ID，我没有删除reply的API
         // createReply(props.id, parentId, text);
         // successful msg
         message.success({
@@ -132,7 +133,8 @@ const Post = (props) => {
         // hide reply input
         $(e.target).closest('replyinput').css({display: "none"});
 
-        setPostData(printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit));
+        const currentPost= await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit)
+        setPostData(currentPost);    
     }
 
 
@@ -146,8 +148,6 @@ const Post = (props) => {
     useEffect(() => {
         async function loadPost() {
             const currentUser = await getUserDetail(props.id);
-            console.log(props.id)
-            console.log(currentUser)
             const currentPost= await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit)
             setName(currentUser.data.username);
             setPostData(currentPost);
