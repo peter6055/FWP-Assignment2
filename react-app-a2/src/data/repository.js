@@ -1,4 +1,4 @@
-import {v4 as uuidv4} from 'uuid';
+import {stringify, v4 as uuidv4} from 'uuid';
 import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
 import {
     QuestionCircleOutlined,
@@ -47,7 +47,7 @@ async function createUsers(username, password, email) {
     const d = new Date();
     let day = days[d.getDay()];
     let date = d.getDate()
-    let month = months[d.getMonth()];
+    let month = months[d.getMonth()]+1;
     let year = d.getFullYear();
     const JoinDate = `${day} ${date} ${month} ${year}`;
     const user =
@@ -62,34 +62,34 @@ async function createUsers(username, password, email) {
     return response.data;
 }
 
-// function createPost(userId, text, images){
-//     const posts = getPosts();
-//     const postData =[text];
-//     for(const image of images){
-//         postData.push(image);
-//     }
-//     const d = new Date();
-//     let date = d.getDate()
-//     let month = d.getMonth();
-//     let year = d.getFullYear();
-//     let hour=d.getHours();
-//     let minutes=d.getMinutes()
-//     const post_time = `${year}-${month}-${date} ${hour}:${minutes}`;
-//     const post =
-//         {
-//             userId : userId,
-//             postId : generateId(),
-//             post_data: postData,
-//             post_time:post_time
-//         };
-//     posts.push(post);
-//     localStorage.setItem(POST_DATABASE, JSON.stringify(posts));
-// }
+async function createPost(userId, text, images){
+    const posts = getPosts();
+    const ImageData =[];
+    for(const image of images){
+        ImageData.push(image);
+    }
+    const d = new Date();
+    let date = d.getDate()
+    let month = d.getMonth()+1;
+    let year = d.getFullYear();
+    let hour=d.getHours();
+    let minutes=d.getMinutes()
+    const post_time = `${year}-${month}-${date} ${hour}:${minutes}`;
+    const post ={
+        user_id: userId,
+        post_text : text,
+        post_img : JSON.stringify(ImageData),
+        post_time : post_time
+    }
+    const response = await axios.post(API_HOST + "/api/v1/posts/create", post);
+
+    return response.data;
+}
 // function createReply(userId, parentId,text){
 //     const replys = getReplys();
 //     const d = new Date();
 //     let date = d.getDate()
-//     let month = d.getMonth();
+//     let month = d.getMonth()+`;
 //     let year = d.getFullYear();
 //     let hour=d.getHours();
 //     let minutes=d.getMinutes()
@@ -119,13 +119,10 @@ async function createUsers(username, password, email) {
 //     return JSON.parse(data);
 // }
 
-// function getPosts() {
-//     // Extract posts data from local storage.
-//     const data = localStorage.getItem(POST_DATABASE);
-
-//     // Convert data to objects.
-//     return JSON.parse(data);
-// }
+async function getPosts() {
+    const response = await axios.get(API_HOST + "/api/v1/posts/getAll");
+    return response.data;
+}
 // function getReplys() {
 //     // Extract reply data from local storage.
 //     const data = localStorage.getItem(REPLY_DATABASE);
@@ -209,35 +206,56 @@ function removeUser() {
 //         }
 //     }
 // }
-// function changeName(id, newUsername) {
-//     const newUsers = [];
-//     const users = getUsers();
-//     for (const user of users) {
-//         if (id === user.id) {
-//             user.username = newUsername;
-//         }
-//         newUsers.push(user);
-//     }
-//     localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
-//     return true;
-// }
+async function changeName(id, newUsername) {
+    const userDetail= await getUserDetail(id);
+    const data={
+        user_id: id,
+        new_username : newUsername,
+        new_email : userDetail.data.email
+    }
+    const response = await axios.post(API_HOST + "/api/v1/users/edit", data);
+    if(response.data.success){
+        return true
+    }else{
+        message.error({
+            content: response.data.message,
+        });
+    }
 
-// function changeEmail(id, newEmail) {
-//     if (/\S+@\S+\.\S+/.test(newEmail)) {
-//         const users = getUsers();
-//         for (const user of users) {
-//             if (id === user.id) {
-//                 user.email = newEmail;
-//                 localStorage.setItem(USERS_KEY, JSON.stringify(users));
-//             }
-//         }
-//         return true
-//     } else {
-//         message.error({
-//             content: 'Please input a valid email address',
-//         });
-//     }
-// }
+    // const newUsers = [];
+    // const users = getUsers();
+    // for (const user of users) {
+    //     if (id === user.id) {
+    //         user.username = newUsername;
+    //     }
+    //     newUsers.push(user);
+    // }
+    // localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
+    // return true;
+}
+
+async function changeEmail(id, newEmail) {
+    if (/\S+@\S+\.\S+/.test(newEmail)) {
+        const userDetail= await getUserDetail(id);
+        const data={
+            user_id: id,
+            new_username : userDetail.data.username,
+            new_email : newEmail
+        }
+        const response = await axios.post(API_HOST + "/api/v1/users/edit", data);
+        if(response.data.success){
+            return true
+        }else{
+            message.error({
+                content: response.data.message,
+            });
+        }
+    } else {
+        message.error({
+            content: 'Please input a valid email address',
+        });
+    }
+}
 
 // function deleteAccount(id) {
 //     const users = getUsers();
@@ -353,273 +371,289 @@ function removeUser() {
 // }
 // // ============================================================== MFA ===============================
 
-// // generate post and reply depends on local storage database
-// function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit) {
-//     let print = [];
-//     const posts = getPosts();
-//     for (const post of posts) {
-//         const id = post.userId;
-//         const post_id = post.postId;
-//         // generate image tags depends on local storage
-//         const images = [];
-//         let i = 1;
-//         while (i < post.post_data.length) {
-//             let URL = post.post_data[i].url;
-//             images.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>)
-//             i++;
-//         }
-//         print.push(
-//             <Card style={{width: "100%", marginTop: "12px"}}>
-//                 <Comment
-//                     actions={[
-//                         <div>
-//                         <span key="comment-nested-reply-to" className={"reply"} onClick={handleReplyOnClick}
-//                               style={{cursor: "pointer"}}>
-//                             Reply
-//                             <replyinput style={{display: "none"}}>
-//                                 <Comment
-//                                     avatar={
-//                                         <Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
-//                                             backgroundColor: "#f56a00",
-//                                             verticalAlign: 'middle',
-//                                             fontSize: '17px'
-//                                         }}>
-//                                             {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
-//                                         </Avatar>
-//                                     }
-//                                     content={
-//                                         <div className={"reply-input-box"}>
-//                                             <Form.Item>
-//
-//                                                 {/*TODO -------------------------------------------------------------------------------*/}
-//                                                 <ReactQuill id="postTextItem" theme="snow"
-//                                                             placeholder={"Write a post..."}></ReactQuill>
-//                                                 {/*TODO -------------------------------------------------------------------------------*/}
-//
-//                                             </Form.Item>
-//                                             <Form.Item>
-//                                                 <Button htmlType="submit" style={{marginTop: "10px"}}
-//                                                         parentId={post.postId} onClick={handleReplySubmit}
-//                                                         type="primary">Reply</Button>
-//                                             </Form.Item>
-//                                         </div>
-//                                     }
-//                                 >
-//                                 </Comment>
-//                             </replyinput>
-//                         </span>
-//                             <br/><br/>
-//                             <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
-//                                   target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
-//                             <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}}
-//                                   reaction={"dislike"} target_id={post_id} target_type={"post"}
-//                                   onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
-//                             <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
-//                                   target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
-//
-//                         </div>
-//                     ]}
-//                     author={<a>{getUserName(id)}</a>}
-//                     avatar={<Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
-//                         backgroundColor: "#f56a00",
-//                         verticalAlign: 'middle',
-//                         fontSize: '17px'
-//                     }}>
-//                         {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
-//                     </Avatar>}
-//                     content={
-//                         <div>
-//                             <p>
-//                                 {post.post_data[0]}
-//                             </p>
-//                             <div className={"postImageGroup"}>
-//                                 {images}
-//                             </div>
-//                         </div>
-//                     }
-//                     datetime={
-//                         <div>
-//                             <div style={{display: "flex"}}>{post.post_time}
-//                                 {/* TODO: if have follow this user, display this*/}
-//                                 {/*<div className={"follow-btn has-follow"} style={{position: "absolute", right: 0, top: 0}}*/}
-//                                 {/*     user_id={id} action={"unfollow"} username={getUserName(id)} onClick={handleFollowSubmit}><CloseCircleFilled/> Unfollow*/}
-//                                 {/*</div>*/}
-//
-//                                 {/* TODO: if have not follow this user, display this*/}
-//                                 <div className={"follow-btn"} style={{position: "absolute", right: 0, top: 0}}
-//                                      user_id={id} action={"follow"} username={getUserName(id)} onClick={handleFollowSubmit}><PlusCircleFilled />  Follow @{getUserName(id)}
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     }
-//                 >
-//                     {printPostReplys(post.postId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
-//                 </Comment>
-//             </Card>
-//         );
-//     }
-//     return <div>{print}</div>;
-// }
-//
-// function printProfilePost(id, editPostOnClick, deletePost, handleEditPost) {
-//     let print = [];
-//     const posts = getPosts();
-//     for (const post of posts) {
-//         const images = [];
-//         let i = 1;
-//         while (i < post.post_data.length) {
-//             let URL = post.post_data[i].url;
-//             images.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>)
-//             i++;
-//         }
-//         if (post.userId === id) {
-//             print.push(
-//                 <Card style={{width: "100%", marginTop: "12px"}}>
-//                     <Comment
-//                         actions={[
-//                             <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
-//                             <Popconfirm
-//                                 title={<div><p>You sure you want to delete this post?</p><input type={"hidden"}
-//                                                                                                 name="postId"
-//                                                                                                 value={post.postId}></input>
-//                                 </div>}
-//                                 icon={
-//                                     <QuestionCircleOutlined
-//                                         style={{
-//                                             color: 'red',
-//                                         }}
-//                                     />
-//                                 }
-//                                 onConfirm={deletePost}
-//                                 placement="bottom"
-//                                 okText="Delete Forever!"
-//                                 cancelText="No"
-//                             >
-//                                 <span className={"danger-text"} key="comment-nested-reply-to"
-//                                       type="danger">Delete post</span>
-//
-//                             </Popconfirm>
-//                         ]}
-//                         author={<a>{getUserName(id)}</a>}
-//                         avatar={<Avatar alt={getUserName(id)} className={"postAvatar"} size="default" style={{
-//                             backgroundColor: "#f56a00",
-//                             verticalAlign: 'middle',
-//                             fontSize: '17px'
-//                         }}>
-//                             {JSON.stringify(getUserName(id)).charAt(1).toUpperCase()}
-//                         </Avatar>}
-//                         content={
-//                             <div>
-//                                 <div className={"postText"}>
-//                                     <p>
-//                                         {post.post_data[0]}
-//                                     </p>
-//                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-//                                     <ReactQuill theme="snow" placeholder={"Write a post..."} style={{display: "none"}}
-//                                                 value={post.post_data[0]}/>
-//                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-//                                     <Button type="primary" postId={post.postId} onClick={handleEditPost}
-//                                             style={{marginTop: "20px", display: "none"}}>Save changes</Button>
-//                                 </div>
-//                                 <div className={"postImageGroup"}>
-//                                     {images}
-//                                 </div>
-//                             </div>
-//                         }
-//                         datetime={
-//                             post.post_time
-//                         }
-//                     >
-//                         {printProfileReplys(post.postId)}
-//                     </Comment>
-//                 </Card>
-//             );
-//         }
-//     }
-//     return <div>{print}</div>;
-// }
-//
-// function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit) {
-//     const replys = getReplys();
-//     let print = [];
-//     for (const reply of replys) {
-//         if (reply.parentId === parentId) {
-//             const name = getNameByReplyId(reply.replyId);
-//             const reply_id = reply.replyId;
-//
-//             print.push(<Comment
-//                 actions={[
-//                     <div>
-//                             <span key="comment-nested-reply-to" onClick={handleReplyOnClick} className={"reply"}
-//                                   style={{cursor: "pointer"}}>
-//                                 Reply
-//                                 <replyinput style={{display: "none"}}>
-//                                     <Comment
-//                                         avatar={
-//                                             <Avatar alt={name} className={"postAvatar"} size="default" style={{
-//                                                 backgroundColor: "#f56a00",
-//                                                 verticalAlign: 'middle',
-//                                                 fontSize: '17px'
-//                                             }}>
-//                                                 {JSON.stringify(name).charAt(1).toUpperCase()}
-//                                             </Avatar>
-//                                         }
-//                                         content={
-//                                             <div className={"reply-input-box"}>
-//                                                 <Form.Item>
-//                                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-//                                                     <ReactQuill id="postTextItem" theme="snow"
-//                                                                 placeholder={"Write a post..."}/>
-//                                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-//                                                 </Form.Item>
-//                                                 <Form.Item>
-//                                                     <Button htmlType="submit" style={{marginTop: "10px"}}
-//                                                             parentId={reply.replyId} onClick={handleReplySubmit}
-//                                                             type="primary">Reply</Button>
-//                                                 </Form.Item>
-//                                             </div>
-//                                         }
-//                                     >
-//                                     </Comment>
-//                                 </replyinput>
-//                             </span>
-//                         <br/><br/>
-//                         <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
-//                               target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
-//                         <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}} reaction={"dislike"}
-//                               target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
-//                         <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
-//                               target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
-//                     </div>
-//                 ]}
-//                 author={<a>{name}</a>}
-//                 avatar={
-//                     <Avatar alt={name} className={"postAvatar"} size="default" style={{
-//                         backgroundColor: "#f56a00",
-//                         verticalAlign: 'middle',
-//                         fontSize: '17px'
-//                     }}>
-//                         {JSON.stringify(name).charAt(1).toUpperCase()}
-//                     </Avatar>
-//                 } content={
-//                 <p>
-//                     {reply.reply_data}
-//                 </p>
-//             }
-//             >
-//                 {printPostReplys(reply.replyId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
-//             </Comment>)
-//         }
-//     }
-//     return <div>{print}</div>;
-// }
-//
+// generate post and reply depends on local storage database
+async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit) {
+    let print = [];
+    const getPosts = await axios.get(API_HOST + "/api/v1/posts/getAll");
+    const posts=getPosts.data.data
+    for (const post of posts) {
+        const userDetail = await getUserDetail(post.user_id)
+        const id = post.user_id;
+        const post_id = post.post_id;
+        // generate image tags depends on local storage
+        const images = [];
+        // let i = 1;
+        // while (i < post.post_data.length) {
+        //     let URL = post.post_data[i].url;
+        //     images.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>)
+        //     i++;
+        // }
+        print.push(
+            <Card style={{width: "100%", marginTop: "12px"}}>
+                <Comment
+                    actions={[
+                        <div>
+                        <span key="comment-nested-reply-to" className={"reply"} onClick={handleReplyOnClick}
+                              style={{cursor: "pointer"}}>
+                            Reply
+                            <replyinput style={{display: "none"}}>
+                                <Comment
+                                    avatar={
+                                        <Avatar alt={userDetail.data.username} className={"postAvatar"} size="default" style={{
+                                            backgroundColor: "#f56a00",
+                                            verticalAlign: 'middle',
+                                            fontSize: '17px'
+                                        }}>
+                                            {JSON.stringify(userDetail.data.username).charAt(1).toUpperCase()}
+                                        </Avatar>
+                                    }
+                                    content={
+                                        <div className={"reply-input-box"}>
+                                            <Form.Item>
+
+                                                {/*TODO -------------------------------------------------------------------------------*/}
+                                                <ReactQuill id="postTextItem" theme="snow"
+                                                            placeholder={"Write a post..."}></ReactQuill>
+                                                {/*TODO -------------------------------------------------------------------------------*/}
+
+                                            </Form.Item>
+                                            <Form.Item>
+                                                <Button htmlType="submit" style={{marginTop: "10px"}}
+                                                        parentId={post_id} onClick={handleReplySubmit}
+                                                        type="primary">Reply</Button>
+                                            </Form.Item>
+                                        </div>
+                                    }
+                                >
+                                </Comment>
+                            </replyinput>
+                        </span>
+                            <br/><br/>
+                            <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
+                                  target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
+                            <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}}
+                                  reaction={"dislike"} target_id={post_id} target_type={"post"}
+                                  onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
+                            <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
+                                  target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
+                        </div>
+                    ]}
+                    author={<a>{userDetail.data.username}</a>}
+                    avatar={<Avatar alt={userDetail.data.username} className={"postAvatar"} size="default" style={{
+                        backgroundColor: "#f56a00",
+                        verticalAlign: 'middle',
+                        fontSize: '17px'
+                    }}>
+                        {JSON.stringify(userDetail.data.username).charAt(1).toUpperCase()}
+                    </Avatar>}
+                    content={
+                        <div>
+                            <p>
+                            <div dangerouslySetInnerHTML={{__html:post.post_text}}></div>
+                            </p>
+                            <div className={"postImageGroup"}>
+                                {images}
+                            </div>
+                        </div>
+                    }
+                    datetime={
+                        <div>
+                            <div style={{display: "flex"}}>{post.post_time}
+                                {/* TODO: if have follow this user, display this*/}
+                                {/*<div className={"follow-btn has-follow"} style={{position: "absolute", right: 0, top: 0}}*/}
+                                {/*     user_id={id} action={"unfollow"} username={getUserName(id)} onClick={handleFollowSubmit}><CloseCircleFilled/> Unfollow*/}
+                                {/*</div>*/}
+
+                                {/* TODO: if have not follow this user, display this*/}
+                                <div className={"follow-btn"} style={{position: "absolute", right: 0, top: 0}}
+                                     user_id={id} action={"follow"} username={userDetail.data.username} onClick={handleFollowSubmit}><PlusCircleFilled />  Follow @{userDetail.data.username}
+                                </div>
+                            </div>
+                        </div>
+                    }
+                >
+
+                    {await printPostReplys(post_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
+                </Comment>
+            </Card>
+        );
+    }
+    return <div>{print}</div>;
+}
+
+async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost) {
+    let print = [];
+    const getPosts = await axios.get(API_HOST + "/api/v1/posts/getAll");
+    const posts=getPosts.data.data
+    //Peter add white box
+    for (const post of posts) {
+        const images = [];
+        // let i = 1;
+        // while (i < post.post_data.length) {
+        //     let URL = post.post_data[i].url;
+        //     images.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>)
+        //     i++;
+        // }
+        if (post.user_id === id) {
+            const userDetail = await getUserDetail(post.user_id)
+            print.push(
+                <Card style={{width: "100%", marginTop: "12px"}}>
+                    <Comment
+                        actions={[
+                            <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
+                            <Popconfirm
+                                title={<div><p>You sure you want to delete this post?</p><input type={"hidden"}
+                                                                                                name="postId"
+                                                                                                value={post.user_id}></input>
+                                </div>}
+                                icon={
+                                    <QuestionCircleOutlined
+                                        style={{
+                                            color: 'red',
+                                        }}
+                                    />
+                                }
+                                onConfirm={deletePost}
+                                placement="bottom"
+                                okText="Delete Forever!"
+                                cancelText="No"
+                            >
+                                <span className={"danger-text"} key="comment-nested-reply-to"
+                                      type="danger">Delete post</span>
+
+                            </Popconfirm>
+                        ]}
+                        author={<a>{userDetail.data.username}</a>}
+                        avatar={<Avatar alt={userDetail.data.username} className={"postAvatar"} size="default" style={{
+                            backgroundColor: "#f56a00",
+                            verticalAlign: 'middle',
+                            fontSize: '17px'
+                        }}>
+                            {JSON.stringify(userDetail.data.username).charAt(1).toUpperCase()}
+                        </Avatar>}
+                        content={
+                            <div>
+                                <div className={"postText"}>
+                                    <p>
+                                    <div dangerouslySetInnerHTML={{__html:post.post_text}}></div>
+                                    </p>
+                                    {/*// TODO ------------------------------------------------------------------------------------------*/}
+                                    <ReactQuill theme="snow" placeholder={"Write a post..."} style={{display: "none"}}
+                                                value={post.post_text}/>
+                                    {/*// TODO ------------------------------------------------------------------------------------------*/}
+                                    <Button type="primary" postId={post.postId} onClick={handleEditPost}
+                                            style={{marginTop: "20px", display: "none"}}>Save changes</Button>
+                                </div>
+                                <div className={"postImageGroup"}>
+                                    {images}
+                                </div>
+                            </div>
+                        }
+                        datetime={
+                            post.post_time
+                        }
+                    >
+                        {/* {printProfileReplys(post.postId)} */}
+                    </Comment>
+                </Card>
+            );
+        }
+    }
+    return <div>{print}</div>;
+}
+
+async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit) {
+    // const replys = getReplys();
+    const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
+    const replys=getReplys.data.data
+    let print = [];
+    for (const reply of replys) {
+        console.log(reply)
+        if (reply.parent_post_id === parentId || reply.parent_reply_id === parentId) {
+            const reply_id = reply.reply_id;
+            const data={
+                reply_id:reply_id
+            }
+            const getReplyDetail = await axios.post(API_HOST + "/api/v1/replies/getSingle",data);
+            const replyUsersId=getReplyDetail.data.data[0].user_id;
+            const UserDetail = await getUserDetail(replyUsersId);
+            const name=UserDetail.data.username;
+            console.log(name)
+
+            print.push(<Comment
+                actions={[
+                    <div>
+                            <span key="comment-nested-reply-to" onClick={handleReplyOnClick} className={"reply"}
+                                  style={{cursor: "pointer"}}>
+                                Reply
+                                <replyinput style={{display: "none"}}>
+                                    <Comment
+                                        avatar={
+                                            <Avatar alt={name} className={"postAvatar"} size="default" style={{
+                                                backgroundColor: "#f56a00",
+                                                verticalAlign: 'middle',
+                                                fontSize: '17px'
+                                            }}>
+                                                {JSON.stringify(name).charAt(1).toUpperCase()}
+                                            </Avatar>
+                                        }
+                                        content={
+                                            <div className={"reply-input-box"}>
+                                                <Form.Item>
+                                                    {/*// TODO ------------------------------------------------------------------------------------------*/}
+                                                    <ReactQuill id="postTextItem" theme="snow"
+                                                                placeholder={"Write a post..."}/>
+                                                    {/*// TODO ------------------------------------------------------------------------------------------*/}
+                                                </Form.Item>
+                                                <Form.Item>
+                                                    <Button htmlType="submit" style={{marginTop: "10px"}}
+                                                            parentId={reply_id} onClick={handleReplySubmit}
+                                                            type="primary">Reply</Button>
+                                                </Form.Item>
+                                            </div>
+                                        }
+                                    >
+                                    </Comment>
+                                </replyinput>
+                            </span>
+                        <br/><br/>
+                        <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
+                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
+                        <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}} reaction={"dislike"}
+                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
+                        <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
+                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
+                    </div>
+                ]}
+                author={<a>{name}</a>}
+                avatar={
+                    <Avatar alt={name} className={"postAvatar"} size="default" style={{
+                        backgroundColor: "#f56a00",
+                        verticalAlign: 'middle',
+                        fontSize: '17px'
+                    }}>
+                        {JSON.stringify(name).charAt(1).toUpperCase()}
+                    </Avatar>
+                }
+                content={
+                <p>
+                    {getReplyDetail.data.data[0].reply_time}
+                </p>
+            }
+            >
+                {/* {printPostReplys(reply_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)} */}
+            </Comment>)
+        }
+    }
+    return <div>{print}</div>;
+}
+
 // function printProfileReplys(parentId) {
 //     const replys = getReplys();
 //     let print = [];
 //     for (const reply of replys) {
-//         if (reply.parentId === parentId) {
-//             const name = getNameByReplyId(reply.replyId);
+//         if (reply.parentId===parentId){
+//             const name=getNameByReplyId(reply.replyId);
 //             print.push(<Comment
 //                 author={<a>{name}</a>}
 //                 avatar={
@@ -630,11 +664,11 @@ function removeUser() {
 //                     }}>
 //                         {JSON.stringify(name).charAt(1).toUpperCase()}
 //                     </Avatar>
-//                 } content={
-//                 <p>
-//                     {reply.reply_data}
-//                 </p>
-//             }
+//                 }                content={
+//                     <p>
+//                         {reply.reply_data}
+//                     </p>
+//                 }
 //             >
 //                 {printProfileReplys(reply.replyId)}
 //             </Comment>)
@@ -642,7 +676,6 @@ function removeUser() {
 //     }
 //     return <div>{print}</div>;
 // }
-//
 // export {
 //     getReplys,
 //     createReply,
@@ -656,7 +689,6 @@ function removeUser() {
 //     changeName,
 //     getEmail,
 //     getJoinDate,
-//     initUsers,
 //     verifyUser,
 //     getUser,
 //     removeUser,
@@ -668,7 +700,14 @@ function removeUser() {
 //     setUser
 // }
 
-export {
+
+export {changeName,
+    printPostReplys,
+    createPost,
+    printPost,
+    changeEmail,
+    printProfilePost,
+    getPosts,
     getUser,
     getUserDetail,
     setUser,

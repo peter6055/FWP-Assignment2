@@ -132,10 +132,10 @@ function App() {
 
                 <Routes>
                     <Route path="/" element={<Home id={id}/>}/>
-                    {/* <Route path="post" element={<Post id={id}/>}/> */}
+                    <Route path="post" element={<Post id={id}/>}/>
                     <Route path="login" element={<Login loginUser={loginUser}/>}/>
                     <Route path="signup" element={<Signup loginUser={loginUser}/>}/>
-                    {/* <Route path="profile" element={<Profile id={id} logoutUser={logoutUser} editName={editName}/>}/> */}
+                    <Route path="profile" element={<Profile id={id} logoutUser={logoutUser} editName={editName}/>}/>
 
                 </Routes>
 
