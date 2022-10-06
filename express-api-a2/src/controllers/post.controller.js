@@ -194,14 +194,14 @@ exports.delete = async (request, response) => {
         response.json(generateRestfulResponse(400, null, "Is delete should be 0 or 1"));
 
     } else {
-        const user = await db.post.update({is_del: request.body.is_del}, {
+        const post = await db.post.update({is_del: request.body.is_del}, {
             raw: true,
             where: {
-                user_id: request.body.post_id
+                post_id: request.body.post_id
             }
         });
 
-        if (user[0] == "") {
+        if (post[0] == "") {
             response.json(generateRestfulResponse(404, null, "Post not found"));
 
         } else {

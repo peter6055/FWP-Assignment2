@@ -17,7 +17,7 @@ import {
 import {PlusOutlined, LoadingOutlined} from '@ant-design/icons';
 import $ from 'jquery';
 
-import {getUserName, createPost, printPost, createReply,getUserDetail} from "../data/repository";
+import {getUserName, createPost, printPost, createReply, getUserDetail} from "../data/repository";
 import {upload} from "../data/aws";
 
 // TODO ------------------------------------------------------------------------------------------
@@ -27,13 +27,13 @@ import 'react-quill/dist/quill.snow.css';
 
 
 const {TextArea} = Input;
-const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+const loadingIcon = <LoadingOutlined style={{fontSize: 24}} spin/>;
 
 
 const Post = (props) => {
 
     // handling reaction
-    const handleReactionSubmit =(e) =>{
+    const handleReactionSubmit = (e) => {
 
         // TODO. "target_type" will tell you it is a reply or a post
         //       "target_id" will tell you the id of target
@@ -57,7 +57,7 @@ const Post = (props) => {
     }
 
     //handling follow
-    const handleFollowSubmit = (e) =>{
+    const handleFollowSubmit = (e) => {
         // TODO. "user_id" will tell you the id of user
         //       "action" will tell to follow or unfollow
 
@@ -71,9 +71,11 @@ const Post = (props) => {
         console.log(e.target.getAttribute("action"));
 
 
-        if(action==="follow"){
+        if (action === "follow") {
             // message.success("You had follow " + username +", would you like to see " + username + "'s post? " + Click)
-            message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span className={"clickable"} onClick={handleFollowPostFilter} user_id={user_id}>Yes, show me the posts!</span></div>, 10)
+            message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span
+                className={"clickable"} onClick={handleFollowPostFilter}
+                user_id={user_id}>Yes, show me the posts!</span></div>, 10)
 
         } else {
             message.success("You had successfully unfollow " + username + "!")
@@ -81,7 +83,7 @@ const Post = (props) => {
     }
 
 
-    const handleFollowPostFilter  = (e) => {
+    const handleFollowPostFilter = (e) => {
         // TODO. "user_id" will tell you the id of user
         //       please call api and rerender post page with this users' post
 
@@ -96,30 +98,32 @@ const Post = (props) => {
     const handleReplyOnClick = (e) => {
         var currentReplyInputDisplay = $(e.target).children().css("display")
 
-        if(currentReplyInputDisplay == "none"){
+        if (currentReplyInputDisplay == "none") {
             $(e.target).children().css({display: "inline"});
 
-        } else if(currentReplyInputDisplay == "inline") {
+        } else if (currentReplyInputDisplay == "inline") {
             $(e.target).children().css({display: "none"});
         }
     };
 
-    const handleReplySubmit = async(e) => {
-        {/*TODO -------------------------------------------------------------------------------*/}
+    const handleReplySubmit = async (e) => {
+        {/*TODO -------------------------------------------------------------------------------*/
+        }
         // this is text of post
         const text = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerHTML;
         const text_length = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerText.length;
-        {/*TODO -------------------------------------------------------------------------------*/}
+        {/*TODO -------------------------------------------------------------------------------*/
+        }
 
         // frocen: this a new way to detect word limit due to formatted text implementation
-        if (text_length > 600 || !text){
+        if (text_length > 600 || !text) {
             message.error({
                 content: 'Reply message can not be empty or exceed 600 characters',
             });
             return
         }
 
-        const parentId=$(e.target).closest(".ant-form-item").find('button').attr( "parentId");
+        const parentId = $(e.target).closest(".ant-form-item").find('button').attr("parentId");
         $(e.target).closest('.ant-comment-content-detail').find('textarea').val('').change();
 
         //Notice!!! 我拿不到reply的ID，我没有删除reply的API
@@ -133,8 +137,8 @@ const Post = (props) => {
         // hide reply input
         $(e.target).closest('replyinput').css({display: "none"});
 
-        const currentPost= await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit)
-        setPostData(currentPost);    
+        const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit)
+        setPostData(currentPost);
     }
 
 
@@ -148,12 +152,13 @@ const Post = (props) => {
     useEffect(() => {
         async function loadPost() {
             const currentUser = await getUserDetail(props.id);
-            const currentPost= await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit)
+            const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit)
             setName(currentUser.data.username);
             setPostData(currentPost);
         }
+
         loadPost();
-        }, []);
+    }, []);
     // useEffect(() => {
     //     // Update the document title using the browser API
     //     console.log(fileList);
@@ -196,7 +201,8 @@ const Post = (props) => {
                                     </div>
                                 }
                             </Upload>
-                            <Spin indicator={loadingIcon} style={{display: "none"}} id={"upload-loading-spinner"} tip="Uploading..."/>
+                            <Spin indicator={loadingIcon} style={{display: "none"}} id={"upload-loading-spinner"}
+                                  tip="Uploading..."/>
                             <Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>
                                 <img
                                     alt="example"
@@ -217,7 +223,6 @@ const Post = (props) => {
             </Comment>
         </Card>
     );
-
 
 
     // upload file
@@ -249,11 +254,11 @@ const Post = (props) => {
 
                 var result = upload(fileUploadName, reader.result, type);
 
-                if(result !== ""){
+                if (result !== "") {
 
                     url = 'https://s3789585.s3.ap-southeast-2.amazonaws.com/fwp-a1/' + fileUploadName
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         fileList.push({"uid": uid, "name": name, "status": "done", "url": url});
                     }, 500);
 
@@ -266,14 +271,14 @@ const Post = (props) => {
             }
 
             // error means end, cuz we are not handling upload official
-        } else if(status === "error"){
+        } else if (status === "error") {
             // when end, hide loading state
             $("#upload-loading-spinner").css("display", "none");
 
             // re-render after finish to flush the image display from s3
             // avoid the list push faster than s3 upload finalise
-            setTimeout(function() {
-                setForceStatus(forceRendering+1);
+            setTimeout(function () {
+                setForceStatus(forceRendering + 1);
             }, 1500);
 
         }
@@ -315,22 +320,24 @@ const Post = (props) => {
     // onclick make a post
     const handleSubmitPost = () => {
 
-        {/*TODO -------------------------------------------------------------------------------*/}
+        {/*TODO -------------------------------------------------------------------------------*/
+        }
         // this is text of post
         const text = document.getElementById("postTextItem").getElementsByTagName('div')[1].getElementsByClassName("ql-editor")[0].innerHTML;
         const text_length = document.getElementById("postTextItem").getElementsByTagName('div')[1].getElementsByClassName("ql-editor")[0].innerText.length;
-        {/*TODO -------------------------------------------------------------------------------*/}
+        {/*TODO -------------------------------------------------------------------------------*/
+        }
 
 
         // frocen: this a new way to detect word limit due to formatted text implementation
-        if (text_length > 600 || !text){
+        if (text_length > 600 || !text) {
             message.error({
                 content: 'Post message can not be empty or exceed 600 characters',
             });
             return
         }
         console.log(text)
-        createPost(props.id ,text, fileList);
+        createPost(props.id, text, fileList);
         setPostData(printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit));
 
         // successful msg
@@ -344,7 +351,7 @@ const Post = (props) => {
     // ============================================================== Make Post ===============================
 
     return (
-        <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
+        <Row className={"postPage safeArea"} style={{display: "flex", justifyContent: "center"}}>
             <Col span={24} style={{maxWidth: "1000px"}}>
                 <div className={"postContainer"}>
                     <MakePostElement></MakePostElement>

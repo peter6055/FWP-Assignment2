@@ -1,5 +1,22 @@
 import {stringify, v4 as uuidv4} from 'uuid';
-import {message, Avatar, Button, Typography, Divider, Popconfirm, Row, Col, Comment, Card, Image, Modal, Form, Input, Alert, AutoComplete} from "antd";
+import {
+    message,
+    Avatar,
+    Button,
+    Typography,
+    Divider,
+    Popconfirm,
+    Row,
+    Col,
+    Comment,
+    Card,
+    Image,
+    Modal,
+    Form,
+    Input,
+    Alert,
+    AutoComplete, Empty
+} from "antd";
 import {
     QuestionCircleOutlined,
     LikeFilled,
@@ -14,7 +31,6 @@ import axios from "axios";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 // TODO ------------------------------------------------------------------------------------------
-
 
 
 // --- Constants ----------------------------------------------------------------------------------
@@ -47,7 +63,7 @@ async function createUsers(username, password, email) {
     const d = new Date();
     let day = days[d.getDay()];
     let date = d.getDate()
-    let month = months[d.getMonth()]+1;
+    let month = months[d.getMonth()] + 1;
     let year = d.getFullYear();
     const JoinDate = `${day} ${date} ${month} ${year}`;
     const user =
@@ -62,46 +78,47 @@ async function createUsers(username, password, email) {
     return response.data;
 }
 
-async function createPost(userId, text, images){
+async function createPost(userId, text, images) {
     const posts = getPosts();
-    const ImageData =[];
-    for(const image of images){
+    const ImageData = [];
+    for (const image of images) {
         ImageData.push(image);
     }
     const d = new Date();
     let date = d.getDate()
-    let month = d.getMonth()+1;
+    let month = d.getMonth() + 1;
     let year = d.getFullYear();
-    let hour=d.getHours();
-    let minutes=d.getMinutes()
+    let hour = d.getHours();
+    let minutes = d.getMinutes()
     const post_time = `${year}-${month}-${date} ${hour}:${minutes}`;
-    const post ={
+    const post = {
         user_id: userId,
-        post_text : text,
-        post_img : JSON.stringify(ImageData),
-        post_time : post_time
+        post_text: text,
+        post_img: JSON.stringify(ImageData),
+        post_time: post_time
     }
     const response = await axios.post(API_HOST + "/api/v1/posts/create", post);
 
     return response.data;
 }
-async function createReply(userId, post_id,reply_id,text){
+
+async function createReply(userId, post_id, reply_id, text) {
     // const replys = getReplys();
-    const postId=post_id;
-    const replyId=reply_id;
+    const postId = post_id;
+    const replyId = reply_id;
     const d = new Date();
     let date = d.getDate()
-    let month = d.getMonth()+1;
+    let month = d.getMonth() + 1;
     let year = d.getFullYear();
-    let hour=d.getHours();
-    let minutes=d.getMinutes()
+    let hour = d.getHours();
+    let minutes = d.getMinutes()
     const reply_time = `${year}-${month}-${date} ${hour}:${minutes}`;
     const reply = {
         user_id: userId,
         parent_post_id: postId,
         parent_reply_id: replyId,
-        reply_text : text,
-        reply_time : reply_time
+        reply_text: text,
+        reply_time: reply_time
     }
     const response = await axios.post(API_HOST + "/api/v1/replies/create", reply);
     return response.data;
@@ -125,6 +142,7 @@ async function getPosts() {
     const response = await axios.get(API_HOST + "/api/v1/posts/getAll");
     return response.data;
 }
+
 // function getReplys() {
 //     // Extract reply data from local storage.
 //     const data = localStorage.getItem(REPLY_DATABASE);
@@ -167,9 +185,9 @@ async function getPosts() {
 
 // // NOTE: In this example the login is also persistent as it is stored in local storage.
 async function verifyUser(username, password) {
-    const data={
-        username : username,
-        password : password
+    const data = {
+        username: username,
+        password: password
     }
     const response = await axios.post(API_HOST + "/api/v1/users/login", data);
     return response.data;
@@ -178,13 +196,15 @@ async function verifyUser(username, password) {
 function setUser(id) {
     localStorage.setItem(USER_KEY, JSON.stringify(id));
 }
+
 async function getUserDetail(id) {
-    const data ={
-        user_id : id
+    const data = {
+        user_id: id
     }
     const response = await axios.post(API_HOST + "/api/v1/users/detail", data);
     return response.data;
 }
+
 function getUser() {
     let data = localStorage.getItem(USER_KEY);
     return JSON.parse(data)
@@ -193,6 +213,7 @@ function getUser() {
 function removeUser() {
     localStorage.removeItem(USER_KEY);
 }
+
 // function getNameByReplyId(id){
 //     const users = getUsers();
 //     const replys =getReplys();
@@ -209,16 +230,16 @@ function removeUser() {
 //     }
 // }
 async function changeName(id, newUsername) {
-    const userDetail= await getUserDetail(id);
-    const data={
+    const userDetail = await getUserDetail(id);
+    const data = {
         user_id: id,
-        new_username : newUsername,
-        new_email : userDetail.data.email
+        new_username: newUsername,
+        new_email: userDetail.data.email
     }
     const response = await axios.post(API_HOST + "/api/v1/users/edit", data);
-    if(response.data.success){
+    if (response.data.success) {
         return true
-    }else{
+    } else {
         message.error({
             content: response.data.message,
         });
@@ -238,16 +259,16 @@ async function changeName(id, newUsername) {
 
 async function changeEmail(id, newEmail) {
     if (/\S+@\S+\.\S+/.test(newEmail)) {
-        const userDetail= await getUserDetail(id);
-        const data={
+        const userDetail = await getUserDetail(id);
+        const data = {
             user_id: id,
-            new_username : userDetail.data.username,
-            new_email : newEmail
+            new_username: userDetail.data.username,
+            new_email: newEmail
         }
         const response = await axios.post(API_HOST + "/api/v1/users/edit", data);
-        if(response.data.success){
+        if (response.data.success) {
             return true
-        }else{
+        } else {
             message.error({
                 content: response.data.message,
             });
@@ -260,13 +281,14 @@ async function changeEmail(id, newEmail) {
 }
 
 async function deleteAccount(id) {
-    const data={
+    const data = {
         post_id: id,
-        is_del : "1"
+        is_del: "1"
     }
     const response = await axios.post(API_HOST + "/api/v1/posts/delete", data);
     removeUser();
 }
+
 // // getter setter delete
 
 // // ============================================================== MFA ===============================
@@ -374,7 +396,7 @@ async function deleteAccount(id) {
 async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit) {
     let print = [];
     const getPosts = await axios.get(API_HOST + "/api/v1/posts/getAll");
-    const posts=getPosts.data.data   
+    const posts = getPosts.data.data
     for (const post of posts) {
         const userDetail = await getUserDetail(post.user_id)
         const id = post.user_id;
@@ -398,11 +420,12 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                             <replyinput style={{display: "none"}}>
                                 <Comment
                                     avatar={
-                                        <Avatar alt={userDetail.data.username} className={"postAvatar"} size="default" style={{
-                                            backgroundColor: "#f56a00",
-                                            verticalAlign: 'middle',
-                                            fontSize: '17px'
-                                        }}>
+                                        <Avatar alt={userDetail.data.username} className={"postAvatar"} size="default"
+                                                style={{
+                                                    backgroundColor: "#f56a00",
+                                                    verticalAlign: 'middle',
+                                                    fontSize: '17px'
+                                                }}>
                                             {JSON.stringify(userDetail.data.username).charAt(1).toUpperCase()}
                                         </Avatar>
                                     }
@@ -448,7 +471,7 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                     content={
                         <div>
                             <p>
-                            <div dangerouslySetInnerHTML={{__html:post.post_text}}></div>
+                                <div dangerouslySetInnerHTML={{__html: post.post_text}}></div>
                             </p>
                             <div className={"postImageGroup"}>
                                 {images}
@@ -465,13 +488,14 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
 
                                 {/* TODO: if have not follow this user, display this*/}
                                 <div className={"follow-btn"} style={{position: "absolute", right: 0, top: 0}}
-                                     user_id={id} action={"follow"} username={userDetail.data.username} onClick={handleFollowSubmit}><PlusCircleFilled />  Follow @{userDetail.data.username}
+                                     user_id={id} action={"follow"} username={userDetail.data.username}
+                                     onClick={handleFollowSubmit}><PlusCircleFilled/> Follow @{userDetail.data.username}
                                 </div>
                             </div>
                         </div>
                     }
                 >
-                
+
                     {await printPostReplys(post_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
                 </Comment>
             </Card>
@@ -483,11 +507,11 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
 async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost) {
     let print = [];
     const getPosts = await axios.get(API_HOST + "/api/v1/posts/getAll");
-    const posts=getPosts.data.data
-    //Peter add white box
-    if(posts===null){
+    const posts = getPosts.data.data
 
-    }
+    console.log(posts);
+
+    //Peter add white box
     for (const post of posts) {
         const images = [];
         // let i = 1;
@@ -502,7 +526,8 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
                 <Card style={{width: "100%", marginTop: "12px"}}>
                     <Comment
                         actions={[
-                            <span className={"clickable-text"} key="comment-nested-reply-to" onClick={editPostOnClick}>Edit post</span>,
+                            <span className={"clickable-text"} key="comment-nested-reply-to"
+                                  onClick={editPostOnClick} style={{paddingLeft: "10px"}}>Edit post</span>,
                             <Popconfirm
                                 title={<div><p>You sure you want to delete this post?</p><input type={"hidden"}
                                                                                                 name="postId"
@@ -521,9 +546,10 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
                                 cancelText="No"
                             >
                                 <span className={"danger-text"} key="comment-nested-reply-to"
-                                      type="danger">Delete post</span>
+                                      style={{paddingLeft: "10px"}} type="danger">Delete post</span>
 
                             </Popconfirm>
+
                         ]}
                         author={<a>{userDetail.data.username}</a>}
                         avatar={<Avatar alt={userDetail.data.username} className={"postAvatar"} size="default" style={{
@@ -537,7 +563,7 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
                             <div>
                                 <div className={"postText"}>
                                     <p>
-                                    <div dangerouslySetInnerHTML={{__html:post.post_text}}></div>
+                                        <div dangerouslySetInnerHTML={{__html: post.post_text}}></div>
                                     </p>
                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
                                     <ReactQuill theme="snow" placeholder={"Write a post..."} style={{display: "none"}}
@@ -561,24 +587,33 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
             );
         }
     }
+
+    if (print == "") {
+        print.push(
+            <Card>
+                <Empty description={"No Post"} style={{padding: "104px 0px"}}/>
+            </Card>
+        )
+    }
+
     return <div>{print}</div>;
 }
 
 async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit) {
     // const replys = getReplys();
     const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
-    const replys=getReplys.data.data
+    const replys = getReplys.data.data
     let print = [];
     for (const reply of replys) {
         if (reply.parent_post_id === parentId || reply.parent_reply_id === parentId) {
             const reply_id = reply.reply_id;
-            const data={
-                reply_id:reply_id
+            const data = {
+                reply_id: reply_id
             }
-            const getReplyDetail = await axios.post(API_HOST + "/api/v1/replies/getSingle",data);
-            const replyUsersId=getReplyDetail.data.data[0].user_id;
+            const getReplyDetail = await axios.post(API_HOST + "/api/v1/replies/getSingle", data);
+            const replyUsersId = getReplyDetail.data.data[0].user_id;
             const UserDetail = await getUserDetail(replyUsersId);
-            const name=UserDetail.data.username;
+            const name = UserDetail.data.username;
 
             print.push(<Comment
                 actions={[
@@ -634,15 +669,15 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
                     }}>
                         {JSON.stringify(name).charAt(1).toUpperCase()}
                     </Avatar>
-                } 
+                }
                 content={
-                <p>
-                    {getReplyDetail.data.data[0].reply_time}
-                </p>
-            }
+                    <p>
+                        {getReplyDetail.data.data[0].reply_time}
+                    </p>
+                }
             >
                 {await printPostReplys(reply_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
-            </Comment>) 
+            </Comment>)
         }
     }
     return <div>{print}</div>;
@@ -651,20 +686,20 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
 async function printProfileReplys(parentId) {
     // const replys = getReplys();
     const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
-    const replys=getReplys.data.data
+    const replys = getReplys.data.data
     let print = [];
     for (const reply of replys) {
         // if (reply.parentId === parentId) {
         //     const name = getNameByReplyId(reply.replyId);
         if (reply.parent_post_id === parentId || reply.parent_reply_id === parentId) {
             const reply_id = reply.reply_id;
-            const data={
-                reply_id:reply_id
+            const data = {
+                reply_id: reply_id
             }
-            const getReplyDetail = await axios.post(API_HOST + "/api/v1/replies/getSingle",data);
-            const replyUsersId=getReplyDetail.data.data[0].user_id;
+            const getReplyDetail = await axios.post(API_HOST + "/api/v1/replies/getSingle", data);
+            const replyUsersId = getReplyDetail.data.data[0].user_id;
             const UserDetail = await getUserDetail(replyUsersId);
-            const name=UserDetail.data.username;
+            const name = UserDetail.data.username;
             print.push(<Comment
                 author={<a>{name}</a>}
                 avatar={
@@ -687,6 +722,7 @@ async function printProfileReplys(parentId) {
     }
     return <div>{print}</div>;
 }
+
 //
 // export {
 //     getReplys,
@@ -713,7 +749,8 @@ async function printProfileReplys(parentId) {
 //     setUser
 // }
 
-export {changeName,
+export {
+    changeName,
     deleteAccount,
     createReply,
     printProfileReplys,

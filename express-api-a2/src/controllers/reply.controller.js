@@ -217,3 +217,33 @@ exports.create = async (request, response) => {
         }
     }
 };
+
+
+// delete a reply
+exports.delete = async (request, response) => {
+    if (request.body.reply_id == "") {
+        response.json(generateRestfulResponse(400, null, "Reply ID not specify"));
+
+    } else if (request.body.is_del === "" || request.body.is_del > 1) {
+        response.json(generateRestfulResponse(400, null, "Is delete should be 0 or 1"));
+
+    } else {
+        const reply = await db.reply.update({is_del: request.body.is_del}, {
+            raw: true,
+            where: {
+                reply_id: request.body.reply_id
+            }
+        });
+
+
+        if (reply[0] == "") {
+            response.json(generateRestfulResponse(404, null, "Reply not found (Or it is already delete)"));
+
+        } else {
+            // TODO: delete logic
+            response.json(generateRestfulResponse(200, null, "Success"));
+
+        }
+
+    }
+};
