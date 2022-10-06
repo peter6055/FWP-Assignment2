@@ -15,7 +15,8 @@
 //     Form,
 //     Input,
 //     Alert,
-//     AutoComplete
+//     AutoComplete,
+//     Empty
 // } from "antd";
 // import {QuestionCircleOutlined, MinusCircleFilled} from '@ant-design/icons';
 // import {useNavigate} from 'react-router-dom';
@@ -336,8 +337,8 @@
 //
 //     return (
 //         <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
-//             <Col span={5} style={{display: "flex", justifyContent: "flex-end"}}>
-//                 <div className={"profileContainer"} style={{maxWidth: "370px"}}>
+//             <Col span={3} style={{display: "flex", justifyContent: "flex-end"}}>
+//                 <div className={"profileContainer"} style={{maxWidth: "300px"}}>
 //                     <Card style={{width: "100%"}}>
 //                         <Avatar size={100} alt="Han Solo"
 //                                 className={"profilePageAvatar"}
@@ -402,17 +403,24 @@
 //                     </Card>
 //                 </div>
 //             </Col>
-//             <Col span={13} style={{maxWidth: "855px"}}>
+//             <Col span={12} style={{maxWidth: "855px"}}>
 //                 <div className={"postContainer"}>
 //                     {postsProfileData}
+//                     <Card>
+//                         <Empty description={"No Post"} style={{padding: "104px 0px"}}/>
+//                     </Card>
+//
+//
 //                 </div>
 //             </Col>
-//             <Col span={4} style={{maxWidth: "855px"}}>
+//             <Col span={4} style={{maxWidth: "300px"}}>
 //                 <div className={"postContainer"}>
 //                     <Card
 //                         title="Followed"
 //                         style={{
-//                             width: 300,
+//                             minWidth: 270,
+//                             maxWidth: 300,
+//                             width: "60%"
 //                         }}
 //                     >
 //                         <FollowerPanel/>

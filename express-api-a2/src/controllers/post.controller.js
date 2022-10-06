@@ -8,7 +8,10 @@ const sanitizeHtml = require('sanitize-html');
 exports.getAll = async (request, response) => {
 
     const post = await db.post.findAll({
-        raw: true
+        raw: true,
+        where: {
+            is_del: 0
+        }
     });
 
     if (post == "") {
@@ -45,11 +48,12 @@ exports.getAllFromUserId = async (request, response) => {
 
         } else {
 
-            // get the post belongs to user
+            // get the post belongs to user and is not delete
             const post = await db.post.findAll({
                 raw: true,
                 where: {
-                    user_id: request.body.user_id
+                    user_id: request.body.user_id,
+                    is_del: 0
                 }
             });
 
@@ -79,7 +83,8 @@ exports.getSingle = async (request, response) => {
         const post = await db.post.findAll({
             raw: true,
             where: {
-                post_id: request.body.post_id
+                post_id: request.body.post_id,
+                is_del: 0
             }
         });
 
@@ -147,7 +152,8 @@ exports.edit = async (request, response) => {
         const exists_post = await db.post.findAll({
             raw: true,
             where: {
-                post_id: request.body.post_id
+                post_id: request.body.post_id,
+                is_del: 0
             }
         });
 
