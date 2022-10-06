@@ -85,25 +85,27 @@ async function createPost(userId, text, images){
 
     return response.data;
 }
-// function createReply(userId, parentId,text){
-//     const replys = getReplys();
-//     const d = new Date();
-//     let date = d.getDate()
-//     let month = d.getMonth()+`;
-//     let year = d.getFullYear();
-//     let hour=d.getHours();
-//     let minutes=d.getMinutes()
-//     const reply_time = `${year}-${month}-${date} ${hour}:${minutes}`;
-//     const reply = {
-//         userId : userId,
-//         parentId: parentId,
-//         replyId : generateId(),
-//         reply_data:text,
-//         reply_time:reply_time
-//     }
-//     replys.push(reply);
-//     localStorage.setItem(REPLY_DATABASE, JSON.stringify(replys));
-// }
+async function createReply(userId, post_id,reply_id,text){
+    // const replys = getReplys();
+    const postId=post_id;
+    const replyId=reply_id;
+    const d = new Date();
+    let date = d.getDate()
+    let month = d.getMonth()+1;
+    let year = d.getFullYear();
+    let hour=d.getHours();
+    let minutes=d.getMinutes()
+    const reply_time = `${year}-${month}-${date} ${hour}:${minutes}`;
+    const reply = {
+        user_id: userId,
+        parent_post_id: postId,
+        parent_reply_id: replyId,
+        reply_text : text,
+        reply_time : reply_time
+    }
+    const response = await axios.post(API_HOST + "/api/v1/replies/create", reply);
+    return response.data;
+}
 
 // function generateId(){
 //     return uuidv4();
@@ -257,17 +259,14 @@ async function changeEmail(id, newEmail) {
     }
 }
 
-// function deleteAccount(id) {
-//     const users = getUsers();
-//     const newUsers = [];
-//     for (const user of users) {
-//         if (id !== user.id) {
-//             newUsers.push(user);
-//         }
-//     }
-//     localStorage.setItem(USERS_KEY, JSON.stringify(newUsers));
-//     removeUser();
-// }
+async function deleteAccount(id) {
+    const data={
+        post_id: id,
+        is_del : "1"
+    }
+    const response = await axios.post(API_HOST + "/api/v1/posts/delete", data);
+    removeUser();
+}
 // // getter setter delete
 
 // // ============================================================== MFA ===============================
@@ -375,7 +374,7 @@ async function changeEmail(id, newEmail) {
 async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit) {
     let print = [];
     const getPosts = await axios.get(API_HOST + "/api/v1/posts/getAll");
-    const posts=getPosts.data.data
+    const posts=getPosts.data.data   
     for (const post of posts) {
         const userDetail = await getUserDetail(post.user_id)
         const id = post.user_id;
@@ -472,7 +471,7 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                         </div>
                     }
                 >
-
+                
                     {await printPostReplys(post_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
                 </Comment>
             </Card>
@@ -486,6 +485,9 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
     const getPosts = await axios.get(API_HOST + "/api/v1/posts/getAll");
     const posts=getPosts.data.data
     //Peter add white box
+    if(posts===null){
+
+    }
     for (const post of posts) {
         const images = [];
         // let i = 1;
@@ -541,7 +543,7 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
                                     <ReactQuill theme="snow" placeholder={"Write a post..."} style={{display: "none"}}
                                                 value={post.post_text}/>
                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-                                    <Button type="primary" postId={post.postId} onClick={handleEditPost}
+                                    <Button type="primary" postId={post.post_id} onClick={handleEditPost}
                                             style={{marginTop: "20px", display: "none"}}>Save changes</Button>
                                 </div>
                                 <div className={"postImageGroup"}>
@@ -553,7 +555,7 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
                             post.post_time
                         }
                     >
-                        {/* {printProfileReplys(post.postId)} */}
+                        {await printProfileReplys(post.post_id)}
                     </Comment>
                 </Card>
             );
@@ -568,7 +570,6 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
     const replys=getReplys.data.data
     let print = [];
     for (const reply of replys) {
-        console.log(reply)
         if (reply.parent_post_id === parentId || reply.parent_reply_id === parentId) {
             const reply_id = reply.reply_id;
             const data={
@@ -578,7 +579,6 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
             const replyUsersId=getReplyDetail.data.data[0].user_id;
             const UserDetail = await getUserDetail(replyUsersId);
             const name=UserDetail.data.username;
-            console.log(name)
 
             print.push(<Comment
                 actions={[
@@ -634,48 +634,60 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
                     }}>
                         {JSON.stringify(name).charAt(1).toUpperCase()}
                     </Avatar>
-                }
+                } 
                 content={
                 <p>
                     {getReplyDetail.data.data[0].reply_time}
                 </p>
             }
             >
-                {/* {printPostReplys(reply_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)} */}
-            </Comment>)
+                {await printPostReplys(reply_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
+            </Comment>) 
         }
     }
     return <div>{print}</div>;
 }
 
-// function printProfileReplys(parentId) {
-//     const replys = getReplys();
-//     let print = [];
-//     for (const reply of replys) {
-//         if (reply.parentId===parentId){
-//             const name=getNameByReplyId(reply.replyId);
-//             print.push(<Comment
-//                 author={<a>{name}</a>}
-//                 avatar={
-//                     <Avatar alt={name} className={"postAvatar"} size="default" style={{
-//                         backgroundColor: "#f56a00",
-//                         verticalAlign: 'middle',
-//                         fontSize: '17px'
-//                     }}>
-//                         {JSON.stringify(name).charAt(1).toUpperCase()}
-//                     </Avatar>
-//                 }                content={
-//                     <p>
-//                         {reply.reply_data}
-//                     </p>
-//                 }
-//             >
-//                 {printProfileReplys(reply.replyId)}
-//             </Comment>)
-//         }
-//     }
-//     return <div>{print}</div>;
-// }
+async function printProfileReplys(parentId) {
+    // const replys = getReplys();
+    const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
+    const replys=getReplys.data.data
+    let print = [];
+    for (const reply of replys) {
+        // if (reply.parentId === parentId) {
+        //     const name = getNameByReplyId(reply.replyId);
+        if (reply.parent_post_id === parentId || reply.parent_reply_id === parentId) {
+            const reply_id = reply.reply_id;
+            const data={
+                reply_id:reply_id
+            }
+            const getReplyDetail = await axios.post(API_HOST + "/api/v1/replies/getSingle",data);
+            const replyUsersId=getReplyDetail.data.data[0].user_id;
+            const UserDetail = await getUserDetail(replyUsersId);
+            const name=UserDetail.data.username;
+            print.push(<Comment
+                author={<a>{name}</a>}
+                avatar={
+                    <Avatar alt={name} className={"postAvatar"} size="default" style={{
+                        backgroundColor: "#f56a00",
+                        verticalAlign: 'middle',
+                        fontSize: '17px'
+                    }}>
+                        {JSON.stringify(name).charAt(1).toUpperCase()}
+                    </Avatar>
+                } content={
+                <p>
+                    {reply.reply_text}
+                </p>
+            }
+            >
+                {printProfileReplys(reply_id)}
+            </Comment>)
+        }
+    }
+    return <div>{print}</div>;
+}
+//
 // export {
 //     getReplys,
 //     createReply,
@@ -689,6 +701,7 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
 //     changeName,
 //     getEmail,
 //     getJoinDate,
+//     initUsers,
 //     verifyUser,
 //     getUser,
 //     removeUser,
@@ -700,8 +713,10 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
 //     setUser
 // }
 
-
 export {changeName,
+    deleteAccount,
+    createReply,
+    printProfileReplys,
     printPostReplys,
     createPost,
     printPost,
