@@ -472,7 +472,8 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                         </div>
                     }
                 >
-                    {/* {printPostReplys(post.postId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)} */}
+                
+                    {await printPostReplys(post_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
                 </Comment>
             </Card>
         );
@@ -561,81 +562,92 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
     return <div>{print}</div>;
 }
 
-// function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit) {
-//     const replys = getReplys();
-//     let print = [];
-//     for (const reply of replys) {
-//         if (reply.parentId === parentId) {
-//             const name = getNameByReplyId(reply.replyId);
-//             const reply_id = reply.replyId;
-//
-//             print.push(<Comment
-//                 actions={[
-//                     <div>
-//                             <span key="comment-nested-reply-to" onClick={handleReplyOnClick} className={"reply"}
-//                                   style={{cursor: "pointer"}}>
-//                                 Reply
-//                                 <replyinput style={{display: "none"}}>
-//                                     <Comment
-//                                         avatar={
-//                                             <Avatar alt={name} className={"postAvatar"} size="default" style={{
-//                                                 backgroundColor: "#f56a00",
-//                                                 verticalAlign: 'middle',
-//                                                 fontSize: '17px'
-//                                             }}>
-//                                                 {JSON.stringify(name).charAt(1).toUpperCase()}
-//                                             </Avatar>
-//                                         }
-//                                         content={
-//                                             <div className={"reply-input-box"}>
-//                                                 <Form.Item>
-//                                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-//                                                     <ReactQuill id="postTextItem" theme="snow"
-//                                                                 placeholder={"Write a post..."}/>
-//                                                     {/*// TODO ------------------------------------------------------------------------------------------*/}
-//                                                 </Form.Item>
-//                                                 <Form.Item>
-//                                                     <Button htmlType="submit" style={{marginTop: "10px"}}
-//                                                             parentId={reply.replyId} onClick={handleReplySubmit}
-//                                                             type="primary">Reply</Button>
-//                                                 </Form.Item>
-//                                             </div>
-//                                         }
-//                                     >
-//                                     </Comment>
-//                                 </replyinput>
-//                             </span>
-//                         <br/><br/>
-//                         <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
-//                               target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
-//                         <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}} reaction={"dislike"}
-//                               target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
-//                         <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
-//                               target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
-//                     </div>
-//                 ]}
-//                 author={<a>{name}</a>}
-//                 avatar={
-//                     <Avatar alt={name} className={"postAvatar"} size="default" style={{
-//                         backgroundColor: "#f56a00",
-//                         verticalAlign: 'middle',
-//                         fontSize: '17px'
-//                     }}>
-//                         {JSON.stringify(name).charAt(1).toUpperCase()}
-//                     </Avatar>
-//                 } content={
-//                 <p>
-//                     {reply.reply_data}
-//                 </p>
-//             }
-//             >
-//                 {printPostReplys(reply.replyId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
-//             </Comment>)
-//         }
-//     }
-//     return <div>{print}</div>;
-// }
-//
+async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit) {
+    // const replys = getReplys();
+    const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
+    const replys=getReplys.data.data
+    let print = [];
+    for (const reply of replys) {
+        console.log(reply)
+        if (reply.parent_post_id === parentId || reply.parent_reply_id === parentId) {
+            const reply_id = reply.reply_id;
+            const data={
+                reply_id:reply_id
+            }
+            const getReplyDetail = await axios.post(API_HOST + "/api/v1/replies/getSingle",data);
+            const replyUsersId=getReplyDetail.data.data[0].user_id;
+            const UserDetail = await getUserDetail(replyUsersId);
+            const name=UserDetail.data.username;
+            console.log(name)
+
+            print.push(<Comment
+                actions={[
+                    <div>
+                            <span key="comment-nested-reply-to" onClick={handleReplyOnClick} className={"reply"}
+                                  style={{cursor: "pointer"}}>
+                                Reply
+                                <replyinput style={{display: "none"}}>
+                                    <Comment
+                                        avatar={
+                                            <Avatar alt={name} className={"postAvatar"} size="default" style={{
+                                                backgroundColor: "#f56a00",
+                                                verticalAlign: 'middle',
+                                                fontSize: '17px'
+                                            }}>
+                                                {JSON.stringify(name).charAt(1).toUpperCase()}
+                                            </Avatar>
+                                        }
+                                        content={
+                                            <div className={"reply-input-box"}>
+                                                <Form.Item>
+                                                    {/*// TODO ------------------------------------------------------------------------------------------*/}
+                                                    <ReactQuill id="postTextItem" theme="snow"
+                                                                placeholder={"Write a post..."}/>
+                                                    {/*// TODO ------------------------------------------------------------------------------------------*/}
+                                                </Form.Item>
+                                                <Form.Item>
+                                                    <Button htmlType="submit" style={{marginTop: "10px"}}
+                                                            parentId={reply_id} onClick={handleReplySubmit}
+                                                            type="primary">Reply</Button>
+                                                </Form.Item>
+                                            </div>
+                                        }
+                                    >
+                                    </Comment>
+                                </replyinput>
+                            </span>
+                        <br/><br/>
+                        <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
+                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
+                        <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}} reaction={"dislike"}
+                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
+                        <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
+                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
+                    </div>
+                ]}
+                author={<a>{name}</a>}
+                avatar={
+                    <Avatar alt={name} className={"postAvatar"} size="default" style={{
+                        backgroundColor: "#f56a00",
+                        verticalAlign: 'middle',
+                        fontSize: '17px'
+                    }}>
+                        {JSON.stringify(name).charAt(1).toUpperCase()}
+                    </Avatar>
+                } 
+                content={
+                <p>
+                    {getReplyDetail.data.data[0].reply_time}
+                </p>
+            }
+            >
+                {/* {printPostReplys(reply_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)} */}
+            </Comment>) 
+        }
+    }
+    return <div>{print}</div>;
+}
+
 // function printProfileReplys(parentId) {
 //     const replys = getReplys();
 //     let print = [];
@@ -691,6 +703,7 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
 // }
 
 export {changeName,
+    printPostReplys,
     createPost,
     printPost,
     changeEmail,

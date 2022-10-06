@@ -230,7 +230,7 @@ const Profile = (props) => {
         message.success({
             content: 'Post message deleted!',
         });
-        // setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost, handleEditsPost));
+        setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
     }
 
     // ============================================================== Post ===============================
