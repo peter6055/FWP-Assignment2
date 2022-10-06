@@ -56,9 +56,6 @@ const Profile = (props) => {
     useEffect(() => {
         async function loadUser() {
             const currentUser = await getUserDetail(props.id);
-            const test=await getPosts();
-            console.log(props.id);
-            console.log(currentUser);
             const currentProfilePost= await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
             setEmail(currentUser.data.email);
             setName(currentUser.data.username);
@@ -158,7 +155,6 @@ const Profile = (props) => {
         {/*TODO -------------------------------------------------------------------------------*/
         }
 
-        console.log(id);
 
         // frocen: this a new way to detect word limit due to formatted text implementation
         if (newText_length > 600 || !newText) {
