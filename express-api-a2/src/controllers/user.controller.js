@@ -14,21 +14,29 @@ exports.login = async (request, response) => {
         }
     });
 
+
     if (user === null || await argon2.verify(user[0].password, request.body.password) === false) {
         // Login failed.
         response.json(generateRestfulResponse(403, null, "Username or password incorrect"));
 
 
     } else {
-        const user = await db.user.findAll({
-            attributes: ['user_id'],
-            where: {
-                username: request.body.username
-            }
-        });
 
-        response.json(generateRestfulResponse(200, user[0], "Welcome " + request.body.username + "!"));
+        if (user[0]['is_del']) {
+            response.json(generateRestfulResponse(404, null, "Username had been deleted! Please contact administrator if you believe this is a mistake"));
+            return null; // end immediately
 
+        } else {
+            const user = await db.user.findAll({
+                attributes: ['user_id'],
+                where: {
+                    username: request.body.username
+                }
+            });
+
+            response.json(generateRestfulResponse(200, user[0], "Welcome " + request.body.username + "!"));
+
+        }
     }
 
 };
