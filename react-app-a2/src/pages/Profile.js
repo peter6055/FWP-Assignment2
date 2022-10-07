@@ -1,4 +1,4 @@
-import React, {useState,useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import {
     message,
     Avatar,
@@ -26,6 +26,8 @@ import {
     getReplys,
     changeName,
     getEmail,
+    editProfilePost,
+    deleteProfilePost,
     getJoinDate,
     deleteAccount,
     getUserName,
@@ -56,37 +58,24 @@ const Profile = (props) => {
     useEffect(() => {
         async function loadUser() {
             const currentUser = await getUserDetail(props.id);
-            const currentProfilePost= await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
+            const currentProfilePost = await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
             setEmail(currentUser.data.email);
             setName(currentUser.data.username);
             setDate(currentUser.data.join_date);
             setProfilePostData(currentProfilePost);
         }
+
         loadUser();
-        }, []);
+    }, []);
     //delete account
-    // const confirmSelected = async () => {
-    //     deleteAccount(props.id);
-    //     props.logoutUser();
-    //     navigate("/");
-    //     const posts = await getPosts();
-    //     // const id= await createUsers(fields.username, fields.password, fields.email);
-    //     const newPosts = [];
-    //     for (const post of posts) {
-    //         if (post.userId !== props.id) {
-    //             newPosts.push(post);
-    //         } else {
-    //             //delete reply here
-    //             deleteReply(post.postId);
-    //         }
-    //     }
-    //     localStorage.setItem("posts", JSON.stringify(newPosts));
-    //     // delete reply message to others
-    //     deleteReplied(props.id);
-    //     message.success({
-    //         content: 'Account deleted! You are now logout.',
-    //     });
-    // };
+    const confirmSelected = async () => {
+        deleteAccount(props.id);
+        props.logoutUser();
+        navigate("/");
+        message.success({
+            content: 'Account deleted! You are now logout.',
+        });
+    };
 
     // when user account delete, call this function to delete this user's reply message
     // function deleteReplied(userId) {
@@ -143,7 +132,7 @@ const Profile = (props) => {
 
     };
 
-    function handleEditPost(e) {
+    async function handleEditPost(e) {
         // get post id
         const id = $(e.target).closest(".postText > button").attr("postId");
 
@@ -163,16 +152,10 @@ const Profile = (props) => {
             });
             return
         }
+        await editProfilePost(id,newText);
+        const currentProfilePost = await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
+        setProfilePostData(currentProfilePost);   
 
-        const posts = getPosts();
-        for (const post of posts) {
-            if (post.postId === id) {
-                post.post_data[0] = newText;
-            }
-        }
-
-        localStorage.setItem("posts", JSON.stringify(posts));
-        setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
 
         // recover to non-editable mode
         // remove text area
@@ -213,24 +196,22 @@ const Profile = (props) => {
     //     }
     // }
 
-    function deletePost(e) {
+    async function deletePost(e) {
         // get post id
         const id = $(e.target).closest(".ant-popover-inner-content").find('input').val();
-        const posts = getPosts();
-        const newPosts = [];
-        for (const post of posts) {
-            if (post.postId !== id) {
-                newPosts.push(post);
-            } else {
-                //delete reply here
-                // deleteReply(id);
-            }
+        const response = await deleteProfilePost(id);
+        if (response.success) {
+            message.success({
+                content: 'Post message deleted!',
+            });
+            const currentProfilePost = await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
+            setProfilePostData(currentProfilePost);            
+            return true
+        } else {
+            message.error({
+                content: response.data.message,
+            });
         }
-        localStorage.setItem("posts", JSON.stringify(newPosts));
-        message.success({
-            content: 'Post message deleted!',
-        });
-        setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
     }
 
     // ============================================================== Post ===============================
@@ -351,7 +332,7 @@ const Profile = (props) => {
 
     return (
         <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
-            <Col span={5} style={{display: "flex", justifyContent: "flex-end"}}>
+            <Col span={3} style={{display: "flex", justifyContent: "flex-end"}}>
                 <div className={"profileContainer"} style={{maxWidth: "370px"}}>
                     <Card style={{width: "100%"}}>
                         <Avatar size={100} alt="Han Solo"
@@ -407,6 +388,7 @@ const Profile = (props) => {
                                     }}
                                 />
                             }
+                            onConfirm={confirmSelected}
                             placement="bottom"
                             okText="Delete Forever!"
                             cancelText="No"
@@ -416,17 +398,19 @@ const Profile = (props) => {
                     </Card>
                 </div>
             </Col>
-            <Col span={13} style={{maxWidth: "855px"}}>
+            <Col span={12} style={{maxWidth: "855px"}}>
                 <div className={"postContainer"}>
                     {postsProfileData}
                 </div>
             </Col>
-            <Col span={4} style={{maxWidth: "855px"}}>
+            <Col span={4} style={{maxWidth: "300px"}}>
                 <div className={"postContainer"}>
                     <Card
                         title="Followed"
                         style={{
-                            width: 300,
+                            minWidth: 270,
+                            maxWidth: 300,
+                            width: "60%"
                         }}
                     >
                         <FollowerPanel/>

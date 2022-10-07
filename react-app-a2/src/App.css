@@ -244,7 +244,14 @@ html {
 /* ----------------------------------------------------------------- Profile ---- */
 .profilePage {
     background: #f9f9f5;
-    padding: 30px 200px 0px calc(200px - 1%);
+    padding: 30px 39px 0px calc(166px);
+    height: 100vh;
+}
+
+
+.postPage {
+    background: #f9f9f5;
+    padding: 30px 39px 0px 19px;
     height: 100vh;
 }
 
@@ -271,7 +278,7 @@ html {
 }
 
 .postContainer {
-    margin: 20px 0px 100px 30px;
+    margin: 20px 0px 100px 20px;
 }
 
 .postContainer > .ant-card {
