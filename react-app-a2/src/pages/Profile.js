@@ -26,12 +26,15 @@ import {
     getReplys,
     changeName,
     getEmail,
+    editProfilePost,
+    deleteProfilePost,
     getJoinDate,
     deleteAccount,
     getUserName,
     getUserDetail,
     setMFA,
     getMFA,
+    printFollow,
     printProfilePost
 } from "../data/repository";
 import $ from "jquery";
@@ -52,42 +55,32 @@ const Profile = (props) => {
     const [Name, setName] = useState(null);
     const [date, setDate] = useState(null);
     const [postsProfileData, setProfilePostData] = useState(null);
+    const [followData, setFollowData] = useState(null);
+
     // const date = getJoinDate((props.id));
     useEffect(() => {
         async function loadUser() {
             const currentUser = await getUserDetail(props.id);
             const currentProfilePost = await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
+            const currentFollow = await printFollow();
             setEmail(currentUser.data.email);
             setName(currentUser.data.username);
             setDate(currentUser.data.join_date);
             setProfilePostData(currentProfilePost);
+            setFollowData(currentFollow);
         }
 
         loadUser();
     }, []);
     //delete account
-    // const confirmSelected = async () => {
-    //     deleteAccount(props.id);
-    //     props.logoutUser();
-    //     navigate("/");
-    //     const posts = await getPosts();
-    //     // const id= await createUsers(fields.username, fields.password, fields.email);
-    //     const newPosts = [];
-    //     for (const post of posts) {
-    //         if (post.userId !== props.id) {
-    //             newPosts.push(post);
-    //         } else {
-    //             //delete reply here
-    //             deleteReply(post.postId);
-    //         }
-    //     }
-    //     localStorage.setItem("posts", JSON.stringify(newPosts));
-    //     // delete reply message to others
-    //     deleteReplied(props.id);
-    //     message.success({
-    //         content: 'Account deleted! You are now logout.',
-    //     });
-    // };
+    const confirmSelected = async () => {
+        deleteAccount(props.id);
+        props.logoutUser();
+        navigate("/");
+        message.success({
+            content: 'Account deleted! You are now logout.',
+        });
+    };
 
     // when user account delete, call this function to delete this user's reply message
     // function deleteReplied(userId) {
@@ -144,7 +137,7 @@ const Profile = (props) => {
 
     };
 
-    function handleEditPost(e) {
+    async function handleEditPost(e) {
         // get post id
         const id = $(e.target).closest(".postText > button").attr("postId");
 
@@ -164,16 +157,10 @@ const Profile = (props) => {
             });
             return
         }
+        await editProfilePost(id,newText);
+        const currentProfilePost = await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
+        setProfilePostData(currentProfilePost);   
 
-        const posts = getPosts();
-        for (const post of posts) {
-            if (post.postId === id) {
-                post.post_data[0] = newText;
-            }
-        }
-
-        localStorage.setItem("posts", JSON.stringify(posts));
-        setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
 
         // recover to non-editable mode
         // remove text area
@@ -214,24 +201,22 @@ const Profile = (props) => {
     //     }
     // }
 
-    function deletePost(e) {
+    async function deletePost(e) {
         // get post id
         const id = $(e.target).closest(".ant-popover-inner-content").find('input').val();
-        const posts = getPosts();
-        const newPosts = [];
-        for (const post of posts) {
-            if (post.postId !== id) {
-                newPosts.push(post);
-            } else {
-                //delete reply here
-                // deleteReply(id);
-            }
+        const response = await deleteProfilePost(id);
+        if (response.success) {
+            message.success({
+                content: 'Post message deleted!',
+            });
+            const currentProfilePost = await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
+            setProfilePostData(currentProfilePost);            
+            return true
+        } else {
+            message.error({
+                content: response.data.message,
+            });
         }
-        localStorage.setItem("posts", JSON.stringify(newPosts));
-        message.success({
-            content: 'Post message deleted!',
-        });
-        setProfilePostData(printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost));
     }
 
     // ============================================================== Post ===============================
@@ -345,7 +330,7 @@ const Profile = (props) => {
                 }}
                 className={"follow-btn"}
             >
-                Unfollow
+                Following
             </Button>
         </div>
     );
@@ -408,6 +393,7 @@ const Profile = (props) => {
                                     }}
                                 />
                             }
+                            onConfirm={confirmSelected}
                             placement="bottom"
                             okText="Delete Forever!"
                             cancelText="No"
@@ -432,9 +418,7 @@ const Profile = (props) => {
                             width: "60%"
                         }}
                     >
-                        <FollowerPanel/>
-                        <FollowerPanel/>
-                        <FollowerPanel/>
+                        {followData}
 
                     </Card>
                 </div>
