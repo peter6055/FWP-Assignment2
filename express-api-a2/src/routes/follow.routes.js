@@ -3,7 +3,7 @@ module.exports = (express, app) => {
     const controller = require("../controllers/follow.controller.js");
     const router = express.Router();
 
-    // get all post
+    // get all follower to make list
     router.post("/getFollowersFromUserId", controller.getFollowersFromUserId);
 
     // get all post from user id
