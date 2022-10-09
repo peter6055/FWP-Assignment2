@@ -3,7 +3,7 @@ const generateRestfulResponse = require("../routes/restful.js")
 const sanitizeHtml = require("sanitize-html");
 
 
-// get all posts
+// get all followed user from current user
 exports.getFollowersFromUserId = async (request, response) => {
 
     // check is there any user id
@@ -36,7 +36,7 @@ exports.getFollowersFromUserId = async (request, response) => {
             });
 
             // identify is there any posy made by this user
-            if (post == "") {
+            if (follow == "") {
                 response.json(generateRestfulResponse(404, null, "No Records Found"));
 
             } else {

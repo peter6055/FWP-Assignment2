@@ -48,7 +48,7 @@ exports.create = async (request, response) => {
             }
         });
 
-        if(founded_username == ""){
+        if (founded_username == "") {
             // do hash password
             const hash = await argon2.hash(request.body.password, {type: argon2.argon2id});
 
@@ -95,27 +95,42 @@ exports.edit = async (request, response) => {
             }
         });
 
-        // check is post exist
+        // check is user exist
         if (exists_user == "") {
             response.json(generateRestfulResponse(404, null, "User not found"));
 
         } else {
-            await db.user.update({username: request.body.new_username, email: request.body.new_email}, {
+
+            // check is username duplication
+            const founded_username = await db.user.findAll({
                 raw: true,
                 where: {
-                    user_id: request.body.user_id
+                    username: request.body.new_username
                 }
             });
 
-            const user_fetch = await db.user.findAll({
-                raw: true,
-                attributes: ['user_id', 'username', 'email', 'join_date', 'mfa_status'],
-                where: {
-                    user_id: request.body.user_id
-                }
-            });
+            if (founded_username == "") {
+                await db.user.update({username: request.body.new_username, email: request.body.new_email}, {
+                    raw: true,
+                    where: {
+                        user_id: request.body.user_id
+                    }
+                });
 
-            response.json(generateRestfulResponse(200, user_fetch[0], "Success"));
+                const user_fetch = await db.user.findAll({
+                    raw: true,
+                    attributes: ['user_id', 'username', 'email', 'join_date', 'mfa_status'],
+                    where: {
+                        user_id: request.body.user_id
+                    }
+                });
+
+                response.json(generateRestfulResponse(200, user_fetch[0], "Success"));
+
+            } else {
+                response.json(generateRestfulResponse(400, null, "Username exist"));
+
+            }
         }
     }
 

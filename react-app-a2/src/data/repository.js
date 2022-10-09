@@ -23,6 +23,7 @@ import {
     DislikeFilled,
     StarFilled,
     PlusCircleFilled,
+    MinusCircleFilled,
     CloseCircleFilled
 } from '@ant-design/icons';
 import axios from "axios";
@@ -284,7 +285,7 @@ async function deleteAccount(id) {
     }
     await axios.post(API_HOST + "/api/v1/users/delete", data);
     const getUserPostsId = {
-        user_id: id,
+        user_id: id
     }
     const response = await axios.post(API_HOST + "/api/v1/posts/getAllFromUserId", getUserPostsId);
     const posts =response.data.data
@@ -399,6 +400,12 @@ async function deleteAccount(id) {
 // generate post and reply depends on local storage database
 async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit) {
     let print = [];
+    const data={
+        user_id:getUser()
+    }
+    //get this user's userID， get all followed user id.
+    const getFollowedUser=await axios.post(API_HOST + "/api/v1/follows/getFollowersFromUserId",data);
+    const FollowedUses=getFollowedUser.data.data;
     const getPosts = await axios.get(API_HOST + "/api/v1/posts/getAll");
     const posts = getPosts.data.data
     for (const post of posts) {
@@ -411,6 +418,15 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
         for (const image of images) {
             let URL = image.url;
             imageTag.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>);
+        }
+        //if Id is exist then follow is true
+        let follow=false;
+        if(FollowedUses!=null){
+            for(const FollowedUse of FollowedUses){
+                if (FollowedUse.followed_user_id === post.user_id){
+                    follow=true;
+                }
+            }
         }
         print.push(
             <Card style={{width: "100%", marginTop: "12px"}}>
@@ -444,8 +460,8 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                                             </Form.Item>
                                             <Form.Item>
                                                 <Button htmlType="submit" style={{marginTop: "10px"}}
-                                                        parent_post_id={post_id} 
-                                                        parent_reply_id={""}                                                         
+                                                        parent_post_id={post_id}
+                                                        parent_reply_id={""}
                                                         onClick={handleReplySubmit}
                                                         type="primary">Reply</Button>
                                             </Form.Item>
@@ -485,17 +501,151 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                     }
                     datetime={
                         <div>
-                            <div style={{display: "flex"}}>{post.post_time}
+                            <div style={{display: "flex"}}>
+                                {post.post_time}
                                 {/* TODO: if have follow this user, display this*/}
-                                {/*<div className={"follow-btn has-follow"} style={{position: "absolute", right: 0, top: 0}}*/}
-                                {/*     user_id={id} action={"unfollow"} username={getUserName(id)} onClick={handleFollowSubmit}><CloseCircleFilled/> Unfollow*/}
-                                {/*</div>*/}
-
-                                {/* TODO: if have not follow this user, display this*/}
-                                <div className={"follow-btn"} style={{position: "absolute", right: 0, top: 0}}
-                                     user_id={id} action={"follow"} username={userDetail.data.username}
-                                     onClick={handleFollowSubmit}><PlusCircleFilled/> Follow @{userDetail.data.username}
+                                {follow ?
+                                <div className={"follow-btn has-follow"} style={{position: "absolute", right: 0, top: 0}}
+                                user_id={id} action={"unfollow"} username={userDetail.data.username} onClick={handleFollowSubmit}><CloseCircleFilled/> Unfollow
                                 </div>
+                                :
+                                <div  className={"follow-btn"} style={{position: "absolute", right: 0, top: 0}}
+                                user_id={id} action={"follow"} username={userDetail.data.username}
+                                onClick={handleFollowSubmit}><PlusCircleFilled/> Follow @{userDetail.data.username}</div>
+                    }
+                                
+                            </div>
+                        </div>
+                    }
+                >
+
+                    {await printPostReplys(post_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
+                </Comment>
+            </Card>
+        );
+    }
+    return <div>{print}</div>;
+}
+async function printFollowingPost(FollowedId,handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit) {
+    let print = [];
+    const data={
+        user_id:getUser()
+    }
+    //get this user's userID， get all followed user id.
+    const getFollowedUser=await axios.post(API_HOST + "/api/v1/follows/getFollowersFromUserId",data);
+    const FollowedUses=getFollowedUser.data.data;
+    console.log(FollowedUses);
+    const getUserPostsId = {
+        user_id: FollowedId
+    }
+    const getPosts = await axios.post(API_HOST + "/api/v1/posts/getAllFromUserId", getUserPostsId);
+    const posts =getPosts.data.data
+    for (const post of posts) {
+        const userDetail = await getUserDetail(post.user_id)
+        const id = post.user_id;
+        const post_id = post.post_id;
+        // generate image tags depends on local storage
+        const imageTag=[];
+        const images = JSON.parse(post.post_img);
+        for (const image of images) {
+            let URL = image.url;
+            imageTag.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>);
+        }
+        //if Id is exist then follow is true
+        let follow=false;
+        if(FollowedUses!=null){
+            for(const FollowedUse of FollowedUses){
+                if (FollowedUse.followed_user_id === post.user_id){
+                    follow=true;
+                }
+            }
+        }
+        print.push(
+            <Card style={{width: "100%", marginTop: "12px"}}>
+                <Comment
+                    actions={[
+                        <div>
+                        <span key="comment-nested-reply-to" className={"reply"} onClick={handleReplyOnClick}
+                              style={{cursor: "pointer"}}>
+                            Reply
+                            <replyinput style={{display: "none"}}>
+                                <Comment
+                                    avatar={
+                                        <Avatar alt={userDetail.data.username} className={"postAvatar"} size="default"
+                                                style={{
+                                                    backgroundColor: "#f56a00",
+                                                    verticalAlign: 'middle',
+                                                    fontSize: '17px'
+                                                }}>
+                                            {JSON.stringify(userDetail.data.username).charAt(1).toUpperCase()}
+                                        </Avatar>
+                                    }
+                                    content={
+                                        <div className={"reply-input-box"}>
+                                            <Form.Item>
+
+                                                {/*TODO -------------------------------------------------------------------------------*/}
+                                                <ReactQuill id="postTextItem" theme="snow"
+                                                            placeholder={"Write a post..."}></ReactQuill>
+                                                {/*TODO -------------------------------------------------------------------------------*/}
+
+                                            </Form.Item>
+                                            <Form.Item>
+                                                <Button htmlType="submit" style={{marginTop: "10px"}}
+                                                        parent_post_id={post_id}
+                                                        parent_reply_id={""}
+                                                        onClick={handleReplySubmit}
+                                                        type="primary">Reply</Button>
+                                            </Form.Item>
+                                        </div>
+                                    }
+                                >
+                                </Comment>
+                            </replyinput>
+                        </span>
+                            <br/><br/>
+                            <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
+                                  target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
+                            <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}}
+                                  reaction={"dislike"} target_id={post_id} target_type={"post"}
+                                  onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
+                            <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
+                                  target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
+                        </div>
+                    ]}
+                    author={<a>{userDetail.data.username}</a>}
+                    avatar={<Avatar alt={userDetail.data.username} className={"postAvatar"} size="default" style={{
+                        backgroundColor: "#f56a00",
+                        verticalAlign: 'middle',
+                        fontSize: '17px'
+                    }}>
+                        {JSON.stringify(userDetail.data.username).charAt(1).toUpperCase()}
+                    </Avatar>}
+                    content={
+                        <div>
+                            <p>
+                                <div dangerouslySetInnerHTML={{__html: post.post_text}}></div>
+                            </p>
+                            <div className={"postImageGroup"}>
+                                {imageTag}
+                            </div>
+                        </div>
+                    }
+                    datetime={
+                        <div>
+                            <div style={{display: "flex"}}>
+                                {post.post_time}
+                                {/* TODO: if have follow this user, display this*/}
+                                {follow ?
+                                <div className={"follow-btn has-follow"} style={{position: "absolute", right: 0, top: 0}}
+                                user_id={id} action={"unfollow"} username={userDetail.data.username} onClick={handleFollowSubmit}><CloseCircleFilled/> Unfollow
+                                </div>
+                                :
+                                <div  className={"follow-btn"} style={{position: "absolute", right: 0, top: 0}}
+                                user_id={id} action={"follow"} username={userDetail.data.username}
+                                onClick={handleFollowSubmit}><PlusCircleFilled/> Follow @{userDetail.data.username}</div>
+                    }
+                                
                             </div>
                         </div>
                     }
@@ -597,6 +747,49 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
         )
     }
 
+    return <div>{print}</div>;
+}
+async function printFollow(){
+    let print = [];
+    const input={
+        user_id:getUser()
+    }
+    const getFollowedUser=await axios.post(API_HOST + "/api/v1/follows/getFollowersFromUserId",input);
+    const FollowedUses=getFollowedUser.data.data;
+    for(const FollowedUse of FollowedUses){
+        const userDetail = await getUserDetail(FollowedUse.followed_user_id);
+        print.push(
+            <div style={{display: "flex", alignItems: "center", margin: "0px 0px 25px 0px"}}>
+                <Avatar
+                    style={{
+                        backgroundColor: "rgb(245, 106, 0)",
+                        verticalAlign: 'middle',
+                    }}
+                    size="large"
+                    gap={5}
+                >
+                    {JSON.stringify(userDetail.data.username).charAt(1).toUpperCase()}
+                </Avatar>
+                <span style={{marginLeft: "10px"}}>{userDetail.data.username}</span>
+                <Button
+                    size="small"
+                    icon={<MinusCircleFilled/>}
+                    style={{
+                        margin: '0 16px',
+                        verticalAlign: 'middle',
+                        position: "inherit",
+                        right: "0px",
+                        top: "0px",
+                        padding: "0px 5px 0px 5px",
+                        marginLeft: "auto"
+                    }}
+                    className={"follow-btn"}
+                >
+                    Following
+                </Button>
+            </div>
+        )
+    }
     return <div>{print}</div>;
 }
 
@@ -740,9 +933,18 @@ async function deleteProfilePost(id){
     const response = await axios.post(API_HOST + "/api/v1/posts/delete", data);
     return response.data;
 }
-
+async function setFollow(followUserId){
+    const data={
+        user_id : getUser(),
+        followed_user_id : followUserId
+    }
+    const response = await axios.post(API_HOST + "/api/v1/follows/setStatus", data);
+    return response.data;
+}
 export {
     changeName,
+    setFollow,
+    printFollow,
     editProfilePost,
     deleteProfilePost,
     deleteAccount,
@@ -751,6 +953,7 @@ export {
     printPostReplys,
     createPost,
     printPost,
+    printFollowingPost,
     changeEmail,
     printProfilePost,
     getPosts,

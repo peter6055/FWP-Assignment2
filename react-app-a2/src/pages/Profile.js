@@ -34,6 +34,7 @@ import {
     getUserDetail,
     setMFA,
     getMFA,
+    printFollow,
     printProfilePost
 } from "../data/repository";
 import $ from "jquery";
@@ -54,15 +55,19 @@ const Profile = (props) => {
     const [Name, setName] = useState(null);
     const [date, setDate] = useState(null);
     const [postsProfileData, setProfilePostData] = useState(null);
+    const [followData, setFollowData] = useState(null);
+
     // const date = getJoinDate((props.id));
     useEffect(() => {
         async function loadUser() {
             const currentUser = await getUserDetail(props.id);
             const currentProfilePost = await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
+            const currentFollow = await printFollow();
             setEmail(currentUser.data.email);
             setName(currentUser.data.username);
             setDate(currentUser.data.join_date);
             setProfilePostData(currentProfilePost);
+            setFollowData(currentFollow);
         }
 
         loadUser();
@@ -325,7 +330,7 @@ const Profile = (props) => {
                 }}
                 className={"follow-btn"}
             >
-                Unfollow
+                Following
             </Button>
         </div>
     );
@@ -413,9 +418,7 @@ const Profile = (props) => {
                             width: "60%"
                         }}
                     >
-                        <FollowerPanel/>
-                        <FollowerPanel/>
-                        <FollowerPanel/>
+                        {followData}
 
                     </Card>
                 </div>

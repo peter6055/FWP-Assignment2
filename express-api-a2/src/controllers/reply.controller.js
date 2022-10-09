@@ -8,7 +8,10 @@ const sanitizeHtml = require('sanitize-html');
 exports.getAll = async (request, response) => {
 
     const reply = await db.reply.findAll({
-        raw: true
+        raw: true,
+        where: {
+            is_del: 0
+        }
     });
 
     if (reply == "") {
@@ -24,10 +27,16 @@ exports.getAll = async (request, response) => {
 // get all reply from a post
 exports.getAllFromPost = async (request, response) => {
 
+    if (request.body.parent_post_id == "") {
+        response.json(generateRestfulResponse(400, null, "Post ID not specify"));
+        return null; //end immediately
+    }
+
     const reply = await db.reply.findAll({
         raw: true,
         where: {
-            parent_post_id: request.body.parent_post_id
+            parent_post_id: request.body.parent_post_id,
+            is_del: 0
         }
     });
 
@@ -43,10 +52,16 @@ exports.getAllFromPost = async (request, response) => {
 // get all reply from a reply
 exports.getAllFromReply = async (request, response) => {
 
+    if (request.body.parent_reply_id == "") {
+        response.json(generateRestfulResponse(400, null, "Reply ID not specify"));
+        return null; //end immediately
+    }
+
     const reply = await db.reply.findAll({
         raw: true,
         where: {
-            parent_reply_id: request.body.parent_reply_id
+            parent_reply_id: request.body.parent_reply_id,
+            is_del: 0
         }
     });
 
@@ -62,13 +77,14 @@ exports.getAllFromReply = async (request, response) => {
 // get a reply
 exports.getSingle = async (request, response) => {
     if (request.body.reply_id == "") {
-        response.json(generateRestfulResponse(400, null, "Post ID not specify"));
+        response.json(generateRestfulResponse(400, null, "Reply ID not specify"));
 
     } else {
         const reply = await db.reply.findAll({
             raw: true,
             where: {
-                reply_id: request.body.reply_id
+                reply_id: request.body.reply_id,
+                is_del: 0
             }
         });
 
@@ -199,5 +215,35 @@ exports.create = async (request, response) => {
 
             response.json(generateRestfulResponse(200, post, "Reply successful"));
         }
+    }
+};
+
+
+// delete a reply
+exports.delete = async (request, response) => {
+    if (request.body.reply_id == "") {
+        response.json(generateRestfulResponse(400, null, "Reply ID not specify"));
+
+    } else if (request.body.is_del === "" || request.body.is_del > 1) {
+        response.json(generateRestfulResponse(400, null, "Is delete should be 0 or 1"));
+
+    } else {
+        const reply = await db.reply.update({is_del: request.body.is_del}, {
+            raw: true,
+            where: {
+                reply_id: request.body.reply_id
+            }
+        });
+
+
+        if (reply[0] == "") {
+            response.json(generateRestfulResponse(404, null, "Reply not found (Or it is already delete)"));
+
+        } else {
+            // TODO: delete logic
+            response.json(generateRestfulResponse(200, null, "Success"));
+
+        }
+
     }
 };
