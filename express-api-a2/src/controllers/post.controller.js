@@ -2,6 +2,7 @@ const db = require("../database");
 const generateRestfulResponse = require("../routes/restful.js")
 var uuid = require('uuid');
 const sanitizeHtml = require('sanitize-html');
+const {Sequelize} = require("sequelize");
 
 
 // get all posts
@@ -11,7 +12,10 @@ exports.getAll = async (request, response) => {
         raw: true,
         where: {
             is_del: 0
-        }
+        },
+        order: [
+            [Sequelize.literal('createdAt'), 'DESC']
+        ]
     });
 
     if (post == "") {
@@ -54,7 +58,10 @@ exports.getAllFromUserId = async (request, response) => {
                 where: {
                     user_id: request.body.user_id,
                     is_del: 0
-                }
+                },
+                order: [
+                    [Sequelize.literal('createdAt'), 'DESC']
+                ]
             });
 
             // identify is there any posy made by this user

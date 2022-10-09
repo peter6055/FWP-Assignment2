@@ -117,7 +117,7 @@ exports.edit = async (request, response) => {
                 }
             });
 
-            if (founded_username == "") {
+            if (founded_username == "" || founded_username[0]['user_id'] === request.body.user_id) {
                 await db.user.update({username: request.body.new_username, email: request.body.new_email}, {
                     raw: true,
                     where: {

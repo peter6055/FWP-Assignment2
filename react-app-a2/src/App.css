@@ -371,6 +371,16 @@ replyinput > .ant-comment > .ant-comment-inner > .ant-comment-avatar {
 
 .ant-comment-content-detail, .ant-comment-content-author {
     padding-left: 10px;
+    margin-top: 20px;
+    margin-right: 145px;
+}
+
+.ant-comment-content-author {
+    margin-top: 9px;
+}
+
+.ant-comment-actions {
+    margin-top: 18px;
 }
 
 

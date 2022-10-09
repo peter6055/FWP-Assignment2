@@ -16,7 +16,7 @@ import {
 } from "antd";
 import {PlusOutlined, LoadingOutlined} from '@ant-design/icons';
 import $ from 'jquery';
-import {setFollow, createPost, printPost, createReply, getUserDetail,printFollowingPost} from "../data/repository";
+import {setFollow, createPost, printPost, createReply, getUserDetail, printFollowingPost} from "../data/repository";
 import {upload} from "../data/aws";
 
 // TODO ------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ const Post = (props) => {
     }
 
     //handling follow
-    const handleFollowSubmit = async(e) => {
+    const handleFollowSubmit = async (e) => {
         // TODO. "user_id" will tell you the id of user
         //       "action" will tell to follow or unfollow
 
@@ -65,9 +65,9 @@ const Post = (props) => {
         const user_id = e.target.getAttribute("user_id");
         const action = e.target.getAttribute("action");
 
-        // console.log(e.target.getAttribute("username"));
-        // console.log(e.target.getAttribute("user_id"));
-        // console.log(e.target.getAttribute("action"));
+        console.log(e.target.getAttribute("username"));
+        console.log(e.target.getAttribute("user_id"));
+        console.log(e.target.getAttribute("action"));
 
 
         if (action === "follow") {
@@ -77,18 +77,19 @@ const Post = (props) => {
                 className={"clickable"} onClick={handleFollowPostFilter}
                 user_id={user_id}>Yes, show me the posts!</span></div>, 10)
         } else {
+            await setFollow(user_id);
             message.success("You had successfully unfollow " + username + "!")
         }
     }
 
 
-    const handleFollowPostFilter = async(e) => {
+    const handleFollowPostFilter = async (e) => {
         // TODO. "user_id" will tell you the id of user
         //       please call api and rerender post page with this users' post
 
         const user_id = e.target.getAttribute("user_id");
         // console.log(e.target.getAttribute("user_id"));
-        const currentPost = await printFollowingPost(user_id,handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
+        const currentPost = await printFollowingPost(user_id, handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
         setPostData(currentPost);
         // for testing, delete when finish
         // alert("click " + user_id);
@@ -126,7 +127,7 @@ const Post = (props) => {
         const parent_post_id = $(e.target).closest(".ant-form-item").find('button').attr("parent_post_id");
         const parent_reply_id = $(e.target).closest(".ant-form-item").find('button').attr("parent_reply_id");
         $(e.target).closest('.ant-comment-content-detail').find('textarea').val('').change();
-        createReply(props.id, parent_post_id,parent_reply_id, text);
+        createReply(props.id, parent_post_id, parent_reply_id, text);
         // successful msg
         message.success({
             content: 'Reply posted',
@@ -155,6 +156,7 @@ const Post = (props) => {
             setName(currentUser.data.username);
             setPostData(currentPost);
         }
+
         loadPost();
     }, []);
     // useEffect(() => {
@@ -221,7 +223,6 @@ const Post = (props) => {
             </Comment>
         </Card>
     );
-
 
 
     // upload file
@@ -316,7 +317,7 @@ const Post = (props) => {
 
 
     // onclick make a post
-    const handleSubmitPost = async() => {
+    const handleSubmitPost = async () => {
 
         {/*TODO -------------------------------------------------------------------------------*/
         }
