@@ -1,59 +1,89 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import App from "../../src/App.js";
-
-import Profile from "../../src/pages/Profile.js";
-// import Login from "../../src/pages/Login.js";
-
-import { logoutUser, editName, loginUser } from "../../src/App.js";
-import {createUsers, deleteAccount} from "../data/repository";
-
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {changeEmail, changeName, createUsers, deleteAccount, verifyUser, getUserDetail} from "../data/repository";
 import React from "react";
-import Login from "./Login";
+import axios from "axios";
+const API_HOST = "http://localhost:40003";
 
-// See here for more information:
-// https://reactjs.org/docs/testing.html
-// https://github.com/testing-library/react-testing-library
-// https://testing-library.com/docs/
-// https://testing-library.com/docs/react-testing-library/intro
 
 // Global data for tests.
-let user; //user for testing
-let users;
-let session_login; //login session
-let session_profile; //login session
-let container; //target page
+let response;
+let users; //user for testing
+let userid; //user id of the result
+let userid2; //user id of the result
+let newUserName;
+let newEmail;
 
 
 // Runs once before tests, here global test data is initialised.
 beforeAll(async () => {
-    users = [{username: "mark", password: "Mark_123456", email: "mark@loop_agile.com"}];
+    users = [
+        {username: "mark", password: "Mark_123456", email: "mark@loop_agile.com"},
+        {username: "kevin", password: "Kevin_123456", email: "kevin@loop_agile.com"}
+    ];
+    newUserName = "Jason";
+    newEmail = "jason@loop_agile.com"
 });
-
-
-// Runs before each test, here the Users component is rendered and the container is stored.
-// beforeEach(() => {
-//
-//
-// });
-//
 
 
 test("Create user", async () => {
-    user = await createUsers(users[0]['username'], users[0]['password'], users[0]['email']);
-    console.log(user)
-    expect(user.code).toBe(200);
+    response = await createUsers(users[1]['username'], users[1]['password'], users[1]['email']);
+    userid = response.data;
+    expect(response.code).toBe(200);
 });
 
-test("Duplicate username", async () => {
-    user = await createUsers(users[0]['username'], users[0]['password'], users[0]['email']);
-    console.log(user)
-    expect(user.code).toBe(400);
+
+test("Create user with duplicate username", async () => {
+    response = await createUsers(users[1]['username'], users[1]['password'], users[1]['email']);
+    expect(response.code).toBe(400);
 });
 
-// clean up created data
+
+test("Edit username", async () => {
+    response = await changeName(userid, newUserName);
+    // once change without error, true will be return
+    expect(response).toBe(true);
+
+    // when verify user with its new username, request should be success
+    response = await verifyUser(newUserName, users[1]['password']);
+    expect(response.code).toBe(200);
+
+});
+
+
+test("Edit username with a exist username", async () => {
+    // create a user named kevin
+    response = await createUsers(users[1]['username'], users[1]['password'], users[1]['email']);
+    userid2 = response.data;
+
+    // change mark's username to kevin
+    response = await changeName(userid, "kevin");
+});
+
+
+test("Edit email", async () => {
+    response = await changeEmail(userid, newEmail);
+
+    // once change without error, true will be return
+    expect(response).toBe(true);
+
+    // when verify user with its new username, request should be success
+    response = await getUserDetail(userid);
+    expect(response.data.email).toBe(newEmail);
+});
+
+
+// clean up and delete all the created test user
 afterAll(async () => {
-    console.log(user.data)
-    console.log(await deleteAccount(user.data));
-});
+    let data;
 
+    // destroy user from api
+    data = {
+        user_id: userid
+    }
+    await axios.post(API_HOST + "/api/v1/users/remove", data);
+
+    // destroy user from api
+    data = {
+        user_id: userid2
+    }
+    await axios.post(API_HOST + "/api/v1/users/remove", data);
+});

@@ -107,7 +107,7 @@ exports.getSingle = async (request, response) => {
 };
 
 
-// make a post
+// remove(destroy) post: for testing purpose
 exports.create = async (request, response) => {
     // verify require fields
     if (request.body.post_text === "" || request.body.post_time === "") {
@@ -203,6 +203,32 @@ exports.delete = async (request, response) => {
     } else {
         const post = await db.post.update({is_del: request.body.is_del}, {
             raw: true,
+            where: {
+                post_id: request.body.post_id
+            }
+        });
+
+        if (post[0] == "") {
+            response.json(generateRestfulResponse(404, null, "Post not found"));
+
+        } else {
+            // TODO: delete logic
+            response.json(generateRestfulResponse(200, null, "Success"));
+
+        }
+
+    }
+};
+
+
+
+// remove(destroy) a post
+exports.remove = async (request, response) => {
+    if (request.body.post_id == "") {
+        response.json(generateRestfulResponse(400, null, "Post ID not specify"));
+
+    } else {
+        const post = await db.post.destroy({
             where: {
                 post_id: request.body.post_id
             }

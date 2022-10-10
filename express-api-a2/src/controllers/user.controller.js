@@ -7,6 +7,12 @@ var uuid = require('uuid');
 // Select one user from the database if username and password are a match.
 exports.login = async (request, response) => {
 
+    // end and post error when there are no value
+    if(request.body.username == "" || request.body.password == ""){
+        response.json(generateRestfulResponse(400, null, "Please enter username and password"));
+        return null; // end immediately
+    }
+
     const user = await db.user.findAll({
         raw: true,
         where: {
@@ -15,10 +21,14 @@ exports.login = async (request, response) => {
     });
 
 
-    if (user === null || await argon2.verify(user[0].password, request.body.password) === false) {
+    if(user == ""){
+        response.json(generateRestfulResponse(403, null, "Username or password incorrect"));
+        return null; // end immediately
+
+    } else if (await argon2.verify(user[0].password, request.body.password) === false) {
         // Login failed.
         response.json(generateRestfulResponse(403, null, "Username or password incorrect"));
-
+        return null; // end immediately
 
     } else {
 
@@ -177,6 +187,30 @@ exports.delete = async (request, response) => {
     } else {
         const user = await db.user.update({is_del: request.body.is_del}, {
             raw: true,
+            where: {
+                user_id: request.body.user_id
+            }
+        });
+
+        if (user[0] == "") {
+            response.json(generateRestfulResponse(404, null, "User not found"));
+
+        } else {
+            response.json(generateRestfulResponse(200, null, "Success"));
+
+        }
+
+    }
+};
+
+
+// remove(destroy) user: for testing purpose
+exports.remove = async (request, response) => {
+    if (request.body.user_id == "") {
+        response.json(generateRestfulResponse(400, null, "User ID not specify"));
+
+    } else {
+        const user = await db.user.destroy({
             where: {
                 user_id: request.body.user_id
             }
