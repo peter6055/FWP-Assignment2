@@ -55,7 +55,6 @@ const USER_KEY = "user";
 //     localStorage.setItem(POST_DATABASE, JSON.stringify(posts));
 //     localStorage.setItem(REPLY_DATABASE, JSON.stringify(replys));
 // }
-// Initialise
 
 // creating
 async function createUsers(username, password, email) {
