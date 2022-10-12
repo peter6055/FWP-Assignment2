@@ -2,6 +2,7 @@ const db = require("../database");
 const generateRestfulResponse = require("../routes/restful.js")
 var uuid = require('uuid');
 const sanitizeHtml = require('sanitize-html');
+const {Sequelize} = require("sequelize");
 
 
 // get all posts
@@ -11,7 +12,10 @@ exports.getAll = async (request, response) => {
         raw: true,
         where: {
             is_del: 0
-        }
+        },
+        order: [
+            [Sequelize.literal('createdAt'), 'DESC']
+        ]
     });
 
     if (post == "") {
@@ -54,7 +58,10 @@ exports.getAllFromUserId = async (request, response) => {
                 where: {
                     user_id: request.body.user_id,
                     is_del: 0
-                }
+                },
+                order: [
+                    [Sequelize.literal('createdAt'), 'DESC']
+                ]
             });
 
             // identify is there any posy made by this user
@@ -100,7 +107,7 @@ exports.getSingle = async (request, response) => {
 };
 
 
-// make a post
+// remove(destroy) post: for testing purpose
 exports.create = async (request, response) => {
     // verify require fields
     if (request.body.post_text === "" || request.body.post_time === "") {
@@ -196,6 +203,32 @@ exports.delete = async (request, response) => {
     } else {
         const post = await db.post.update({is_del: request.body.is_del}, {
             raw: true,
+            where: {
+                post_id: request.body.post_id
+            }
+        });
+
+        if (post[0] == "") {
+            response.json(generateRestfulResponse(404, null, "Post not found"));
+
+        } else {
+            // TODO: delete logic
+            response.json(generateRestfulResponse(200, null, "Success"));
+
+        }
+
+    }
+};
+
+
+
+// remove(destroy) a post
+exports.remove = async (request, response) => {
+    if (request.body.post_id == "") {
+        response.json(generateRestfulResponse(400, null, "Post ID not specify"));
+
+    } else {
+        const post = await db.post.destroy({
             where: {
                 post_id: request.body.post_id
             }

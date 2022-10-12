@@ -55,7 +55,6 @@ const USER_KEY = "user";
 //     localStorage.setItem(POST_DATABASE, JSON.stringify(posts));
 //     localStorage.setItem(REPLY_DATABASE, JSON.stringify(replys));
 // }
-// Initialise
 
 // creating
 async function createUsers(username, password, email) {
@@ -408,6 +407,7 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
     const FollowedUses=getFollowedUser.data.data;
     const getPosts = await axios.get(API_HOST + "/api/v1/posts/getAll");
     const posts = getPosts.data.data
+    if(posts!=null){
     for (const post of posts) {
         const userDetail = await getUserDetail(post.user_id)
         const id = post.user_id;
@@ -428,6 +428,21 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                 }
             }
         }
+        //get reaction
+        const targetId={
+            target_id:post_id
+        }
+        const clickedData={
+            user_id:getUser(),
+            target_id:post_id
+        }
+        const getReactionAccount = await axios.post(API_HOST + "/api/v1/reactions/getCountFromTarget",targetId);
+        const ReactionAccount = getReactionAccount.data.data.reaction_count;
+        const getReactionClicked = await axios.post(API_HOST + "/api/v1/reactions/getUserReactionOfTarget",clickedData);
+        const ReactionClicked = getReactionClicked.data.data.reaction;
+        const likeClicked=ReactionClicked.like;
+        const dislikeClicked=ReactionClicked.dislike;
+        const starClicked=ReactionClicked.star;
         print.push(
             <Card style={{width: "100%", marginTop: "12px"}}>
                 <Comment
@@ -472,14 +487,29 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                             </replyinput>
                         </span>
                             <br/><br/>
-                            <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
-                                  target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
-                            <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}}
+                            {(likeClicked=="true")?
+                            <span className={"reaction reaction-like reaction-has-like"} style={{cursor: "pointer"}} reaction={"like"}
+                            target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><LikeFilled/>  Like({ReactionAccount.like})</span>
+                        :
+                        <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
+                                  target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><LikeFilled/>  Like({ReactionAccount.like})</span>
+                        }
+                            {(dislikeClicked=="true")?
+                            <span className={"reaction reaction-dislike  reaction-has-dislike"} style={{cursor: "pointer"}}
                                   reaction={"dislike"} target_id={post_id} target_type={"post"}
-                                  onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
-                            <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
-                                  target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
-                        </div>
+                                  onClick={handleReactionSubmit}><DislikeFilled/>  Dislike({ReactionAccount.dislike})</span>
+                                :
+                                <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}}
+                                  reaction={"dislike"} target_id={post_id} target_type={"post"}
+                                  onClick={handleReactionSubmit}><DislikeFilled/>  Dislike({ReactionAccount.dislike})</span>}
+                            {(starClicked=="true")?
+                            <span className={"reaction reaction-star reaction-has-star"} style={{cursor: "pointer"}} reaction={"star"}
+                                  target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><StarFilled/>  Star({ReactionAccount.star})</span>
+                                :
+                                <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
+                                  target_id={post_id} target_type={"post"} onClick={handleReactionSubmit}><StarFilled/>  Star({ReactionAccount.star})</span>}
+                            
+                        </div> 
                     ]}
                     author={<a>{userDetail.data.username}</a>}
                     avatar={<Avatar alt={userDetail.data.username} className={"postAvatar"} size="default" style={{
@@ -523,7 +553,7 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                 </Comment>
             </Card>
         );
-    }
+    }}
     return <div>{print}</div>;
 }
 async function printFollowingPost(FollowedId,handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit) {
@@ -534,12 +564,12 @@ async function printFollowingPost(FollowedId,handleReplySubmit, handleReplyOnCli
     //get this user's userID， get all followed user id.
     const getFollowedUser=await axios.post(API_HOST + "/api/v1/follows/getFollowersFromUserId",data);
     const FollowedUses=getFollowedUser.data.data;
-    console.log(FollowedUses);
     const getUserPostsId = {
         user_id: FollowedId
     }
     const getPosts = await axios.post(API_HOST + "/api/v1/posts/getAllFromUserId", getUserPostsId);
     const posts =getPosts.data.data
+    if(posts!=null){
     for (const post of posts) {
         const userDetail = await getUserDetail(post.user_id)
         const id = post.user_id;
@@ -655,7 +685,7 @@ async function printFollowingPost(FollowedId,handleReplySubmit, handleReplyOnCli
                 </Comment>
             </Card>
         );
-    }
+    }}
     return <div>{print}</div>;
 }
 
@@ -663,6 +693,7 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
     let print = [];
     const getPosts = await axios.get(API_HOST + "/api/v1/posts/getAll");
     const posts = getPosts.data.data
+    if(posts!=null){
     for (const post of posts) {
         const imageTag=[];
         const images = JSON.parse(post.post_img);
@@ -737,7 +768,7 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
                 </Card>
             );
         }
-    }
+    }}
 
     if (print == "") {
         print.push(
@@ -756,6 +787,7 @@ async function printFollow(){
     }
     const getFollowedUser=await axios.post(API_HOST + "/api/v1/follows/getFollowersFromUserId",input);
     const FollowedUses=getFollowedUser.data.data;
+    if(FollowedUses!=null){
     for(const FollowedUse of FollowedUses){
         const userDetail = await getUserDetail(FollowedUse.followed_user_id);
         print.push(
@@ -789,7 +821,7 @@ async function printFollow(){
                 </Button>
             </div>
         )
-    }
+    }}
     return <div>{print}</div>;
 }
 
@@ -798,6 +830,7 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
     const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
     const replys = getReplys.data.data
     let print = [];
+    if(replys!=null){
     for (const reply of replys) {
         if (reply.parent_post_id === parentId && reply.parent_reply_id === null || reply.parent_reply_id === parentId) {
             const reply_id = reply.reply_id;
@@ -808,7 +841,20 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
             const replyUsersId = getReplyDetail.data.data[0].user_id;
             const UserDetail = await getUserDetail(replyUsersId);
             const name = UserDetail.data.username;
-
+            const targetId={
+                target_id:reply.reply_id
+            }
+            const getReactionAccount = await axios.post(API_HOST + "/api/v1/reactions/getCountFromTarget",targetId);
+            const ReactionAccount = getReactionAccount.data.data.reaction_count;
+            const clickedData={
+                user_id:getUser(),
+                target_id:reply_id
+            }
+            const getReactionClicked = await axios.post(API_HOST + "/api/v1/reactions/getUserReactionOfTarget",clickedData);
+            const ReactionClicked = getReactionClicked.data.data.reaction;
+            const likeClicked=ReactionClicked.like;
+            const dislikeClicked=ReactionClicked.dislike;
+            const starClicked=ReactionClicked.star;
             print.push(<Comment
                 actions={[
                     <div>
@@ -848,12 +894,25 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
                                 </replyinput>
                             </span>
                         <br/><br/>
-                        <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
-                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
-                        <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}} reaction={"dislike"}
-                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
-                        <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
-                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
+                        {(likeClicked=="true")?
+                        <span className={"reaction reaction-like reaction-has-like"} style={{cursor: "pointer"}} reaction={"like"}
+                        target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><LikeFilled/>  Like({ReactionAccount.like})</span>
+                    :
+                    <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
+                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><LikeFilled/>  Like({ReactionAccount.like})</span>}
+                       {(dislikeClicked=="true")?
+                       <span className={"reaction reaction-dislike reaction-has-dislike"} style={{cursor: "pointer"}} reaction={"dislike"}
+                       target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><DislikeFilled/>  Dislike({ReactionAccount.dislike})</span>
+                    :
+                    <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}} reaction={"dislike"}
+                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><DislikeFilled/>  Dislike({ReactionAccount.dislike})</span>}
+                        {(starClicked=="true")?
+                        <span className={"reaction reaction-star reaction-has-star"} style={{cursor: "pointer"}} reaction={"star"}
+                        target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><StarFilled/>  Star({ReactionAccount.star})</span>
+                    :
+                    <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
+                              target_id={reply_id} target_type={"reply"} onClick={handleReactionSubmit}><StarFilled/>  Star({ReactionAccount.star})</span>}
+                        
                     </div>
                 ]}
                 author={<a>{name}</a>}
@@ -875,7 +934,7 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
                 {await printPostReplys(reply_id, handleReplyOnClick, handleReplySubmit, handleReactionSubmit)}
             </Comment>)
         }
-    }
+    }}
     return <div>{print}</div>;
 }
 
@@ -884,9 +943,8 @@ async function printProfileReplys(parentId) {
     const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
     const replys = getReplys.data.data
     let print = [];
+    if(replys!=null){
     for (const reply of replys) {
-        // if (reply.parentId === parentId) {
-        //     const name = getNameByReplyId(reply.replyId);
         if (reply.parent_post_id === parentId && reply.parent_reply_id === null || reply.parent_reply_id === parentId) {
             const reply_id = reply.reply_id;
             const data = {
@@ -915,7 +973,7 @@ async function printProfileReplys(parentId) {
                 {await printProfileReplys(reply_id)}
             </Comment>)
         }
-    }
+    }}
     return <div>{print}</div>;
 }
 async function editProfilePost(id, newtext){
@@ -941,8 +999,26 @@ async function setFollow(followUserId){
     const response = await axios.post(API_HOST + "/api/v1/follows/setStatus", data);
     return response.data;
 }
+async function setReaction(targetId,reactionString){
+    let reactionInt="";
+    if(reactionString=="like"){
+        reactionInt=10;
+    }else if(reactionString=="dislike"){
+        reactionInt=20;
+    }else if(reactionString=="star"){
+        reactionInt=30;
+    }
+    const data={
+        user_id : getUser(),
+        target_id : targetId,
+        reaction:reactionInt
+    }
+    const response = await axios.post(API_HOST + "/api/v1/reactions/setUserReactionOnTarget", data);
+    return response.data;
+}
 export {
     changeName,
+    setReaction,
     setFollow,
     printFollow,
     editProfilePost,

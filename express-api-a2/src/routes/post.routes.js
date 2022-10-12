@@ -21,6 +21,10 @@ module.exports = (express, app) => {
     // delete post
     router.post("/delete", controller.delete);
 
+    // remove(destroy) post: for testing purpose
+    router.post("/remove", controller.remove);
+
+
 
     // add routes to server.
     app.use("/api/v1/posts", router);

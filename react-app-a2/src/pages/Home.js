@@ -17,7 +17,7 @@ const Home = () => {
                     post, reply to other posts and maintain their profile details.</h2>
 
                 <NavLink to="login">
-                    <Button type="primary" size={"default"}>Try it</Button>
+                    <Button type="primary" size={"default"} value={"try-it"}>Try it</Button>
                 </NavLink>
             </Col>
         </Row>

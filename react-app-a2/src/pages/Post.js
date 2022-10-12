@@ -16,7 +16,7 @@ import {
 } from "antd";
 import {PlusOutlined, LoadingOutlined} from '@ant-design/icons';
 import $ from 'jquery';
-import {setFollow, createPost, printPost, createReply, getUserDetail,printFollowingPost} from "../data/repository";
+import {setFollow, createPost, printPost, createReply, getUserDetail, printFollowingPost,setReaction} from "../data/repository";
 import {upload} from "../data/aws";
 
 // TODO ------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ const loadingIcon = <LoadingOutlined style={{fontSize: 24}} spin/>;
 const Post = (props) => {
 
     // handling reaction
-    const handleReactionSubmit = (e) => {
+    const handleReactionSubmit = async(e) => {
 
         // TODO. "target_type" will tell you it is a reply or a post
         //       "target_id" will tell you the id of target
@@ -48,15 +48,19 @@ const Post = (props) => {
         // TODO. call api
         //       when target_type==post, pass id to target_post_id
         //       when target_type==reply, pass id to target_post_id
+        const success=await setReaction(target_id,reaction);
 
         // TODO. when success remove all reaction-has-.. from all action in this target
         //       then add the reaction-has-... to the current click one
         //       (reaction-has-like, reaction-has-dislike, reaction-has-star)
 
+
+        const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
+        setPostData(currentPost);
     }
 
     //handling follow
-    const handleFollowSubmit = async(e) => {
+    const handleFollowSubmit = async (e) => {
         // TODO. "user_id" will tell you the id of user
         //       "action" will tell to follow or unfollow
 
@@ -65,30 +69,35 @@ const Post = (props) => {
         const user_id = e.target.getAttribute("user_id");
         const action = e.target.getAttribute("action");
 
-        // console.log(e.target.getAttribute("username"));
-        // console.log(e.target.getAttribute("user_id"));
-        // console.log(e.target.getAttribute("action"));
+        console.log(e.target.getAttribute("username"));
+        console.log(e.target.getAttribute("user_id"));
+        console.log(e.target.getAttribute("action"));
 
 
         if (action === "follow") {
             await setFollow(user_id);
             // message.success("You had follow " + username +", would you like to see " + username + "'s post? " + Click)
+            const currentPost = await printFollowingPost(user_id, handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
+            setPostData(currentPost);
             message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span
                 className={"clickable"} onClick={handleFollowPostFilter}
                 user_id={user_id}>Yes, show me the posts!</span></div>, 10)
         } else {
+            await setFollow(user_id);
+            const currentPost = await printFollowingPost(user_id, handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
+            setPostData(currentPost);
             message.success("You had successfully unfollow " + username + "!")
         }
     }
 
 
-    const handleFollowPostFilter = async(e) => {
+    const handleFollowPostFilter = async (e) => {
         // TODO. "user_id" will tell you the id of user
         //       please call api and rerender post page with this users' post
 
         const user_id = e.target.getAttribute("user_id");
         // console.log(e.target.getAttribute("user_id"));
-        const currentPost = await printFollowingPost(user_id,handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
+        const currentPost = await printFollowingPost(user_id, handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
         setPostData(currentPost);
         // for testing, delete when finish
         // alert("click " + user_id);
@@ -126,7 +135,7 @@ const Post = (props) => {
         const parent_post_id = $(e.target).closest(".ant-form-item").find('button').attr("parent_post_id");
         const parent_reply_id = $(e.target).closest(".ant-form-item").find('button').attr("parent_reply_id");
         $(e.target).closest('.ant-comment-content-detail').find('textarea').val('').change();
-        createReply(props.id, parent_post_id,parent_reply_id, text);
+        createReply(props.id, parent_post_id, parent_reply_id, text);
         // successful msg
         message.success({
             content: 'Reply posted',
@@ -155,6 +164,7 @@ const Post = (props) => {
             setName(currentUser.data.username);
             setPostData(currentPost);
         }
+
         loadPost();
     }, []);
     // useEffect(() => {
@@ -228,6 +238,7 @@ const Post = (props) => {
 
     let url;
     const handleFileUpload = (e) => {
+        console.log(e);
         // display loading state, no using hook cuz re-rendering cause upload issue
         $("#upload-loading-spinner").css("display", "flex");
 
@@ -314,7 +325,7 @@ const Post = (props) => {
 
 
     // onclick make a post
-    const handleSubmitPost = async() => {
+    const handleSubmitPost = async () => {
 
         {/*TODO -------------------------------------------------------------------------------*/
         }

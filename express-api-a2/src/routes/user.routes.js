@@ -18,6 +18,9 @@ module.exports = (express, app) => {
     // delete user
     router.post("/delete", controller.delete);
 
+    // remove(destroy) user: for testing purpose
+    router.post("/remove", controller.remove);
+
 
     // add routes to server.
     app.use("/api/v1/users", router);

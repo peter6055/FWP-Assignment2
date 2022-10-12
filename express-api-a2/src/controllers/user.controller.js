@@ -7,6 +7,12 @@ var uuid = require('uuid');
 // Select one user from the database if username and password are a match.
 exports.login = async (request, response) => {
 
+    // end and post error when there are no value
+    if(request.body.username == "" || request.body.password == ""){
+        response.json(generateRestfulResponse(400, null, "Please enter username and password"));
+        return null; // end immediately
+    }
+
     const user = await db.user.findAll({
         raw: true,
         where: {
@@ -14,21 +20,33 @@ exports.login = async (request, response) => {
         }
     });
 
-    if (user === null || await argon2.verify(user[0].password, request.body.password) === false) {
+
+    if(user == ""){
+        response.json(generateRestfulResponse(403, null, "Username or password incorrect"));
+        return null; // end immediately
+
+    } else if (await argon2.verify(user[0].password, request.body.password) === false) {
         // Login failed.
         response.json(generateRestfulResponse(403, null, "Username or password incorrect"));
-
+        return null; // end immediately
 
     } else {
-        const user = await db.user.findAll({
-            attributes: ['user_id'],
-            where: {
-                username: request.body.username
-            }
-        });
 
-        response.json(generateRestfulResponse(200, user[0], "Welcome " + request.body.username + "!"));
+        if (user[0]['is_del']) {
+            response.json(generateRestfulResponse(404, null, "Username had been deleted! Please contact administrator if you believe this is a mistake"));
+            return null; // end immediately
 
+        } else {
+            const user = await db.user.findAll({
+                attributes: ['user_id'],
+                where: {
+                    username: request.body.username
+                }
+            });
+
+            response.json(generateRestfulResponse(200, user[0], "Welcome " + request.body.username + "!"));
+
+        }
     }
 
 };
@@ -109,7 +127,7 @@ exports.edit = async (request, response) => {
                 }
             });
 
-            if (founded_username == "") {
+            if (founded_username == "" || founded_username[0]['user_id'] === request.body.user_id) {
                 await db.user.update({username: request.body.new_username, email: request.body.new_email}, {
                     raw: true,
                     where: {
@@ -169,6 +187,30 @@ exports.delete = async (request, response) => {
     } else {
         const user = await db.user.update({is_del: request.body.is_del}, {
             raw: true,
+            where: {
+                user_id: request.body.user_id
+            }
+        });
+
+        if (user[0] == "") {
+            response.json(generateRestfulResponse(404, null, "User not found"));
+
+        } else {
+            response.json(generateRestfulResponse(200, null, "Success"));
+
+        }
+
+    }
+};
+
+
+// remove(destroy) user: for testing purpose
+exports.remove = async (request, response) => {
+    if (request.body.user_id == "") {
+        response.json(generateRestfulResponse(400, null, "User ID not specify"));
+
+    } else {
+        const user = await db.user.destroy({
             where: {
                 user_id: request.body.user_id
             }

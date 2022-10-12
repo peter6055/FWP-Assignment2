@@ -303,37 +303,37 @@ const Profile = (props) => {
     // };
     // ============================================================== MFA ===============================
 
-    const FollowerPanel = () => (
-        <div style={{display: "flex", alignItems: "center", margin: "0px 0px 25px 0px"}}>
-            <Avatar
-                style={{
-                    backgroundColor: "rgb(245, 106, 0)",
-                    verticalAlign: 'middle',
-                }}
-                size="large"
-                gap={5}
-            >
-                P
-            </Avatar>
-            <span style={{marginLeft: "10px"}}>Peter Liu</span>
-            <Button
-                size="small"
-                icon={<MinusCircleFilled/>}
-                style={{
-                    margin: '0 16px',
-                    verticalAlign: 'middle',
-                    position: "inherit",
-                    right: "0px",
-                    top: "0px",
-                    padding: "0px 5px 0px 5px",
-                    marginLeft: "auto"
-                }}
-                className={"follow-btn"}
-            >
-                Following
-            </Button>
-        </div>
-    );
+    // const FollowerPanel = () => (
+    //     <div style={{display: "flex", alignItems: "center", margin: "0px 0px 25px 0px"}}>
+    //         <Avatar
+    //             style={{
+    //                 backgroundColor: "rgb(245, 106, 0)",
+    //                 verticalAlign: 'middle',
+    //             }}
+    //             size="large"
+    //             gap={5}
+    //         >
+    //             P
+    //         </Avatar>
+    //         <span style={{marginLeft: "10px"}}>Peter Liu</span>
+    //         <Button
+    //             size="small"
+    //             icon={<MinusCircleFilled/>}
+    //             style={{
+    //                 margin: '0 16px',
+    //                 verticalAlign: 'middle',
+    //                 position: "inherit",
+    //                 right: "0px",
+    //                 top: "0px",
+    //                 padding: "0px 5px 0px 5px",
+    //                 marginLeft: "auto"
+    //             }}
+    //             className={"follow-btn"}
+    //         >
+    //             Following
+    //         </Button>
+    //     </div>
+    // );
 
     return (
         <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
