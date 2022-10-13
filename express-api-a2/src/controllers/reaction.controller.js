@@ -90,8 +90,6 @@ exports.getUserReactionOfTarget = async (request, response) => {
 
     if (find_result != "") {
 
-        console.log(find_result[0]['reaction']);
-
         switch (find_result[0]['reaction']) {
             case 10:
                 reaction_like = true;
@@ -206,7 +204,7 @@ exports.setUserReactionOnTarget = async (request, response) => {
         founded_reaction = await db.reaction.findAll({
             raw: true,
             where: {
-                [Op.and]: [{post_id: target_id}, {user_id: user_id}]
+                [Op.and]: [{reply_id: target_id}, {user_id: user_id}]
             }
         });
 

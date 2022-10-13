@@ -33,7 +33,7 @@ const Signup = (props) => {
             props.loginUser(id.data);
             navigate("/Profile");
             message.success({
-                content: 'Sign up successful',
+                content: 'Welcome ' + fields.username + "!",
             });
         }
     }

@@ -33,7 +33,7 @@ const Login = (props) => {
             navigate("/profile");
 
             message.success({
-                content: 'Login successful',
+                content: result.message,
             });
         }
         // else if (result === "error.pswd.isempty") {

@@ -22,27 +22,18 @@ import {useNavigate} from 'react-router-dom';
 
 import {
     changeEmail,
-    getPosts,
-    getReplys,
     changeName,
-    getEmail,
     editProfilePost,
     deleteProfilePost,
-    getJoinDate,
     deleteAccount,
-    getUserName,
     getUserDetail,
-    setMFA,
-    getMFA,
     printFollow,
     printProfilePost
 } from "../data/repository";
 import $ from "jquery";
 
-// TODO ------------------------------------------------------------------------------------------
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-// TODO ------------------------------------------------------------------------------------------
 
 
 const {Text, Paragraph} = Typography;
@@ -82,24 +73,6 @@ const Profile = (props) => {
         });
     };
 
-    // when user account delete, call this function to delete this user's reply message
-    // function deleteReplied(userId) {
-    //     const replys = getReplys();
-    //     const newReplys = [];
-    //     let nextID = "";
-    //     for (const reply of replys) {
-    //         if (reply.userId !== userId) {
-    //             newReplys.push(reply);
-    //         } else {
-    //             nextID = reply.replyId;
-    //         }
-    //     }
-    //     localStorage.setItem("replys", JSON.stringify(newReplys));
-    //     if (nextID !== "") {
-    //         deleteReply(nextID);
-    //     }
-    // }
-
 
     const handleNameChange = (event) => {
         if (changeName(props.id, event)) {
@@ -123,11 +96,9 @@ const Profile = (props) => {
         // hide read only and add a textarea
         $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "none"})
 
-        {/*// TODO ------------------------------------------------------------------------------------------*/
-        }
+
         $(e.target).closest('.ant-comment-content').find('.postText > .quill ').css({display: "inline"});
-        {/*// TODO ------------------------------------------------------------------------------------------*/
-        }
+
 
         // add a save btn after the content text
         $(e.target).closest('.ant-comment-content').find('.postText > button').css({display: "inline"});
@@ -184,23 +155,6 @@ const Profile = (props) => {
         });
     }
 
-    // function deleteReply(id) {
-    //     const replys = getReplys();
-    //     const newReplys = [];
-    //     let nextID = "";
-    //     for (const reply of replys) {
-    //         if (reply.parentId !== id) {
-    //             newReplys.push(reply);
-    //         } else {
-    //             nextID = id;
-    //         }
-    //     }
-    //     localStorage.setItem("replys", JSON.stringify(newReplys));
-    //     if (nextID !== "") {
-    //         deleteReply(nextID);
-    //     }
-    // }
-
     async function deletePost(e) {
         // get post id
         const id = $(e.target).closest(".ant-popover-inner-content").find('input').val();
@@ -218,122 +172,6 @@ const Profile = (props) => {
             });
         }
     }
-
-    // ============================================================== Post ===============================
-
-
-    // ============================================================== MFA ===============================
-    // const [isModalVisible, setIsModalVisible] = useState(false);
-    // const [mfaInputQuestion, setMfaInputQuestion] = useState("");
-    // const [mfaInputAnswer, setMfaInputAnswer] = useState("");
-
-    // // question sources: https://www.beyondtrust.com/blog/entry/reused-security-questions-can-pose-a-high-risk-learn-tips-tricks-to-mitigate-the-threat
-    // const mfaQuestionRecommendationOption = [
-    //     {value: 'In what city were you born?'},
-    //     {value: 'What is the name of your favorite pet?'},
-    //     {value: 'What is your mother\'s maiden name?'},
-    //     {value: 'What high school did you attend?'},
-    //     {value: 'What was the name of your elementary school?'},
-    //     {value: 'What was the make of your first car?'},
-    //     {value: 'What was your favorite food as a child?'},
-    //     {value: 'Where did you meet your spouse?'},
-    //     {value: 'What year was your father (or mother) born?'},
-    // ];
-
-
-    // // Intro content source: https://www.onelogin.com/learn/what-is-mfa
-    // const MFAModal = () => (
-    //     <Modal className={"mfaSetupModal"} title="Set up Multi-factor Authentication" visible={isModalVisible}
-    //            onOk={handleOk} okText={"Confirm to set MFA"} cancelButtonProps={{style: {display: 'none'}}}
-    //            onCancel={handleCancel}>
-    //         <Alert
-    //             message="You should remember the answer you put below. Following login will require you to answer this question. If you forgot it, we are not able to recover you account! Once setup you will not able to turn off it!"
-    //             type="warning" showIcon/>
-    //         <br/>
-    //         <p><strong>What is Multi-factor Authentication (MFA)?</strong></p>
-    //         <p>Rather than just asking for a username and password, MFA requires one or more additional verification
-    //             factors, which decreases the likelihood of a successful cyber attack.</p>
-    //         <br/>
-    //         <Form.Item label="Question">
-    //             <AutoComplete id={"mfaTextQuestion"} placeholder={mfaInputQuestion}
-    //                           options={mfaQuestionRecommendationOption}/>
-    //         </Form.Item>
-    //         <Form.Item label="Answer">
-    //             <Input id={"mfaTextAnswer"} placeholder={mfaInputAnswer}/>
-    //         </Form.Item>
-    //     </Modal>
-    // );
-
-    // const showModal = () => {
-    //     // getMFA value first
-    //     var result = getMFA(props.id);
-    //     setIsModalVisible(true);
-
-    //     console.log(result["mfaStatus"]);
-    //     // hide answer
-    //     if (result["mfaStatus"] == true) {
-    //         setMfaInputQuestion(result["mfaQuestion"]);
-    //         setMfaInputAnswer("The actual answer is hidden...");
-    //     } else {
-    //         setMfaInputQuestion("Select a question or setup one yourself...");
-    //         setMfaInputAnswer("Input your answer...");
-    //     }
-    // };
-
-    // const handleOk = () => {
-    //     let mfaQuestion = document.getElementById("mfaTextQuestion").value;
-    //     let mfaAnswer = document.getElementById("mfaTextAnswer").value;
-    //     let result = setMFA(props.id, mfaQuestion, mfaAnswer);
-
-    //     if (result === true) {
-    //         setIsModalVisible(false);
-    //         message.success({
-    //             content: "Completed!",
-    //         });
-
-    //     } else {
-    //         message.error({
-    //             content: result,
-    //         });
-    //     }
-    // };
-
-    // const handleCancel = () => {
-    //     setIsModalVisible(false);
-    // };
-    // ============================================================== MFA ===============================
-
-    // const FollowerPanel = () => (
-    //     <div style={{display: "flex", alignItems: "center", margin: "0px 0px 25px 0px"}}>
-    //         <Avatar
-    //             style={{
-    //                 backgroundColor: "rgb(245, 106, 0)",
-    //                 verticalAlign: 'middle',
-    //             }}
-    //             size="large"
-    //             gap={5}
-    //         >
-    //             P
-    //         </Avatar>
-    //         <span style={{marginLeft: "10px"}}>Peter Liu</span>
-    //         <Button
-    //             size="small"
-    //             icon={<MinusCircleFilled/>}
-    //             style={{
-    //                 margin: '0 16px',
-    //                 verticalAlign: 'middle',
-    //                 position: "inherit",
-    //                 right: "0px",
-    //                 top: "0px",
-    //                 padding: "0px 5px 0px 5px",
-    //                 marginLeft: "auto"
-    //             }}
-    //             className={"follow-btn"}
-    //         >
-    //             Following
-    //         </Button>
-    //     </div>
-    // );
 
     return (
         <Row className={"profilePage safeArea"} style={{display: "flex", justifyContent: "center"}}>
