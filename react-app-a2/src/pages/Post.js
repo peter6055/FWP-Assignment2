@@ -72,8 +72,6 @@ const Post = (props) => {
         if (action === "follow") {
             await setFollow(user_id);
             // message.success("You had follow " + username +", would you like to see " + username + "'s post? " + Click)
-            const currentPost = await printFollowingPost(user_id, handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
-            setPostData(currentPost);
             message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span
                 className={"clickable"} onClick={handleFollowPostFilter}
                 user_id={user_id}>Yes, show me the posts!</span></div>, 10)

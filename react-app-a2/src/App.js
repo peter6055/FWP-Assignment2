@@ -72,15 +72,21 @@ function App() {
                                     :
                                     <></>
                             }
-                            <NavLink to="login" className={({ isActive }) => isActive && activeClassName}>
+                            {
+                                name?
+                                <></>
+                                :
+                                <NavLink to="login" className={({ isActive }) => isActive && activeClassName}>
                                <Menu.Item icon={<UserOutlined />}>Account</Menu.Item>
                             </NavLink>
+                            }
+                            
 
                             {
                                 name ?
-                                    <NavLink to="profile" className={({isActive}) => isActive && activeClassName}>
-                                        <Menu.Item icon={<UserOutlined/>}>Profile</Menu.Item>
-                                    </NavLink>
+                                <NavLink to="profile" className={({isActive}) => isActive && activeClassName}>
+                                <Menu.Item icon={<UserOutlined/>}>Profile</Menu.Item>
+                            </NavLink>
                                     :
                                     <></>
                             }
