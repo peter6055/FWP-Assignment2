@@ -76,10 +76,10 @@ const Profile = (props) => {
 
     //handling follow
     const handleFollowSubmit = async (e) => {
-        const username = e.target.getAttribute("username");
-        const user_id = e.target.getAttribute("user_id");
-        console.log(e.target.getAttribute("username"));
-        console.log(e.target.getAttribute("user_id"));
+        const username = e.target.closest("button").getAttribute("username");
+        const user_id = e.target.closest("button").getAttribute("user_id");
+        console.log(username);
+        console.log(user_id);
 
         await setFollow(user_id);
         const currentFollow = await printFollow(handleFollowSubmit);

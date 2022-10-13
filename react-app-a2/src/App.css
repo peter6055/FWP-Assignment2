@@ -474,3 +474,7 @@ replyinput > .ant-comment > .ant-comment-inner > .ant-comment-avatar {
     color: #fe6783;
     background-color: #fe6783;
 }
+
+.ant-message{
+    padding-top: 66px;
+}

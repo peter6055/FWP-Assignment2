@@ -361,9 +361,9 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                         }
                         datetime={
                             <div>
-                                <div style={{display: "flex"}}>
+                                <div style={{display: "flex"}} className={"control-tab"}>
                                     {post.post_time}
-                                    {/* TODO: if have follow this user, display this*/}
+                                    <Spin spinning={true} style={{"position": "absolute", "background": "rgb(255 255 255 / 83%)", "width": "110px", "display": "none", "padding": "22px 0px", "marginTop": "-23px", "z-index": "100000","right": "0px","paddingLeft": "58px"}}></Spin>
                                     {follow ?
                                         <div className={"follow-btn has-follow"}
                                              style={{position: "absolute", right: 0, top: 0}}
@@ -541,7 +541,7 @@ async function printFollowingPost(FollowedId, handleReplySubmit, handleReplyOnCl
                             <div>
                                 <div style={{display: "flex"}}>
                                     {post.post_time}
-                                    {/* TODO: if have follow this user, display this*/}
+                                    <Spin spinning={true} style={{"position": "absolute", "background": "rgb(255 255 255 / 83%)", "width": "110px", "display": "none", "padding": "22px 0px", "marginTop": "-23px", "z-index": "100000","right": "0px","paddingLeft": "58px"}}></Spin>
                                     {follow ?
                                         <div className={"follow-btn has-follow"}
                                              style={{position: "absolute", right: 0, top: 0}}
@@ -676,6 +676,7 @@ async function printFollow(handleFollowSubmit) {
             const userDetail = await getUserDetail(FollowedUse.followed_user_id);
             print.push(
                 <div style={{display: "flex", alignItems: "center", margin: "0px 0px 25px 0px"}}>
+                    <Spin spinning={true} style={{"position": "absolute", "background": "rgb(255 255 255 / 83%)", "width": "221px", "display": "none", "padding": "22px 0px", "z-index": "100000"}}></Spin>
                     <Avatar
                         style={{
                             backgroundColor: "rgb(245, 106, 0)",
@@ -699,7 +700,7 @@ async function printFollow(handleFollowSubmit) {
                         padding: "0px 5px 0px 5px",
                         marginLeft: "auto"
                     }}
-                    user_id={getUser()} username={userDetail.data.username}
+                    user_id={FollowedUse.followed_user_id} username={userDetail.data.username}
                     onClick={handleFollowSubmit}
                     className={"follow-btn"}
                 >
