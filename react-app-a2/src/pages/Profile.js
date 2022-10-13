@@ -25,6 +25,7 @@ import {
     changeName,
     editProfilePost,
     deleteProfilePost,
+    setFollow,
     deleteAccount,
     getUserDetail,
     printFollow,
@@ -53,7 +54,7 @@ const Profile = (props) => {
         async function loadUser() {
             const currentUser = await getUserDetail(props.id);
             const currentProfilePost = await printProfilePost(props.id, editPostOnClick, deletePost, handleEditPost);
-            const currentFollow = await printFollow();
+            const currentFollow = await printFollow(handleFollowSubmit);
             setEmail(currentUser.data.email);
             setName(currentUser.data.username);
             setDate(currentUser.data.join_date);
@@ -73,7 +74,18 @@ const Profile = (props) => {
         });
     };
 
+    //handling follow
+    const handleFollowSubmit = async (e) => {
+        const username = e.target.closest("button").getAttribute("username");
+        const user_id = e.target.closest("button").getAttribute("user_id");
+        console.log(username);
+        console.log(user_id);
 
+        await setFollow(user_id);
+        const currentFollow = await printFollow(handleFollowSubmit);
+        setFollowData(currentFollow);
+        message.success("You had successfully unfollow " + username + "!")
+    }
     const handleNameChange = (event) => {
         if (changeName(props.id, event)) {
             setName(event);

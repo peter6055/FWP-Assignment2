@@ -28,10 +28,8 @@ import {
 } from "../data/repository";
 import {upload} from "../data/aws";
 
-// TODO ------------------------------------------------------------------------------------------
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-// TODO ------------------------------------------------------------------------------------------
 
 
 const {TextArea} = Input;
@@ -60,6 +58,9 @@ const Post = (props) => {
 
     //handling follow
     const handleFollowSubmit = async (e) => {
+
+        $(e.target).parents(".control-tab").find(".ant-spin-spinning").css("display","inherit")
+
         const username = e.target.getAttribute("username");
         const user_id = e.target.getAttribute("user_id");
         const action = e.target.getAttribute("action");
@@ -72,17 +73,20 @@ const Post = (props) => {
         if (action === "follow") {
             await setFollow(user_id);
             // message.success("You had follow " + username +", would you like to see " + username + "'s post? " + Click)
-            const currentPost = await printFollowingPost(user_id, handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
-            setPostData(currentPost);
             message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span
                 className={"clickable"} onClick={handleFollowPostFilter}
-                user_id={user_id}>Yes, show me the posts!</span></div>, 10)
+                user_id={user_id}>Yes, show me the posts!</span></div>, 3)
+            const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
+            setPostData(currentPost);
         } else {
             await setFollow(user_id);
-            const currentPost = await printFollowingPost(user_id, handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
+            const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
             setPostData(currentPost);
             message.success("You had successfully unfollow " + username + "!")
         }
+
+        $(e.target).parents(".control-tab").find(".ant-spin-spinning").css("display","none")
+
     }
 
 
@@ -142,8 +146,6 @@ const Post = (props) => {
     }
 
 
-    // const [Name, setName] = useState(getUserName(props.id));
-    // const [postsData, setPostData] = useState(printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit));
     const [Name, setName] = useState(null);
     const [postsData, setPostData] = useState(null);
 
@@ -159,10 +161,7 @@ const Post = (props) => {
 
         loadPost();
     }, []);
-    // useEffect(() => {
-    //     // Update the document title using the browser API
-    //     console.log(fileList);
-    // },[fileList]);
+
 
     const MakePostElement = () => (
         <Card style={{width: "100%"}}>

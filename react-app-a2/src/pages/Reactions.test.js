@@ -61,7 +61,6 @@ test("Reaction to a post", async () => {
 
     //set a reaction, 10=like, first assertion, should response 200 ok
     response = await setReaction(userid, postid, "star");
-    console.log(response);
     expect(response.response).toContain("OK");
 
 

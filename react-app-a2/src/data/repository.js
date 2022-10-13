@@ -361,9 +361,9 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                         }
                         datetime={
                             <div>
-                                <div style={{display: "flex"}}>
+                                <div style={{display: "flex"}} className={"control-tab"}>
                                     {post.post_time}
-                                    {/* TODO: if have follow this user, display this*/}
+                                    <Spin spinning={true} style={{"position": "absolute", "background": "rgb(255 255 255 / 83%)", "width": "110px", "display": "none", "padding": "22px 0px", "marginTop": "-23px", "z-index": "100000","right": "0px","paddingLeft": "58px"}}></Spin>
                                     {follow ?
                                         <div className={"follow-btn has-follow"}
                                              style={{position: "absolute", right: 0, top: 0}}
@@ -425,6 +425,21 @@ async function printFollowingPost(FollowedId, handleReplySubmit, handleReplyOnCl
                     }
                 }
             }
+            //get reaction
+            const targetId = {
+                target_id: post_id
+            }
+            const clickedData = {
+                user_id: getUser(),
+                target_id: post_id
+            }
+            const getReactionAccount = await axios.post(API_HOST + "/api/v1/reactions/getCountFromTarget", targetId);
+            const ReactionAccount = getReactionAccount.data.data.reaction_count;
+            const getReactionClicked = await axios.post(API_HOST + "/api/v1/reactions/getUserReactionOfTarget", clickedData);
+            const ReactionClicked = getReactionClicked.data.data.reaction;
+            const likeClicked = ReactionClicked.like;
+            const dislikeClicked = ReactionClicked.dislike;
+            const starClicked = ReactionClicked.star;
             print.push(
                 <Card style={{width: "100%", marginTop: "12px"}}>
                     <Comment
@@ -470,15 +485,38 @@ async function printFollowingPost(FollowedId, handleReplySubmit, handleReplyOnCl
                         </span>
                                 <br/><br/>
                                 <Spin spinning={true} style={{"position": "absolute", "background": "rgb(255 255 255 / 83%)", "width": "300px", "display": "none", "padding": "25px 0px", "marginTop": "-23px"}}></Spin>
-                                <span className={"reaction reaction-like"} style={{cursor: "pointer"}} reaction={"like"}
-                                      target_id={post_id} target_type={"post"}
-                                      onClick={handleReactionSubmit}><LikeFilled/>  Like(x)</span>
-                                <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}}
-                                      reaction={"dislike"} target_id={post_id} target_type={"post"}
-                                      onClick={handleReactionSubmit}><DislikeFilled/>  Dislike(x)</span>
-                                <span className={"reaction reaction-star"} style={{cursor: "pointer"}} reaction={"star"}
-                                      target_id={post_id} target_type={"post"}
-                                      onClick={handleReactionSubmit}><StarFilled/>  Star(x)</span>
+                                {(likeClicked == "true") ?
+                                        <span className={"reaction reaction-like reaction-has-like"}
+                                              style={{cursor: "pointer"}} reaction={"like"}
+                                              target_id={post_id} target_type={"post"}
+                                              onClick={handleReactionSubmit}><LikeFilled/>  Like({ReactionAccount.like})</span>
+                                        :
+
+                                        <span className={"reaction reaction-like"} style={{cursor: "pointer"}}
+                                              reaction={"like"}
+                                              target_id={post_id} target_type={"post"}
+                                              onClick={handleReactionSubmit}><LikeFilled/>  Like({ReactionAccount.like})</span>
+
+                                    }
+                                    {(dislikeClicked == "true") ?
+                                        <span className={"reaction reaction-dislike  reaction-has-dislike"}
+                                              style={{cursor: "pointer"}}
+                                              reaction={"dislike"} target_id={post_id} target_type={"post"}
+                                              onClick={handleReactionSubmit}><DislikeFilled/>  Dislike({ReactionAccount.dislike})</span>
+                                        :
+                                        <span className={"reaction reaction-dislike"} style={{cursor: "pointer"}}
+                                              reaction={"dislike"} target_id={post_id} target_type={"post"}
+                                              onClick={handleReactionSubmit}><DislikeFilled/>  Dislike({ReactionAccount.dislike})</span>}
+                                    {(starClicked == "true") ?
+                                        <span className={"reaction reaction-star reaction-has-star"}
+                                              style={{cursor: "pointer"}} reaction={"star"}
+                                              target_id={post_id} target_type={"post"}
+                                              onClick={handleReactionSubmit}><StarFilled/>  Star({ReactionAccount.star})</span>
+                                        :
+                                        <span className={"reaction reaction-star"} style={{cursor: "pointer"}}
+                                              reaction={"star"}
+                                              target_id={post_id} target_type={"post"}
+                                              onClick={handleReactionSubmit}><StarFilled/>  Star({ReactionAccount.star})</span>}
                             </div>
                         ]}
                         author={<a>{userDetail.data.username}</a>}
@@ -503,7 +541,7 @@ async function printFollowingPost(FollowedId, handleReplySubmit, handleReplyOnCl
                             <div>
                                 <div style={{display: "flex"}}>
                                     {post.post_time}
-                                    {/* TODO: if have follow this user, display this*/}
+                                    <Spin spinning={true} style={{"position": "absolute", "background": "rgb(255 255 255 / 83%)", "width": "110px", "display": "none", "padding": "22px 0px", "marginTop": "-23px", "z-index": "100000","right": "0px","paddingLeft": "58px"}}></Spin>
                                     {follow ?
                                         <div className={"follow-btn has-follow"}
                                              style={{position: "absolute", right: 0, top: 0}}
@@ -626,7 +664,7 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
     return <div>{print}</div>;
 }
 
-async function printFollow() {
+async function printFollow(handleFollowSubmit) {
     let print = [];
     const input = {
         user_id: getUser()
@@ -638,6 +676,7 @@ async function printFollow() {
             const userDetail = await getUserDetail(FollowedUse.followed_user_id);
             print.push(
                 <div style={{display: "flex", alignItems: "center", margin: "0px 0px 25px 0px"}}>
+                    <Spin spinning={true} style={{"position": "absolute", "background": "rgb(255 255 255 / 83%)", "width": "221px", "display": "none", "padding": "22px 0px", "z-index": "100000"}}></Spin>
                     <Avatar
                         style={{
                             backgroundColor: "rgb(245, 106, 0)",
@@ -649,7 +688,24 @@ async function printFollow() {
                         {JSON.stringify(userDetail.data.username).charAt(1).toUpperCase()}
                     </Avatar>
                     <span style={{marginLeft: "10px"}}>{userDetail.data.username}</span>
-
+                    <Button
+                    size="small"
+                    icon={<MinusCircleFilled/>}
+                    style={{
+                        margin: '0 16px',
+                        verticalAlign: 'middle',
+                        position: "inherit",
+                        right: "0px",
+                        top: "0px",
+                        padding: "0px 5px 0px 5px",
+                        marginLeft: "auto"
+                    }}
+                    user_id={FollowedUse.followed_user_id} username={userDetail.data.username}
+                    onClick={handleFollowSubmit}
+                    className={"follow-btn"}
+                >
+                    Unfollow
+                </Button>
                 </div>
             )
         }
