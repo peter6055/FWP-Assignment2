@@ -417,19 +417,23 @@ replyinput > .ant-comment > .ant-comment-inner > .ant-comment-avatar {
 
 }
 
-.reaction-has-like, .reaction-like:hover {
+.reaction-like:hover, .reaction-dislike:hover, .reaction-star:hover {
+    background: #9292921a;
+}
+
+.reaction-has-like{
     transition: 0.3s;
     background: rgba(24, 144, 255, 0.15);
     border: 1px solid #1890ff;
 }
 
-.reaction-has-dislike, .reaction-dislike:hover {
+.reaction-has-dislike{
     transition: 0.3s;
     background: rgba(255, 77, 79, 0.15);
     border: 1px solid #ff4d4f;
 }
 
-.reaction-has-star, .reaction-star:hover {
+.reaction-has-star {
     transition: 0.3s;
     background: rgba(250, 173, 20, 0.15);
     border: 1px solid #faad14;
@@ -464,4 +468,9 @@ replyinput > .ant-comment > .ant-comment-inner > .ant-comment-avatar {
 
 .ant-message-custom-content.ant-message-success {
     display: flex;
+}
+
+.ant-spin, .ant-spin-dot-item{
+    color: #fe6783;
+    background-color: #fe6783;
 }
