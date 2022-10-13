@@ -470,7 +470,8 @@ replyinput > .ant-comment > .ant-comment-inner > .ant-comment-avatar {
     display: flex;
 }
 
-.ant-spin, .ant-spin-dot-item{
+
+.ant-spin-dot-item{
     color: #fe6783;
     background-color: #fe6783;
 }

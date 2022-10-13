@@ -220,7 +220,6 @@ exports.remove = async (request, response) => {
             response.json(generateRestfulResponse(404, null, "User not found"));
 
         } else {
-            // TODO: delete logic
             response.json(generateRestfulResponse(200, null, "Success"));
 
         }

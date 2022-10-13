@@ -28,10 +28,8 @@ import {
 } from '@ant-design/icons';
 import axios from "axios";
 
-// TODO ------------------------------------------------------------------------------------------
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-// TODO ------------------------------------------------------------------------------------------
 
 
 // --- Constants ----------------------------------------------------------------------------------
@@ -142,21 +140,6 @@ function removeUser() {
     localStorage.removeItem(USER_KEY);
 }
 
-// function getNameByReplyId(id){
-//     const users = getUsers();
-//     const replys =getReplys();
-//     let userId="";
-//     for (const reply of replys) {
-//         if (id === reply.replyId) {
-//             userId=reply.userId;
-//         }
-//     }
-//     for (const user of users) {
-//         if (userId === user.id) {
-//             return user.username
-//         }
-//     }
-// }
 async function changeName(id, newUsername) {
     const userDetail = await getUserDetail(id);
     const data = {
@@ -285,10 +268,8 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                                         <div className={"reply-input-box"}>
                                             <Form.Item>
 
-                                                {/*TODO -------------------------------------------------------------------------------*/}
                                                 <ReactQuill id="postTextItem" theme="snow"
                                                             placeholder={"Write a post..."}></ReactQuill>
-                                                {/*TODO -------------------------------------------------------------------------------*/}
 
                                             </Form.Item>
                                             <Form.Item>
@@ -464,10 +445,8 @@ async function printFollowingPost(FollowedId, handleReplySubmit, handleReplyOnCl
                                         <div className={"reply-input-box"}>
                                             <Form.Item>
 
-                                                {/*TODO -------------------------------------------------------------------------------*/}
                                                 <ReactQuill id="postTextItem" theme="snow"
                                                             placeholder={"Write a post..."}></ReactQuill>
-                                                {/*TODO -------------------------------------------------------------------------------*/}
 
                                             </Form.Item>
                                             <Form.Item>
@@ -628,11 +607,9 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
                                         <p>
                                             <div dangerouslySetInnerHTML={{__html: post.post_text}}></div>
                                         </p>
-                                        {/*// TODO ------------------------------------------------------------------------------------------*/}
                                         <ReactQuill theme="snow" placeholder={"Write a post..."}
                                                     style={{display: "none"}}
                                                     value={post.post_text}/>
-                                        {/*// TODO ------------------------------------------------------------------------------------------*/}
                                         <Button type="primary" postId={post.post_id} onClick={handleEditPost}
                                                 style={{marginTop: "20px", display: "none"}}>Save changes</Button>
                                     </div>
@@ -769,10 +746,8 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
                                         content={
                                             <div className={"reply-input-box"}>
                                                 <Form.Item>
-                                                    {/*// TODO ------------------------------------------------------------------------------------------*/}
                                                     <ReactQuill id="postTextItem" theme="snow"
                                                                 placeholder={"Write a post..."}/>
-                                                    {/*// TODO ------------------------------------------------------------------------------------------*/}
                                                 </Form.Item>
                                                 <Form.Item>
                                                     <Button htmlType="submit" style={{marginTop: "10px"}}
@@ -845,7 +820,6 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
 }
 
 async function printProfileReplys(parentId) {
-    // const replys = getReplys();
     const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
     const replys = getReplys.data.data
     let print = [];

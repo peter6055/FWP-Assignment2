@@ -240,7 +240,6 @@ exports.delete = async (request, response) => {
             response.json(generateRestfulResponse(404, null, "Reply not found (Or it is already delete)"));
 
         } else {
-            // TODO: delete logic
             response.json(generateRestfulResponse(200, null, "Success"));
 
         }

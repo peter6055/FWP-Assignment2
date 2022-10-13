@@ -212,7 +212,6 @@ exports.delete = async (request, response) => {
             response.json(generateRestfulResponse(404, null, "Post not found"));
 
         } else {
-            // TODO: delete logic
             response.json(generateRestfulResponse(200, null, "Success"));
 
         }
@@ -238,7 +237,6 @@ exports.remove = async (request, response) => {
             response.json(generateRestfulResponse(404, null, "Post not found"));
 
         } else {
-            // TODO: delete logic
             response.json(generateRestfulResponse(200, null, "Success"));
 
         }

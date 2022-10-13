@@ -41,15 +41,13 @@ const {Text, Paragraph} = Typography;
 
 const Profile = (props) => {
     const navigate = useNavigate();
-    // const [Email, setEmail] = useState(getEmail(props.id));
-    // const [Name, setName] = useState(getUserName(props.id));
+
     const [Email, setEmail] = useState(null);
     const [Name, setName] = useState(null);
     const [date, setDate] = useState(null);
     const [postsProfileData, setProfilePostData] = useState(null);
     const [followData, setFollowData] = useState(null);
 
-    // const date = getJoinDate((props.id));
     useEffect(() => {
         async function loadUser() {
             const currentUser = await getUserDetail(props.id);
@@ -124,16 +122,12 @@ const Profile = (props) => {
         // get post id
         const id = $(e.target).closest(".postText > button").attr("postId");
 
-        {/*TODO -------------------------------------------------------------------------------*/
-        }
         // this is text of post
         const newText = $(e.target).closest('.ant-comment-content').find('.postText > .quill ').find('.ql-editor')[0].innerHTML;
         const newText_length = $(e.target).closest('.ant-comment-content').find('.postText > .quill ').find('.ql-editor')[0].innerText.length;
-        {/*TODO -------------------------------------------------------------------------------*/
-        }
 
 
-        // frocen: this a new way to detect word limit due to formatted text implementation
+        // this a new way to detect word limit due to formatted text implementation
         if (newText_length > 600 || !newText) {
             message.error({
                 content: 'Post message can not be empty or exceed 600 characters',
@@ -147,11 +141,9 @@ const Profile = (props) => {
 
         // recover to non-editable mode
         // remove text area
-        {/*// TODO ------------------------------------------------------------------------------------------*/
-        }
+
         $(e.target).closest('.ant-comment-content').find('.postText > .quill ').css({display: "none"});
-        {/*// TODO ------------------------------------------------------------------------------------------*/
-        }
+
         // show read only text
         $(e.target).closest('.ant-comment-content').find('.postText > p').css({display: "inline"})
 

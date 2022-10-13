@@ -72,7 +72,6 @@ const Post = (props) => {
 
         if (action === "follow") {
             await setFollow(user_id);
-            // message.success("You had follow " + username +", would you like to see " + username + "'s post? " + Click)
             message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span
                 className={"clickable"} onClick={handleFollowPostFilter}
                 user_id={user_id}>Yes, show me the posts!</span></div>, 3)
@@ -92,11 +91,9 @@ const Post = (props) => {
 
     const handleFollowPostFilter = async (e) => {
         const user_id = e.target.getAttribute("user_id");
-        // console.log(e.target.getAttribute("user_id"));
         const currentPost = await printFollowingPost(user_id, handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
         setPostData(currentPost);
-        // for testing, delete when finish
-        // alert("click " + user_id);
+
     }
 
 
@@ -112,15 +109,12 @@ const Post = (props) => {
     };
 
     const handleReplySubmit = async (e) => {
-        {/*TODO -------------------------------------------------------------------------------*/
-        }
         // this is text of post
         const text = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerHTML;
         const text_length = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerText.length;
-        {/*TODO -------------------------------------------------------------------------------*/
-        }
 
-        // frocen: this a new way to detect word limit due to formatted text implementation
+
+        // this a new way to detect word limit due to formatted text implementation
         if (text_length > 600 || (text_length < 2 && text === "<p><br></p>")) {
             message.error({
                 content: 'Reply message can not be empty or exceed 600 characters',
@@ -178,9 +172,7 @@ const Post = (props) => {
                 content={
                     <div>
                         <Form.Item>
-                            {/*TODO -------------------------------------------------------------------------------*/}
                             <ReactQuill id="postTextItem" theme="snow" placeholder={"Write a post..."}/>
-                            {/*TODO -------------------------------------------------------------------------------*/}
 
                         </Form.Item>
                         <Form.Item>
@@ -261,7 +253,6 @@ const Post = (props) => {
                         fileList.push({"uid": uid, "name": name, "status": "done", "url": url});
                     }, 500);
 
-                    // setForceStatus(forceRendering + 1);
 
                 } else {
                     alert("AWS upload promise issue");
@@ -322,7 +313,7 @@ const Post = (props) => {
         const text = document.getElementById("postTextItem").getElementsByTagName('div')[1].getElementsByClassName("ql-editor")[0].innerHTML;
         const text_length = document.getElementById("postTextItem").getElementsByTagName('div')[1].getElementsByClassName("ql-editor")[0].innerText.length;
 
-        console.log(text);
+        console.log(text_length);
 
         // frocen: this a new way to detect word limit due to formatted text implementation
         if (text_length > 600 || (text_length < 2 && text === "<p><br></p>")) {
