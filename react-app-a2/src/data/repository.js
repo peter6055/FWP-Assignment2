@@ -39,6 +39,7 @@ const USER_KEY = "user";
 
 // creating
 async function createUsers(username, password, email) {
+    //generate time
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const d = new Date();
@@ -60,7 +61,7 @@ async function createUsers(username, password, email) {
 }
 
 async function createPost(userId, text, images) {
-    const posts = getPosts();
+    //generate image datta
     const ImageData = [];
     for (const image of images) {
         ImageData.push(image);
@@ -190,6 +191,7 @@ async function deleteAccount(id) {
         user_id: id
     }
     const response = await axios.post(API_HOST + "/api/v1/posts/getAllFromUserId", getUserPostsId);
+    //get all post from this user and delete
     const posts = response.data.data
     for (const post of posts) {
         await deleteProfilePost(post.post_id);
@@ -197,7 +199,7 @@ async function deleteAccount(id) {
     removeUser();
 }
 
-// generate post and reply depends on local storage database
+// generate post and reply depends on all the post
 async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit) {
     let print = [];
     const data = {
@@ -554,13 +556,14 @@ async function printProfilePost(id, editPostOnClick, deletePost, handleEditPost)
     const posts = getPosts.data.data
     if (posts != null) {
         for (const post of posts) {
+            //get image data
             const imageTag = [];
             const images = JSON.parse(post.post_img);
             for (const image of images) {
                 let URL = image.url;
                 imageTag.push(<Image className={"center-cropped"} width={"12vh"} src={URL}/>);
             }
-
+            //check the user id in post to ensure the post is from this person
             if (post.user_id === id) {
                 const userDetail = await getUserDetail(post.user_id)
                 print.push(
@@ -646,6 +649,7 @@ async function printFollow(handleFollowSubmit) {
     const input = {
         user_id: getUser()
     }
+    //get all the followed user
     const getFollowedUser = await axios.post(API_HOST + "/api/v1/follows/getFollowersFromUserId", input);
     const FollowedUses = getFollowedUser.data.data;
     if (FollowedUses != null) {
@@ -697,17 +701,19 @@ async function printFollow(handleFollowSubmit) {
 }
 
 async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, handleReactionSubmit) {
-    // const replys = getReplys();
     const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
     const replys = getReplys.data.data
     let print = [];
     if (replys != null) {
         for (const reply of replys) {
+            //only the reply's parent id is same and reply id is null, means this reply is under post
+            //only reply id is same as parent id, means this reply is under other reply
             if (reply.parent_post_id === parentId && reply.parent_reply_id === null || reply.parent_reply_id === parentId) {
                 const reply_id = reply.reply_id;
                 const data = {
                     reply_id: reply_id
                 }
+                //get reply detail
                 const getReplyDetail = await axios.post(API_HOST + "/api/v1/replies/getSingle", data);
                 const replyUsersId = getReplyDetail.data.data[0].user_id;
                 const UserDetail = await getUserDetail(replyUsersId);
@@ -715,12 +721,14 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
                 const targetId = {
                     target_id: reply.reply_id
                 }
+                //get reaction number
                 const getReactionAccount = await axios.post(API_HOST + "/api/v1/reactions/getCountFromTarget", targetId);
                 const ReactionAccount = getReactionAccount.data.data.reaction_count;
                 const clickedData = {
                     user_id: getUser(),
                     target_id: reply_id
                 }
+                //get clicked true or false
                 const getReactionClicked = await axios.post(API_HOST + "/api/v1/reactions/getUserReactionOfTarget", clickedData);
                 const ReactionClicked = getReactionClicked.data.data.reaction;
                 const likeClicked = ReactionClicked.like;
@@ -819,6 +827,7 @@ async function printPostReplys(parentId, handleReplyOnClick, handleReplySubmit, 
     return <div>{print}</div>;
 }
 
+//logic is same as upper function
 async function printProfileReplys(parentId) {
     const getReplys = await axios.get(API_HOST + "/api/v1/replies/getAll");
     const replys = getReplys.data.data
