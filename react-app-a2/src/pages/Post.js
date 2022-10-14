@@ -40,7 +40,7 @@ const Post = (props) => {
 
 
     // handling reaction
-    const handleReactionSubmit = async(e) => {
+    const handleReactionSubmit = async (e) => {
 
         e.target.closest("div").querySelector(".ant-spin-spinning").style.display = "inherit"
 
@@ -48,7 +48,7 @@ const Post = (props) => {
         const target_id = e.target.getAttribute("target_id");
         const reaction = e.target.getAttribute("reaction");
 
-        const success=await setReaction(getUser(), target_id,reaction);
+        const success = await setReaction(getUser(), target_id, reaction);
 
         const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
         setPostData(currentPost);
@@ -61,7 +61,7 @@ const Post = (props) => {
     const [filteringTarget, setFilteringTarget] = useState(null);
     const handleFollowSubmit = async (e) => {
 
-        $(e.target).parents(".control-tab").find(".ant-spin-spinning").css("display","inherit")
+        $(e.target).parents(".control-tab").find(".ant-spin-spinning").css("display", "inherit")
 
         const username = e.target.getAttribute("username");
         const user_id = e.target.getAttribute("user_id");
@@ -71,25 +71,33 @@ const Post = (props) => {
         console.log(e.target.getAttribute("user_id"));
         console.log(e.target.getAttribute("action"));
 
-        if(user_id === getUser()){
+        if (user_id === getUser()) {
             message.warning("You cannot follow yourself", 3)
         } else if (action === "follow") {
 
             await setFollow(user_id);
-            message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span
-                className={"clickable"} onClick={handleFollowPostFilter}
-                user_id={user_id} user_name={username}>Yes, show me the posts!</span></div>, 3)
+
+            $(".app-loading-container").css("display", "inline");
             const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
             await setPostData(currentPost);
+            $(".app-loading-container").css("display", "none");
+
+            message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span
+                className={"clickable"} onClick={await handleFollowPostFilter}
+                user_id={user_id} user_name={username}>Yes, show me the posts!</span></div>, 3)
+
 
         } else {
+            $(".app-loading-container").css("display", "inline");
             await setFollow(user_id);
             const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
             await setPostData(currentPost);
+            setFilteringTarget(null);
+            $(".app-loading-container").css("display", "none");
             message.success("You had successfully unfollow " + username + "!")
         }
 
-        $(e.target).parents(".control-tab").find(".ant-spin-spinning").css("display","none")
+        $(e.target).parents(".control-tab").find(".ant-spin-spinning").css("display", "none")
     }
 
     const handleFollowPostFilter = async (e) => {
