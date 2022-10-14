@@ -8,7 +8,7 @@ import Login from './pages/Login.js';
 import Signup from './pages/Signup.js';
 import Profile from './pages/Profile.js';
 
-import {Avatar, Button, Col, Menu, Row} from "antd";
+import {Avatar, Button, Col, Menu, Row, Spin} from "antd";
 import Logo from "./assets/logo.svg";
 import {HomeOutlined, LoginOutlined, LogoutOutlined, PicRightOutlined, UserOutlined} from "@ant-design/icons";
 import {BrowserRouter, NavLink, Routes, Route} from 'react-router-dom';
@@ -52,6 +52,10 @@ function App() {
 
     return (
         <div className="App">
+            <div className={"app-loading-container"}>
+                <Spin tip="Loading..." className={"app-loading-spinner"}></Spin>
+            </div>
+
             <BrowserRouter>
                 <Row className="header">
                     <Col span={6}>

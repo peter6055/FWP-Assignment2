@@ -1,4 +1,38 @@
 /* ----------------------------------------------------------------- GLOBAL ---- */
+.app-loading-container{
+    position: fixed;
+    z-index: 1000000;
+    width: 100%;
+    height: 100%;
+    background: #ffffffe6;
+    display: none;
+}
+
+.app-loading-spinner{
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #ff6783 !important;
+}
+
+.app-loading-spinner > .ant-spin-text {
+    margin-top: 10px;
+    margin-left: 8px;
+}
+
+.control-tab > .ant-spin-spinning{
+    display: flex;
+    justify-content: center;
+}
+
+.control-tab > .ant-spin-spinning > .ant-spin-text{
+    margin-left: 10px;
+    color: #ff6783 !important;
+
+}
+
 /* Theme color*/
 /* Buttons*/
 .ant-btn-primary {

@@ -27,6 +27,7 @@ import {
     CloseCircleFilled
 } from '@ant-design/icons';
 import axios from "axios";
+import $ from 'jquery';
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -346,7 +347,7 @@ async function printPost(handleReplySubmit, handleReplyOnClick, handleReactionSu
                             <div>
                                 <div style={{display: "flex"}} className={"control-tab"}>
                                     {post.post_time}
-                                    <Spin spinning={true} style={{"position": "absolute", "background": "rgb(255 255 255 / 83%)", "width": "110px", "display": "none", "padding": "22px 0px", "marginTop": "-23px", "z-index": "100000","right": "0px","paddingLeft": "58px"}}></Spin>
+                                    <Spin spinning={true} tip="Loading..." style={{"position": "absolute", "background": "rgb(255 255 255 / 83%)", "width": "164px", "display": "none", "padding": "22px 0px", "marginTop": "-23px", "z-index": "100000","right": "0px"}}></Spin>
                                     {follow ?
                                         <div className={"follow-btn has-follow"}
                                              style={{position: "absolute", right: 0, top: 0}}

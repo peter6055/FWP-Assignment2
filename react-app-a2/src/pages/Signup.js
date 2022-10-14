@@ -29,12 +29,20 @@ const Signup = (props) => {
         } else if (!/[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/.test(fields.password) || !/[A-Z]/.test(fields.password) || !/[0-9]/.test(fields.password) || !/[a-z]/.test(fields.password)) {
             setErrorMessage("Password should be strong");
         } else {
+
             const id= await createUsers(fields.username, fields.password, fields.email);
-            props.loginUser(id.data);
-            navigate("/Profile");
-            message.success({
-                content: 'Welcome ' + fields.username + "!",
-            });
+            console.log(id);
+
+            if(id.code !== 200){
+                setErrorMessage(id.message);
+
+            } else {
+                props.loginUser(id.data);
+                navigate("/Profile");
+                message.success({
+                    content: 'Welcome ' + fields.username + "!",
+                });
+            }
         }
     }
     // Generic change handler.

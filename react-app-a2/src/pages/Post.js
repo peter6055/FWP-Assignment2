@@ -12,7 +12,7 @@ import {
     Upload,
     Modal,
     message,
-    Spin
+    Spin, Alert
 } from "antd";
 import {PlusOutlined, LoadingOutlined} from '@ant-design/icons';
 import $ from 'jquery';
@@ -38,6 +38,7 @@ const loadingIcon = <LoadingOutlined style={{fontSize: 24}} spin/>;
 
 const Post = (props) => {
 
+
     // handling reaction
     const handleReactionSubmit = async(e) => {
 
@@ -57,6 +58,7 @@ const Post = (props) => {
     }
 
     //handling follow
+    const [filteringTarget, setFilteringTarget] = useState(null);
     const handleFollowSubmit = async (e) => {
 
         $(e.target).parents(".control-tab").find(".ant-spin-spinning").css("display","inherit")
@@ -69,30 +71,52 @@ const Post = (props) => {
         console.log(e.target.getAttribute("user_id"));
         console.log(e.target.getAttribute("action"));
 
+        if(user_id === getUser()){
+            message.warning("You cannot follow yourself", 3)
+        } else if (action === "follow") {
 
-        if (action === "follow") {
             await setFollow(user_id);
             message.success(<div>You had follow {username}, would you like to see {username}'s posts? <span
                 className={"clickable"} onClick={handleFollowPostFilter}
-                user_id={user_id}>Yes, show me the posts!</span></div>, 3)
+                user_id={user_id} user_name={username}>Yes, show me the posts!</span></div>, 3)
             const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
-            setPostData(currentPost);
+            await setPostData(currentPost);
+
         } else {
             await setFollow(user_id);
             const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
-            setPostData(currentPost);
+            await setPostData(currentPost);
             message.success("You had successfully unfollow " + username + "!")
         }
 
         $(e.target).parents(".control-tab").find(".ant-spin-spinning").css("display","none")
-
     }
 
-
     const handleFollowPostFilter = async (e) => {
+
+        $(".app-loading-container").css("display", "inline");
+
         const user_id = e.target.getAttribute("user_id");
+        const user_name = e.target.getAttribute("user_name");
+
+        setFilteringTarget(
+            <Alert
+                message={"Now filtering " + user_name + "'s post"}
+                description="Post made by other user are remove in this view. Re-click this page to undo this action."
+                type="info"
+                style={{marginBottom: "10px"}}
+                showIcon
+            />);
+
         const currentPost = await printFollowingPost(user_id, handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
         setPostData(currentPost);
+
+
+        // back to top
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+
+        $(".app-loading-container").css("display", "none");
 
     }
 
@@ -109,6 +133,10 @@ const Post = (props) => {
     };
 
     const handleReplySubmit = async (e) => {
+
+        $(".app-loading-container").css("display", "inline");
+
+
         // this is text of post
         const text = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerHTML;
         const text_length = $(e.target).closest('.reply-input-box').find('.ql-editor')[0].innerText.length;
@@ -136,7 +164,10 @@ const Post = (props) => {
         $(e.target).closest('replyinput').css({display: "none"});
 
         const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
-        setPostData(currentPost);
+        await setPostData(currentPost);
+
+        $(".app-loading-container").css("display", "none");
+
     }
 
 
@@ -147,13 +178,20 @@ const Post = (props) => {
     const [fileList, setFileList] = useState([]);
     useEffect(() => {
         async function loadPost() {
+            $(".app-loading-container").css("display", "inline");
+
             const currentUser = await getUserDetail(props.id);
             const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit)
-            setName(currentUser.data.username);
-            setPostData(currentPost);
+            await setName(currentUser.data.username);
+            await setPostData(currentPost);
+
+            $(".app-loading-container").css("display", "none");
+
         }
 
         loadPost();
+
+
     }, []);
 
 
@@ -308,6 +346,8 @@ const Post = (props) => {
 
     // onclick make a post
     const handleSubmitPost = async () => {
+        $(".app-loading-container").css("display", "inline");
+
 
         // this is text of post
         const text = document.getElementById("postTextItem").getElementsByTagName('div')[1].getElementsByClassName("ql-editor")[0].innerHTML;
@@ -331,7 +371,10 @@ const Post = (props) => {
         // clear file list
         setFileList([]);
         const currentPost = await printPost(handleReplySubmit, handleReplyOnClick, handleReactionSubmit, handleFollowSubmit);
-        setPostData(currentPost);
+        await setPostData(currentPost);
+
+        $(".app-loading-container").css("display", "none");
+
     };
     // ============================================================== Make Post ===============================
 
@@ -339,6 +382,7 @@ const Post = (props) => {
         <Row className={"postPage safeArea"} style={{display: "flex", justifyContent: "center"}}>
             <Col span={24} style={{maxWidth: "1000px"}}>
                 <div className={"postContainer"}>
+                    {filteringTarget}
                     <MakePostElement></MakePostElement>
                     {postsData}
                 </div>
